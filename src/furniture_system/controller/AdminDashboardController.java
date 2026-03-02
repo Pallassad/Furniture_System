@@ -21,6 +21,7 @@ public class AdminDashboardController {
     @FXML private Button btnEmployee;
     @FXML private Button btnCustomer;
     @FXML private Button btnProduct;
+    @FXML private Button btnFurnitureType;   // ★ MỚI
     @FXML private Button btnOrders;
     @FXML private Button btnReports;
 
@@ -42,8 +43,12 @@ public class AdminDashboardController {
             lblUsername.setText("Welcome, " +
                 SessionManager.getInstance().getCurrentAccount().getUsername());
         }
-        sidebarButtons = List.of(btnAuth, btnEmployee, btnCustomer,
-                                 btnProduct, btnOrders, btnReports);
+
+        sidebarButtons = List.of(
+            btnAuth, btnEmployee, btnCustomer,
+            btnProduct, btnFurnitureType,       // ★ MỚI
+            btnOrders, btnReports
+        );
 
         // Mặc định load Auth & Authorization
         setActive(btnAuth);
@@ -74,6 +79,13 @@ public class AdminDashboardController {
     public void showProductManagement() {
         setActive(btnProduct);
         showPlaceholder("📦 Product Management");
+    }
+
+    // ★ MỚI ──────────────────────────────────────────────────────────────────
+    @FXML
+    public void showFurnitureTypeManagement() {
+        setActive(btnFurnitureType);
+        loadView("/furniture_system/view/furniture_type_management.fxml");
     }
 
     @FXML

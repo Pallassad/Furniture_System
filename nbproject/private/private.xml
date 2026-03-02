@@ -3,13 +3,26 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/dao/AccountDAO.java</file>
-            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/model/Account.java</file>
-            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/service/AuthService.java</file>
-            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/controller/AuthController.java</file>
-            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/view/auth_management.fxml</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/config/DatabaseConfig.java</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/db.properties</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/controller/CustomerController.java</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/view/admin_dashboard.fxml</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/view/employee_management.fxml</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/view/employee_dashboard.fxml</file>
             <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/controller/AdminDashboardController.java</file>
-            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/utils/auth_management.fxml</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/controller/EmployeeDashboardController.java</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/controller/EmployeeFurnitureTypeController.java</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/controller/FurnitureTypeController.java</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/dao/FurnitureTypeDAO.java</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/model/FurnitureType.java</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/service/FurnitureTypeService.java</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/view/employee_product_filter.fxml</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/view/furniture_type_management.fxml</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/view/auth_management.fxml</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/view/customer_management.fxml</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/view/login.fxml</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/model/Employee.java</file>
+            <file>file:/E:/Projects%202/Furniture_System/src/furniture_system/model/OrderSummary.java</file>
         </group>
     </open-files>
 </project-private>

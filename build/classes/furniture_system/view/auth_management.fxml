@@ -9,7 +9,7 @@
   Controller : furniture_system.controller.AuthController
   Access     : ADMIN only
 -->
-<VBox xmlns="http://javafx.com/javafx/21"
+<VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="furniture_system.controller.AuthController"
       stylesheets="@/furniture_system/resources/css/style.css"

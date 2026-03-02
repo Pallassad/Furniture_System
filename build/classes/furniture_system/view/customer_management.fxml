@@ -8,7 +8,7 @@
   Controller : furniture_system.controller.CustomerController
   Access     : Admin (full) | Employee (search + create + history)
 -->
-<VBox xmlns="http://javafx.com/javafx/21"
+<VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="furniture_system.controller.CustomerController"
       spacing="12"

@@ -10,7 +10,7 @@
   login.fxml  –  Login screen
   Controller : furniture_system.controller.LoginController
 -->
-<StackPane xmlns="http://javafx.com/javafx/21"
+<StackPane xmlns="http://javafx.com/javafx/25"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="furniture_system.controller.LoginController"
            stylesheets="@/furniture_system/resources/css/style.css"

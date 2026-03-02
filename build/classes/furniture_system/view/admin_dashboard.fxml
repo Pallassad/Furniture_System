@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21"
+<BorderPane xmlns="http://javafx.com/javafx/25"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="furniture_system.controller.AdminDashboardController"
             prefWidth="1100" prefHeight="680"
@@ -28,7 +28,7 @@
 
     <!-- SIDEBAR -->
     <left>
-        <VBox style="-fx-background-color:#283593; -fx-pref-width:200px;"
+        <VBox style="-fx-background-color:#283593; -fx-pref-width:210px;"
               spacing="2">
             <padding><Insets top="16" right="8" bottom="16" left="8"/></padding>
             <Label text="MENU" style="-fx-text-fill:#9fa8da; -fx-font-size:11px;
@@ -58,6 +58,14 @@
 
             <Button fx:id="btnProduct" text="📦  Product Management"
                     onAction="#showProductManagement"
+                    maxWidth="Infinity"
+                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
+                           -fx-background-radius:6; -fx-cursor:hand;
+                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
+
+            <!-- ★ MỚI: Furniture Type Management -->
+            <Button fx:id="btnFurnitureType" text="🪑  Furniture Types"
+                    onAction="#showFurnitureTypeManagement"
                     maxWidth="Infinity"
                     style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
                            -fx-background-radius:6; -fx-cursor:hand;
