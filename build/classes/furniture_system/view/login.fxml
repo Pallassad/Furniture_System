@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<!--
+  login.fxml  –  Login screen
+  Controller : furniture_system.controller.LoginController
+-->
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="furniture_system.controller.LoginController"
+           stylesheets="@/furniture_system/resources/css/style.css"
+           styleClass="login-root">
+
+    <!-- Full-screen background gradient -->
+    <VBox alignment="CENTER" spacing="0">
+
+        <!-- Header banner -->
+        <VBox alignment="CENTER" spacing="6" styleClass="login-header">
+            <Label text="🪑 Fair Deal Furniture" styleClass="app-title"/>
+            <Label text="Store Management System" styleClass="app-subtitle"/>
+        </VBox>
+
+        <!-- Login card -->
+        <VBox alignment="CENTER" spacing="18" styleClass="login-card"
+              maxWidth="400" maxHeight="400">
+
+            <padding><Insets top="36" right="40" bottom="36" left="40"/></padding>
+
+            <Label text="Sign In" styleClass="card-title"/>
+
+            <!-- Username -->
+            <VBox spacing="4">
+                <Label text="Username" styleClass="field-label"/>
+                <TextField fx:id="usernameField"
+                           promptText="Enter your username"
+                           styleClass="login-field"/>
+            </VBox>
+
+            <!-- Password -->
+            <VBox spacing="4">
+                <Label text="Password" styleClass="field-label"/>
+                <PasswordField fx:id="passwordField"
+                               promptText="Enter your password"
+                               styleClass="login-field"/>
+            </VBox>
+
+            <!-- Error message -->
+            <Label fx:id="errorLabel"
+                   text=""
+                   styleClass="error-label"
+                   wrapText="true"
+                   maxWidth="320"
+                   visible="false"/>
+
+            <!-- Buttons -->
+            <HBox spacing="12" alignment="CENTER_RIGHT">
+                <Button text="Exit"
+                        onAction="#handleExit"
+                        styleClass="btn-secondary"/>
+                <Button fx:id="loginButton"
+                        text="Login"
+                        defaultButton="true"
+                        onAction="#handleLogin"
+                        styleClass="btn-primary"/>
+            </HBox>
+
+        </VBox>
+
+        <!-- Footer -->
+        <Label text="© 2026 Fair Deal Store  |  v1.0"
+               styleClass="login-footer"/>
+
+    </VBox>
+</StackPane>

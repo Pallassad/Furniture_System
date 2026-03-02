@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+  customer_management.fxml
+  Controller : furniture_system.controller.CustomerController
+  Access     : Admin (full) | Employee (search + create + history)
+-->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.CustomerController"
+      spacing="12"
+      style="-fx-background-color:#f5f6fa; -fx-padding:20 24 16 24;">
+
+    <!-- ── Page header ──────────────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="👤 Customer Management"
+               style="-fx-font-size:20px;-fx-font-weight:bold;-fx-text-fill:#1a237e;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnStats" text="📊  Statistics"
+                onAction="#handleStats"
+                style="-fx-background-color:#7b1fa2;-fx-text-fill:white;
+                       -fx-background-radius:6;-fx-padding:7 14;-fx-cursor:hand;"/>
+    </HBox>
+
+    <Separator/>
+
+    <!-- ── Toolbar ──────────────────────────────────────────────────────── -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField"
+                   promptText="🔍  Search by name / phone / email / status / ID..."
+                   prefWidth="380"
+                   style="-fx-background-radius:6;-fx-border-color:#c5cae9;
+                          -fx-border-radius:6;-fx-padding:6 10;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnRefresh" text="⟳  Refresh"
+                onAction="#handleRefresh"
+                style="-fx-background-color:transparent;-fx-border-color:#3949ab;
+                       -fx-border-radius:6;-fx-text-fill:#3949ab;
+                       -fx-padding:7 14;-fx-cursor:hand;"/>
+        <Button fx:id="btnAdd" text="➕  Add Customer"
+                onAction="#handleAdd"
+                style="-fx-background-color:#3949ab;-fx-text-fill:white;
+                       -fx-background-radius:6;-fx-padding:7 14;
+                       -fx-font-weight:bold;-fx-cursor:hand;"/>
+        <Button fx:id="btnEdit" text="✏  Edit"
+                onAction="#handleEdit"
+                style="-fx-background-color:#f57c00;-fx-text-fill:white;
+                       -fx-background-radius:6;-fx-padding:7 14;-fx-cursor:hand;"/>
+        <Button fx:id="btnDelete" text="🗑  Remove"
+                onAction="#handleDelete"
+                style="-fx-background-color:#c62828;-fx-text-fill:white;
+                       -fx-background-radius:6;-fx-padding:7 14;-fx-cursor:hand;"/>
+        <Button fx:id="btnHistory" text="🛒  Purchase History"
+                onAction="#handleHistory"
+                style="-fx-background-color:#00695c;-fx-text-fill:white;
+                       -fx-background-radius:6;-fx-padding:7 14;-fx-cursor:hand;"/>
+    </HBox>
+
+    <!-- ── Table ────────────────────────────────────────────────────────── -->
+    <TableView fx:id="customerTable" VBox.vgrow="ALWAYS"
+               style="-fx-background-color:white;-fx-border-color:#e0e0e0;
+                      -fx-border-radius:6;-fx-background-radius:6;">
+        <columns>
+            <TableColumn fx:id="colId"        text="ID"         prefWidth="60"/>
+            <TableColumn fx:id="colFullName"  text="Full Name"  prefWidth="190"/>
+            <TableColumn fx:id="colPhone"     text="Phone"      prefWidth="120"/>
+            <TableColumn fx:id="colEmail"     text="Email"      prefWidth="200"/>
+            <TableColumn fx:id="colGender"    text="Gender"     prefWidth="90"/>
+            <TableColumn fx:id="colStatus"    text="Status"     prefWidth="90"/>
+            <TableColumn fx:id="colCreatedAt" text="Created At" prefWidth="145"/>
+        </columns>
+        <placeholder>
+            <Label text="No customers found."
+                   style="-fx-text-fill:#9e9e9e;-fx-font-style:italic;"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Legend ───────────────────────────────────────────────────────── -->
+    <HBox spacing="18" alignment="CENTER_LEFT" style="-fx-padding:2 0 0 4;">
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <Label style="-fx-background-color:#e8e8e8;-fx-min-width:16px;
+                          -fx-min-height:16px;-fx-background-radius:3;"/>
+            <Label text="INACTIVE" style="-fx-font-size:11px;-fx-text-fill:#555;"/>
+        </HBox>
+    </HBox>
+
+    <!-- ── Status bar ───────────────────────────────────────────────────── -->
+    <HBox style="-fx-background-color:#e8eaf6;-fx-background-radius:4;-fx-padding:6 12;"
+          alignment="CENTER_LEFT" spacing="6">
+        <Label text="ℹ"/>
+        <Label fx:id="statusBarLabel" text="Ready."
+               style="-fx-text-fill:#37474f;-fx-font-size:12px;"/>
+    </HBox>
+
+</VBox>
