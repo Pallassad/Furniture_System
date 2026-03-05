@@ -26,18 +26,19 @@ import java.util.Locale;
 
 public class CustomerController {
 
-    private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private static final NumberFormat      CUR_FMT = NumberFormat.getNumberInstance(new Locale("vi","VN"));
+    private static final DateTimeFormatter DT_FMT  = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final NumberFormat      CUR_FMT  =
+            NumberFormat.getNumberInstance(Locale.of("vi", "VN")); // ✅ fix deprecated new Locale()
 
     // ── Table ─────────────────────────────────────────────────────────────────
-    @FXML private TableView<Customer>           customerTable;
-    @FXML private TableColumn<Customer,Integer> colId;
-    @FXML private TableColumn<Customer,String>  colFullName;
-    @FXML private TableColumn<Customer,String>  colPhone;
-    @FXML private TableColumn<Customer,String>  colEmail;
-    @FXML private TableColumn<Customer,String>  colGender;
-    @FXML private TableColumn<Customer,String>  colStatus;
-    @FXML private TableColumn<Customer,String>  colCreatedAt;
+    @FXML private TableView<Customer>            customerTable;
+    @FXML private TableColumn<Customer, Integer> colId;
+    @FXML private TableColumn<Customer, String>  colFullName;
+    @FXML private TableColumn<Customer, String>  colPhone;
+    @FXML private TableColumn<Customer, String>  colEmail;
+    @FXML private TableColumn<Customer, String>  colGender;
+    @FXML private TableColumn<Customer, String>  colStatus;
+    @FXML private TableColumn<Customer, String>  colCreatedAt;
 
     // ── Toolbar ───────────────────────────────────────────────────────────────
     @FXML private TextField searchField;
@@ -50,10 +51,9 @@ public class CustomerController {
     @FXML private Label     statusBarLabel;
 
     // ── State ─────────────────────────────────────────────────────────────────
-    private final CustomerService            service  = new CustomerService();
-    private final ObservableList<Customer>   data     = FXCollections.observableArrayList();
-    private final boolean                    isAdmin  =
-            SessionManager.getInstance().isAdmin();
+    private final CustomerService          service = new CustomerService();
+    private final ObservableList<Customer> data    = FXCollections.observableArrayList();
+    private final boolean                  isAdmin = SessionManager.getInstance().isAdmin();
 
     // ─────────────────────────────────────────────────────────────────────────
     @FXML
@@ -63,15 +63,15 @@ public class CustomerController {
 
         customerTable.getSelectionModel().selectedItemProperty().addListener((o, old, sel) -> {
             boolean has = sel != null;
-            if (btnEdit   != null) btnEdit.setDisable(!has || !isAdmin);
-            if (btnDelete != null) btnDelete.setDisable(!has || !isAdmin);
-            if (btnHistory!= null) btnHistory.setDisable(!has);
+            if (btnEdit    != null) btnEdit.setDisable(!has || !isAdmin);
+            if (btnDelete  != null) btnDelete.setDisable(!has || !isAdmin);
+            if (btnHistory != null) btnHistory.setDisable(!has);
         });
-        if (btnEdit   != null) btnEdit.setDisable(true);
-        if (btnDelete != null) btnDelete.setDisable(true);
-        if (btnHistory!= null) btnHistory.setDisable(true);
-        if (btnAdd    != null) btnAdd.setVisible(isAdmin);
-        if (btnStats  != null) btnStats.setVisible(isAdmin);
+        if (btnEdit    != null) btnEdit.setDisable(true);
+        if (btnDelete  != null) btnDelete.setDisable(true);
+        if (btnHistory != null) btnHistory.setDisable(true);
+        if (btnAdd     != null) btnAdd.setVisible(isAdmin);
+        if (btnStats   != null) btnStats.setVisible(isAdmin);
 
         searchField.textProperty().addListener((o, old, v) -> handleSearch());
     }
@@ -79,30 +79,31 @@ public class CustomerController {
     // ── Columns ───────────────────────────────────────────────────────────────
     private void setupColumns() {
         colId.setCellValueFactory(c ->
-            new SimpleIntegerProperty(c.getValue().getCustomerId()).asObject());
+                new SimpleIntegerProperty(c.getValue().getCustomerId()).asObject());
         colFullName.setCellValueFactory(c ->
-            new SimpleStringProperty(c.getValue().getFullName()));
+                new SimpleStringProperty(c.getValue().getFullName()));
         colPhone.setCellValueFactory(c ->
-            new SimpleStringProperty(c.getValue().getPhone()));
+                new SimpleStringProperty(c.getValue().getPhone()));
         colEmail.setCellValueFactory(c ->
-            new SimpleStringProperty(nvl(c.getValue().getEmail())));
+                new SimpleStringProperty(nvl(c.getValue().getEmail())));
         colGender.setCellValueFactory(c ->
-            new SimpleStringProperty(c.getValue().getGender() != null
-                ? c.getValue().getGender().name() : "—"));
+                new SimpleStringProperty(c.getValue().getGender() != null
+                        ? c.getValue().getGender().name() : "—"));
         colStatus.setCellValueFactory(c ->
-            new SimpleStringProperty(c.getValue().getStatus().name()));
+                new SimpleStringProperty(c.getValue().getStatus().name()));
         colCreatedAt.setCellValueFactory(c -> {
             var dt = c.getValue().getCreatedAt();
             return new SimpleStringProperty(dt != null ? dt.format(DT_FMT) : "—");
         });
 
-        // Row colouring: INACTIVE = grey
-        customerTable.setRowFactory(tv -> new TableRow<>() {
-            @Override protected void updateItem(Customer item, boolean empty) {
+        // Row colouring: INACTIVE = grey ✅ typed TableRow — no raw type
+        customerTable.setRowFactory(tv -> new TableRow<Customer>() {
+            @Override
+            protected void updateItem(Customer item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) { setStyle(""); return; }
                 setStyle(item.getStatus() == Status.INACTIVE
-                    ? "-fx-background-color:#e8e8e8;" : "");
+                        ? "-fx-background-color:#e8e8e8;" : "");
             }
         });
         customerTable.setItems(data);
@@ -112,7 +113,9 @@ public class CustomerController {
         try {
             data.setAll(service.getAll());
             setStatus("Loaded " + data.size() + " customer(s).");
-        } catch (Exception e) { showError("Load failed", e.getMessage()); }
+        } catch (Exception e) {
+            showError("Load failed", e.getMessage());
+        }
     }
 
     // ── Search ────────────────────────────────────────────────────────────────
@@ -120,7 +123,9 @@ public class CustomerController {
         try {
             data.setAll(service.search(searchField.getText()));
             setStatus("Found " + data.size() + " result(s).");
-        } catch (Exception e) { showError("Search error", e.getMessage()); }
+        } catch (Exception e) {
+            showError("Search error", e.getMessage());
+        }
     }
 
     @FXML public void handleRefresh() { searchField.clear(); loadAll(); }
@@ -139,30 +144,35 @@ public class CustomerController {
         Customer sel = customerTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-            "Remove customer [" + sel.getFullName() + "]?\n\n" +
-            "• Has orders → set INACTIVE\n• No orders → permanently deleted",
-            ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirm Remove"); confirm.setHeaderText(null);
+                "Remove customer [" + sel.getFullName() + "]?\n\n" +
+                "• Has orders → set INACTIVE\n• No orders → permanently deleted",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirm Remove");
+        confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
                 String r = service.removeCustomer(sel.getCustomerId());
                 setStatus(r.equals("SOFT")
-                    ? "Customer set to INACTIVE (has order history)."
-                    : "Customer permanently deleted.");
+                        ? "Customer set to INACTIVE (has order history)."
+                        : "Customer permanently deleted.");
                 loadAll();
-            } catch (Exception e) { showError("Remove failed", e.getMessage()); }
+            } catch (Exception e) {
+                showError("Remove failed", e.getMessage());
+            }
         });
     }
 
-    // ── 4.9.3 Purchase History ────────────────────────────────────────────────
+    // ── Purchase History ──────────────────────────────────────────────────────
     @FXML public void handleHistory() {
         Customer sel = customerTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
         try {
             List<OrderSummary> orders = service.getPurchaseHistory(sel.getCustomerId());
             showHistoryDialog(sel, orders);
-        } catch (Exception e) { showError("History error", e.getMessage()); }
+        } catch (Exception e) {
+            showError("History error", e.getMessage());
+        }
     }
 
     // ── Statistics ────────────────────────────────────────────────────────────
@@ -188,15 +198,15 @@ public class CustomerController {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle(isEdit ? "Edit Customer" : "Add New Customer");
 
-        TextField      tfName   = new TextField();
-        TextField      tfPhone  = new TextField();
-        TextField      tfEmail  = new TextField();
-        ComboBox<String> cbGender = new ComboBox<>(
-            FXCollections.observableArrayList("—", "MALE", "FEMALE", "OTHER"));
-        ComboBox<Status> cbStatus = new ComboBox<>(
-            FXCollections.observableArrayList(Status.values()));
+        TextField        tfName    = new TextField();
+        TextField        tfPhone   = new TextField();
+        TextField        tfEmail   = new TextField();
+        ComboBox<String> cbGender  = new ComboBox<>(
+                FXCollections.observableArrayList("—", "MALE", "FEMALE", "OTHER"));
+        ComboBox<Status> cbStatus  = new ComboBox<>(
+                FXCollections.observableArrayList(Status.values()));
         Label lblErr = new Label();
-        lblErr.setStyle("-fx-text-fill:#c62828;-fx-font-size:12px;");
+        lblErr.setStyle("-fx-text-fill:#c62828; -fx-font-size:12px;");
         lblErr.setWrapText(true);
 
         // Pre-fill
@@ -210,14 +220,13 @@ public class CustomerController {
             cbGender.setValue("—");
             cbStatus.setValue(Status.ACTIVE);
         }
-        // Employees cannot change status
         if (!isAdmin) { cbStatus.setDisable(true); cbStatus.setValue(Status.ACTIVE); }
 
-        // Layout
         GridPane grid = new GridPane();
         grid.setHgap(12); grid.setVgap(10);
         grid.setPadding(new Insets(24));
-        grid.getColumnConstraints().addAll(new ColumnConstraints(110), new ColumnConstraints(260));
+        grid.getColumnConstraints().addAll(
+                new ColumnConstraints(110), new ColumnConstraints(260));
 
         int row = 0;
         grid.add(lbl("Full Name *"), 0, row); grid.add(tfName,   1, row++);
@@ -229,9 +238,9 @@ public class CustomerController {
 
         Button btnSave   = new Button(isEdit ? "💾  Save Changes" : "➕  Add Customer");
         Button btnCancel = new Button("Cancel");
-        btnSave.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;" +
-            "-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;");
-        btnCancel.setStyle("-fx-background-radius:6;-fx-padding:8 18;");
+        btnSave.setStyle("-fx-background-color:#3949ab; -fx-text-fill:white;" +
+                " -fx-background-radius:6; -fx-padding:8 18; -fx-font-weight:bold;");
+        btnCancel.setStyle("-fx-background-radius:6; -fx-padding:8 18;");
         HBox btns = new HBox(10, btnCancel, btnSave);
         btns.setAlignment(Pos.CENTER_RIGHT);
         grid.add(btns, 0, row, 2, 1);
@@ -285,48 +294,45 @@ public class CustomerController {
 
         // Customer info bar
         HBox info = new HBox(20);
-        info.setStyle("-fx-background-color:#e8eaf6;-fx-background-radius:6;-fx-padding:10 14;");
+        info.setStyle("-fx-background-color:#e8eaf6; -fx-background-radius:6; -fx-padding:10 14;");
         info.getChildren().addAll(
-            infoChip("ID",     String.valueOf(customer.getCustomerId())),
-            infoChip("Name",   customer.getFullName()),
-            infoChip("Phone",  customer.getPhone()),
-            infoChip("Email",  nvl(customer.getEmail())),
-            infoChip("Orders", String.valueOf(orders.size()))
+                infoChip("ID",     String.valueOf(customer.getCustomerId())),
+                infoChip("Name",   customer.getFullName()),
+                infoChip("Phone",  customer.getPhone()),
+                infoChip("Email",  nvl(customer.getEmail())),
+                infoChip("Orders", String.valueOf(orders.size()))
         );
         root.getChildren().add(info);
 
         if (orders.isEmpty()) {
             Label empty = new Label("No purchase history found.");
-            empty.setStyle("-fx-font-size:14px;-fx-text-fill:#9e9e9e;-fx-font-style:italic;");
+            empty.setStyle("-fx-font-size:14px; -fx-text-fill:#9e9e9e; -fx-font-style:italic;");
             root.getChildren().add(empty);
         } else {
-            // Total spent summary
             BigDecimal totalSpent = orders.stream()
-                .filter(o -> !List.of("CANCELLED","RETURNED").contains(o.getStatus()))
-                .map(OrderSummary::getFinalTotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    .filter(o -> !List.of("CANCELLED", "RETURNED").contains(o.getStatus()))
+                    .map(OrderSummary::getFinalTotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
             Label lblTotal = new Label("Total Spent (excl. cancelled): "
-                + CUR_FMT.format(totalSpent) + " VND");
-            lblTotal.setStyle("-fx-font-weight:bold;-fx-font-size:13px;-fx-text-fill:#1a237e;");
+                    + CUR_FMT.format(totalSpent) + " VND");
+            lblTotal.setStyle("-fx-font-weight:bold; -fx-font-size:13px; -fx-text-fill:#1a237e;");
             root.getChildren().add(lblTotal);
 
             ScrollPane scroll = new ScrollPane();
             scroll.setFitToWidth(true);
             VBox orderList = new VBox(10);
             orderList.setPadding(new Insets(4));
-
             for (OrderSummary o : orders) {
-                TitledPane pane = buildOrderPane(o);
-                orderList.getChildren().add(pane);
+                orderList.getChildren().add(buildOrderPane(o));
             }
             scroll.setContent(orderList);
-            VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
+            VBox.setVgrow(scroll, Priority.ALWAYS);
             root.getChildren().add(scroll);
         }
 
         Button btnClose = new Button("Close");
-        btnClose.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;" +
-            "-fx-background-radius:6;-fx-padding:8 20;");
+        btnClose.setStyle("-fx-background-color:#3949ab; -fx-text-fill:white;" +
+                " -fx-background-radius:6; -fx-padding:8 20;");
         btnClose.setOnAction(e -> dlg.close());
         HBox footer = new HBox(btnClose);
         footer.setAlignment(Pos.CENTER_RIGHT);
@@ -340,49 +346,52 @@ public class CustomerController {
         String orderStatus   = o.getStatus();
         String billingStatus = o.getBillingStatus() != null ? o.getBillingStatus() : "—";
         String color = switch (orderStatus) {
-            case "COMPLETED"  -> "#1b5e20";
-            case "CANCELLED","RETURNED" -> "#b71c1c";
-            case "DELIVERING" -> "#e65100";
-            default           -> "#1a237e";
+            case "COMPLETED"            -> "#1b5e20";
+            case "CANCELLED", "RETURNED"-> "#b71c1c";
+            case "DELIVERING"           -> "#e65100";
+            default                     -> "#1a237e";
         };
 
         String title = String.format("Order #%d  |  %s  |  %s  |  💰 %s VND  |  🧾 %s",
-            o.getOrderId(),
-            o.getOrderDate() != null ? o.getOrderDate().format(DT_FMT) : "—",
-            orderStatus,
-            CUR_FMT.format(o.getFinalTotal()),
-            billingStatus);
+                o.getOrderId(),
+                o.getOrderDate() != null ? o.getOrderDate().format(DT_FMT) : "—",
+                orderStatus,
+                CUR_FMT.format(o.getFinalTotal()),
+                billingStatus);
 
         VBox content = new VBox(8);
         content.setPadding(new Insets(10));
 
-        // Summary row
         HBox summary = new HBox(24);
         summary.getChildren().addAll(
-            chip("SubTotal",  CUR_FMT.format(o.getSubTotal()) + " VND"),
-            chip("Discount",  CUR_FMT.format(o.getDiscount()) + " VND"),
-            chip("Final",     CUR_FMT.format(o.getFinalTotal()) + " VND"),
-            chip("Payment",   nvl(o.getPaymentMethod()))
+                chip("SubTotal", CUR_FMT.format(o.getSubTotal())   + " VND"),
+                chip("Discount", CUR_FMT.format(o.getDiscount())   + " VND"),
+                chip("Final",    CUR_FMT.format(o.getFinalTotal()) + " VND"),
+                chip("Payment",  nvl(o.getPaymentMethod()))
         );
         content.getChildren().add(summary);
 
-        // Order lines table
         if (o.getLines() != null && !o.getLines().isEmpty()) {
+            // ✅ fully typed TableView — no raw/unchecked
             TableView<OrderLineItem> tbl = new TableView<>();
             tbl.setPrefHeight(110);
             tbl.setStyle("-fx-font-size:12px;");
 
-            TableColumn<OrderLineItem,String>     cProd  = new TableColumn<>("Product");
-            TableColumn<OrderLineItem,Integer>    cQty   = new TableColumn<>("Qty");
-            TableColumn<OrderLineItem,String>     cPrice = new TableColumn<>("Unit Price");
-            TableColumn<OrderLineItem,String>     cTotal = new TableColumn<>("Line Total");
+            TableColumn<OrderLineItem, String>  cProd  = new TableColumn<>("Product");
+            TableColumn<OrderLineItem, Integer> cQty   = new TableColumn<>("Qty");
+            TableColumn<OrderLineItem, String>  cPrice = new TableColumn<>("Unit Price");
+            TableColumn<OrderLineItem, String>  cTotal = new TableColumn<>("Line Total");
             cProd.setPrefWidth(220); cQty.setPrefWidth(60);
             cPrice.setPrefWidth(130); cTotal.setPrefWidth(130);
 
-            cProd.setCellValueFactory(c  -> new SimpleStringProperty(c.getValue().getProductName()));
-            cQty.setCellValueFactory(c   -> new SimpleIntegerProperty(c.getValue().getQuantity()).asObject());
-            cPrice.setCellValueFactory(c -> new SimpleStringProperty(CUR_FMT.format(c.getValue().getUnitPrice())));
-            cTotal.setCellValueFactory(c -> new SimpleStringProperty(CUR_FMT.format(c.getValue().getLineTotal())));
+            cProd.setCellValueFactory(c  ->
+                    new SimpleStringProperty(c.getValue().getProductName()));
+            cQty.setCellValueFactory(c   ->
+                    new SimpleIntegerProperty(c.getValue().getQuantity()).asObject());
+            cPrice.setCellValueFactory(c ->
+                    new SimpleStringProperty(CUR_FMT.format(c.getValue().getUnitPrice())));
+            cTotal.setCellValueFactory(c ->
+                    new SimpleStringProperty(CUR_FMT.format(c.getValue().getLineTotal())));
 
             tbl.getColumns().addAll(cProd, cQty, cPrice, cTotal);
             tbl.setItems(FXCollections.observableArrayList(o.getLines()));
@@ -395,7 +404,7 @@ public class CustomerController {
 
         TitledPane pane = new TitledPane(title, content);
         pane.setExpanded(false);
-        pane.setStyle("-fx-text-fill:" + color + ";-fx-font-weight:bold;");
+        pane.setStyle("-fx-text-fill:" + color + "; -fx-font-weight:bold;");
         return pane;
     }
 
@@ -403,8 +412,11 @@ public class CustomerController {
     private Tab buildStatusTab() {
         PieChart chart = new PieChart();
         chart.setTitle("Customers by Status");
+        // ✅ cast to Number then doubleValue() — no unchecked warning
         service.countByStatus().forEach(r ->
-            chart.getData().add(new PieChart.Data((String)r[0], (Integer)r[1])));
+                chart.getData().add(new PieChart.Data(
+                        (String) r[0],
+                        ((Number) r[1]).doubleValue())));
         return new Tab("By Status", chart);
     }
 
@@ -412,28 +424,36 @@ public class CustomerController {
         PieChart chart = new PieChart();
         chart.setTitle("Customers by Gender");
         service.countByGender().forEach(r ->
-            chart.getData().add(new PieChart.Data((String)r[0], (Integer)r[1])));
+                chart.getData().add(new PieChart.Data(
+                        (String) r[0],
+                        ((Number) r[1]).doubleValue()))); // ✅
         return new Tab("By Gender", chart);
     }
 
     private Tab buildMonthTab() {
-        BarChart<String,Number> chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
+        BarChart<String, Number> chart =
+                new BarChart<>(new CategoryAxis(), new NumberAxis());
         chart.setTitle("New Customers per Month (last 12 months)");
         chart.setLegendVisible(false);
-        XYChart.Series<String,Number> s = new XYChart.Series<>();
-        service.newByMonth().forEach(r -> s.getData().add(
-            new XYChart.Data<>((String)r[0], (Integer)r[1])));
+        XYChart.Series<String, Number> s = new XYChart.Series<>();
+        service.newByMonth().forEach(r ->
+                s.getData().add(new XYChart.Data<>(
+                        (String) r[0],
+                        ((Number) r[1]).intValue()))); // ✅
         chart.getData().add(s);
         return new Tab("New by Month", chart);
     }
 
     private Tab buildTopTab() {
-        BarChart<Number,String> chart = new BarChart<>(new NumberAxis(), new CategoryAxis());
+        BarChart<Number, String> chart =
+                new BarChart<>(new NumberAxis(), new CategoryAxis());
         chart.setTitle("Top 5 Customers by Spending");
         chart.setLegendVisible(false);
-        XYChart.Series<Number,String> s = new XYChart.Series<>();
-        service.topSpenders().forEach(r -> s.getData().add(
-            new XYChart.Data<>((BigDecimal)r[1], (String)r[0])));
+        XYChart.Series<Number, String> s = new XYChart.Series<>();
+        service.topSpenders().forEach(r ->
+                s.getData().add(new XYChart.Data<>(
+                        ((Number) r[1]).doubleValue(), // ✅ thay (BigDecimal)
+                        (String) r[0])));
         chart.getData().add(s);
         return new Tab("Top Spenders", chart);
     }
@@ -441,26 +461,29 @@ public class CustomerController {
     // ── Helpers ───────────────────────────────────────────────────────────────
     private Label lbl(String t) {
         Label l = new Label(t);
-        l.setStyle("-fx-font-weight:bold;-fx-font-size:12px;");
+        l.setStyle("-fx-font-weight:bold; -fx-font-size:12px;");
         return l;
     }
+
     private HBox infoChip(String k, String v) {
         Label l = new Label(k + ": ");
-        l.setStyle("-fx-font-size:12px;-fx-text-fill:#555;");
+        l.setStyle("-fx-font-size:12px; -fx-text-fill:#555;");
         Label val = new Label(v);
-        val.setStyle("-fx-font-size:12px;-fx-font-weight:bold;-fx-text-fill:#1a237e;");
+        val.setStyle("-fx-font-size:12px; -fx-font-weight:bold; -fx-text-fill:#1a237e;");
         return new HBox(2, l, val);
     }
+
     private VBox chip(String k, String v) {
         Label lk = new Label(k);
-        lk.setStyle("-fx-font-size:10px;-fx-text-fill:#888;");
+        lk.setStyle("-fx-font-size:10px; -fx-text-fill:#888;");
         Label lv = new Label(v);
-        lv.setStyle("-fx-font-size:12px;-fx-font-weight:bold;");
+        lv.setStyle("-fx-font-size:12px; -fx-font-weight:bold;");
         return new VBox(1, lk, lv);
     }
-    private String nvl(String s) { return s == null ? "" : s; }
-    private void setStatus(String m) { if (statusBarLabel!=null) statusBarLabel.setText(m); }
-    private void showError(String t, String m) {
+
+    private String nvl(String s)      { return s == null ? "" : s; }
+    private void   setStatus(String m) { if (statusBarLabel != null) statusBarLabel.setText(m); }
+    private void   showError(String t, String m) {
         Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle(t); a.setHeaderText(null); a.setContentText(m); a.showAndWait();
     }

@@ -19,7 +19,8 @@ public class EmployeeDashboardController {
 
     @FXML private Button btnOrders;
     @FXML private Button btnCustomer;
-    @FXML private Button btnFurnitureType;   // ★ MỚI
+    @FXML private Button btnFurnitureType;
+    @FXML private Button btnProducts;      // ★ MỚI
     @FXML private Button btnInventory;
     @FXML private Button btnWarranty;
 
@@ -44,11 +45,11 @@ public class EmployeeDashboardController {
 
         sidebarButtons = List.of(
             btnOrders, btnCustomer,
-            btnFurnitureType,                   // ★ MỚI
+            btnFurnitureType,
+            btnProducts,                        // ★ MỚI
             btnInventory, btnWarranty
         );
 
-        // Mặc định active nút đầu tiên
         setActive(btnOrders);
         showPlaceholder("🛒 Sales / Orders");
     }
@@ -67,7 +68,6 @@ public class EmployeeDashboardController {
         loadView("/furniture_system/view/customer_management.fxml");
     }
 
-    // ★ MỚI ──────────────────────────────────────────────────────────────────
     @FXML
     public void showFurnitureTypeFilter() {
         setActive(btnFurnitureType);
@@ -75,9 +75,15 @@ public class EmployeeDashboardController {
     }
 
     @FXML
+    public void showProducts() {                // ★ MỚI
+        setActive(btnProducts);
+        loadView("/furniture_system/view/employee_furniture_management.fxml");
+    }
+
+    @FXML
     public void showInventory() {
         setActive(btnInventory);
-        showPlaceholder("📦 Inventory Check");
+        loadView("/furniture_system/view/employee_stock_view.fxml"); // ★ ĐÃ CẬP NHẬT
     }
 
     @FXML

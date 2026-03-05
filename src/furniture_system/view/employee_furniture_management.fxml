@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    employee_furniture_management.fxml
+    Read-only: shows ACTIVE products only.
+    No Add / Edit / Delete buttons.
+-->
+<BorderPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="furniture_system.controller.EmployeeFurnitureController"
+            styleClass="content-root"
+            stylesheets="@../resources/css/emp.css"
+            prefWidth="1100" prefHeight="700">
+
+    <!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="14" styleClass="page-header-bar">
+            <Label text="🛋  Furniture Catalog"
+                   styleClass="app-title" style="-fx-font-size:19px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblCount" styleClass="badge-label"/>
+        </HBox>
+    </top>
+
+    <!-- ══ BODY ════════════════════════════════════════════════════════════ -->
+    <center>
+        <SplitPane dividerPositions="0.64"
+                   style="-fx-background-color:#f5f6fa; -fx-padding:12; -fx-box-border:transparent;">
+
+            <!-- LEFT: Table panel -->
+            <VBox spacing="10" styleClass="action-pane" style="-fx-padding:14;">
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <TextField fx:id="txtSearch" styleClass="login-field"
+                               promptText="🔍  Search by product name or category…"
+                               HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="txtMinPrice" styleClass="login-field"
+                               promptText="Min price" prefWidth="105"/>
+                    <Label text="–" style="-fx-text-fill:#555;"/>
+                    <TextField fx:id="txtMaxPrice" styleClass="login-field"
+                               promptText="Max price" prefWidth="105"/>
+                    <Button text="Search" onAction="#handleSearch"      styleClass="btn-primary"/>
+                    <Button text="Reset"  onAction="#handleClearSearch" styleClass="btn-secondary"/>
+                </HBox>
+
+                <Label fx:id="lblMessage" wrapText="true" styleClass="hint-label"/>
+
+                <TableView fx:id="tableView" VBox.vgrow="ALWAYS" styleClass="table-view">
+                    <columns>
+                        <TableColumn fx:id="colId"       text="ID"            prefWidth="55"/>
+                        <TableColumn fx:id="colName"     text="Product Name"  prefWidth="210"/>
+                        <TableColumn fx:id="colType"     text="Category"      prefWidth="125"/>
+                        <TableColumn fx:id="colSupplier" text="Supplier"      prefWidth="120"/>
+                        <TableColumn fx:id="colPrice"    text="Price"         prefWidth="120"/>
+                        <TableColumn fx:id="colWarranty" text="Warranty (mo)" prefWidth="100"/>
+                        <TableColumn fx:id="colStatus"   text="Status"        prefWidth="80"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="No active products found." styleClass="table-placeholder"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+
+            <!-- RIGHT: Detail panel -->
+            <VBox spacing="12" styleClass="action-pane" style="-fx-padding:20;">
+                <Label text="Product Detail" styleClass="page-title"
+                       style="-fx-font-size:16px;"/>
+                <Separator styleClass="separator"/>
+
+                <GridPane hgap="10" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="90" halignment="RIGHT"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <Label text="Name:"     styleClass="field-label"
+                           GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Label fx:id="lblDetailName" text="—" wrapText="true"
+                           style="-fx-font-weight:bold; -fx-font-size:14px;"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                    <Label text="Category:" styleClass="field-label"
+                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <Label fx:id="lblDetailType" text="—"
+                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                    <Label text="Supplier:" styleClass="field-label"
+                           GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <Label fx:id="lblDetailSupplier" text="—"
+                           GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                    <Label text="Price:"    styleClass="field-label"
+                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <Label fx:id="lblDetailPrice" text="—"
+                           style="-fx-text-fill:#27ae60; -fx-font-weight:bold; -fx-font-size:14px;"
+                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                    <Label text="Warranty:" styleClass="field-label"
+                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <Label fx:id="lblDetailWarranty" text="—"
+                           GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                    <Label text="Status:"   styleClass="field-label"
+                           GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                    <Label fx:id="lblDetailStatus" text="—"
+                           style="-fx-text-fill:#27ae60; -fx-font-weight:bold;"
+                           GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                </GridPane>
+
+                <Separator styleClass="separator"/>
+
+                <Label text="Description" styleClass="field-label"/>
+                <TextArea fx:id="txtDetailDescription"
+                          wrapText="true" editable="false" VBox.vgrow="ALWAYS"
+                          prefRowCount="6" styleClass="text-area"
+                          style="-fx-background-color:#f5f6fa;"/>
+
+                <Label text="ℹ  Click any row to view product details."
+                       styleClass="hint-label"/>
+            </VBox>
+
+        </SplitPane>
+    </center>
+
+</BorderPane>

@@ -1,6 +1,6 @@
 /* ============================================================
    style.css  –  Furniture System UI Theme
-   Covers: Login screen, Auth management, shared components
+   Covers: Login, Forgot Password (Step 1/2/3), shared components
    ============================================================ */
 
 /* ── Root & Body ──────────────────────────────────────────── */
@@ -22,8 +22,8 @@
 }
 
 .app-title {
-    -fx-text-fill:  white;
-    -fx-font-size:  28px;
+    -fx-text-fill:   white;
+    -fx-font-size:   28px;
     -fx-font-weight: bold;
 }
 
@@ -45,7 +45,13 @@
     -fx-font-size:   22px;
     -fx-font-weight: bold;
     -fx-text-fill:   #1a237e;
-    -fx-padding:     0 0 8 0;
+    -fx-padding:     0 0 4 0;
+}
+
+.card-subtitle {
+    -fx-font-size:  13px;
+    -fx-text-fill:  #757575;
+    -fx-padding:    0 0 4 0;
 }
 
 .field-label {
@@ -54,33 +60,229 @@
     -fx-text-fill:   #555;
 }
 
+.field-req {
+    -fx-text-fill:  #c62828;
+    -fx-font-size:  12px;
+    -fx-font-weight: bold;
+}
+
 .login-field {
-    -fx-pref-height:          38px;
-    -fx-pref-width:           100%;
-    -fx-background-radius:    6px;
-    -fx-border-color:         #c5cae9;
-    -fx-border-radius:        6px;
-    -fx-padding:              4 10 4 10;
-    -fx-font-size:            13px;
+    -fx-pref-height:       38px;
+    -fx-background-radius: 6px;
+    -fx-border-color:      #c5cae9;
+    -fx-border-radius:     6px;
+    -fx-padding:           4 10 4 10;
+    -fx-font-size:         13px;
+    -fx-background-color:  #fafafa;
 }
 
 .login-field:focused {
-    -fx-border-color: #3949ab;
+    -fx-border-color:      #3949ab;
+    -fx-background-color:  white;
     -fx-effect: dropshadow(gaussian, rgba(57,73,171,0.3), 6, 0, 0, 0);
 }
 
+/* OTP field – chữ to, căn giữa */
+.otp-field {
+    -fx-font-size:         22px;
+    -fx-font-weight:       bold;
+    -fx-alignment:         center;
+    -fx-letter-spacing:    10px;
+    -fx-text-fill:         #3949ab;
+    -fx-background-color:  #f3f4fd;
+    -fx-border-color:      #9fa8da;
+}
+
 .error-label {
-    -fx-text-fill:       #c62828;
-    -fx-font-size:       12px;
-    -fx-background-color: #ffebee;
+    -fx-text-fill:         #c62828;
+    -fx-font-size:         12px;
+    -fx-background-color:  #ffebee;
     -fx-background-radius: 4px;
-    -fx-padding:         6 10 6 10;
+    -fx-padding:           6 10 6 10;
 }
 
 .login-footer {
-    -fx-text-fill:   #c5cae9;
-    -fx-font-size:   11px;
-    -fx-padding:     20 0 30 0;
+    -fx-text-fill: #c5cae9;
+    -fx-font-size: 11px;
+    -fx-padding:   20 0 30 0;
+}
+
+/* Forgot password link */
+.btn-link {
+    -fx-background-color: transparent;
+    -fx-border-color:     transparent;
+    -fx-text-fill:        #3949ab;
+    -fx-font-size:        11px;
+    -fx-underline:        true;
+    -fx-cursor:           hand;
+    -fx-padding:          2 0 0 0;
+}
+.btn-link:hover { -fx-text-fill: #1a237e; }
+
+/* ── FORGOT PASSWORD – STEP INDICATOR ───────────────────── */
+
+.steps-bar {
+    -fx-padding: 0 0 2 0;
+}
+
+/* Trạng thái dot */
+.step-dot {
+    -fx-min-width:         28px;
+    -fx-min-height:        28px;
+    -fx-max-width:         28px;
+    -fx-max-height:        28px;
+    -fx-background-radius: 14px;
+    -fx-border-radius:     14px;
+    -fx-alignment:         center;
+    -fx-font-size:         12px;
+    -fx-font-weight:       bold;
+}
+
+.step-inactive {
+    -fx-background-color: #e8eaf6;
+    -fx-text-fill:        #9fa8da;
+    -fx-border-color:     #e8eaf6;
+    -fx-border-width:     2px;
+}
+
+.step-active {
+    -fx-background-color: white;
+    -fx-text-fill:        #3949ab;
+    -fx-border-color:     #3949ab;
+    -fx-border-width:     2px;
+    -fx-effect: dropshadow(gaussian, rgba(57,73,171,0.2), 6, 0, 0, 0);
+}
+
+.step-done {
+    -fx-background-color: #3949ab;
+    -fx-text-fill:        white;
+    -fx-border-color:     #3949ab;
+    -fx-border-width:     2px;
+}
+
+.step-success {
+    -fx-background-color: #43a047;
+    -fx-text-fill:        white;
+    -fx-border-color:     #43a047;
+    -fx-border-width:     2px;
+    -fx-effect: dropshadow(gaussian, rgba(67,160,71,0.25), 6, 0, 0, 0);
+}
+
+/* Đường nối giữa các step */
+.step-line {
+    -fx-background-color: #e8eaf6;
+    -fx-pref-height:      2px;
+    -fx-max-height:       2px;
+}
+
+.step-line-done {
+    -fx-background-color: #3949ab;
+}
+
+/* Nhãn tên bước */
+.steps-labels {
+    -fx-padding: 2 4 8 4;
+}
+
+.step-lbl {
+    -fx-font-size:  11px;
+    -fx-text-fill:  #9e9e9e;
+    -fx-alignment:  center;
+}
+
+.step-lbl-active {
+    -fx-text-fill:   #3949ab;
+    -fx-font-weight: bold;
+}
+
+.step-lbl-success {
+    -fx-text-fill:   #43a047;
+    -fx-font-weight: bold;
+}
+
+/* ── FORGOT PASSWORD – INFO BOX ──────────────────────────── */
+
+.info-box {
+    -fx-background-color:  #e8eaf6;
+    -fx-background-radius: 6px;
+    -fx-border-color:      #3949ab;
+    -fx-border-radius:     6px;
+    -fx-border-width:      0 0 0 4px;
+    -fx-padding:           10 14 10 14;
+}
+
+.tip-box {
+    -fx-background-color:  #e8eaf6;
+    -fx-background-radius: 6px;
+    -fx-padding:           10 14 10 14;
+}
+
+.info-icon {
+    -fx-font-size: 16px;
+}
+
+.info-text {
+    -fx-font-size:  13px;
+    -fx-text-fill:  #37474f;
+}
+
+/* ── FORGOT PASSWORD – SEPARATOR ─────────────────────────── */
+
+.fp-separator {
+    -fx-padding: 6 0 6 0;
+}
+
+.fp-separator .line {
+    -fx-border-color: #eeeeee;
+}
+
+/* ── FORGOT PASSWORD – STEP 3 SUCCESS ───────────────────── */
+
+.success-circle {
+    -fx-background-color:  linear-gradient(to bottom right, #43a047, #66bb6a);
+    -fx-background-radius: 36px;
+    -fx-text-fill:         white;
+    -fx-font-size:         32px;
+    -fx-font-weight:       bold;
+    -fx-min-width:         72px;
+    -fx-min-height:        72px;
+    -fx-max-width:         72px;
+    -fx-max-height:        72px;
+    -fx-effect: dropshadow(gaussian, rgba(67,160,71,0.4), 14, 0, 0, 4);
+}
+
+.summary-box {
+    -fx-background-color:  #f1f8e9;
+    -fx-background-radius: 6px;
+    -fx-border-color:      #43a047;
+    -fx-border-radius:     6px;
+    -fx-border-width:      0 0 0 4px;
+    -fx-padding:           4 0 4 0;
+}
+
+.summary-row {
+    -fx-padding:    6 16 6 16;
+    -fx-alignment:  center-left;
+}
+
+.summary-lbl {
+    -fx-font-size:  13px;
+    -fx-text-fill:  #757575;
+}
+
+.summary-val {
+    -fx-font-size:   13px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #263238;
+}
+
+.summary-ok {
+    -fx-text-fill: #43a047;
+}
+
+.summary-sep .line {
+    -fx-border-color: #dcedc8;
+    -fx-padding:      0 16 0 16;
 }
 
 /* ── BUTTONS ─────────────────────────────────────────────── */
@@ -92,10 +294,11 @@
     -fx-padding:           8 20 8 20;
     -fx-font-weight:       bold;
     -fx-cursor:            hand;
+    -fx-effect: dropshadow(gaussian, rgba(57,73,171,0.35), 8, 0, 0, 2);
 }
-.btn-primary:hover     { -fx-background-color: #283593; }
-.btn-primary:pressed   { -fx-background-color: #1a237e; }
-.btn-primary:disabled  { -fx-opacity: 0.5; }
+.btn-primary:hover    { -fx-background-color: #283593; }
+.btn-primary:pressed  { -fx-background-color: #1a237e; }
+.btn-primary:disabled { -fx-opacity: 0.5; }
 
 .btn-secondary {
     -fx-background-color:  #eceff1;
@@ -104,15 +307,15 @@
     -fx-padding:           8 20 8 20;
     -fx-cursor:            hand;
 }
-.btn-secondary:hover    { -fx-background-color: #cfd8dc; }
+.btn-secondary:hover { -fx-background-color: #cfd8dc; }
 
 .btn-outline {
-    -fx-background-color:  transparent;
-    -fx-border-color:      #3949ab;
-    -fx-border-radius:     6px;
-    -fx-text-fill:         #3949ab;
-    -fx-padding:           6 16 6 16;
-    -fx-cursor:            hand;
+    -fx-background-color: transparent;
+    -fx-border-color:     #3949ab;
+    -fx-border-radius:    6px;
+    -fx-text-fill:        #3949ab;
+    -fx-padding:          6 16 6 16;
+    -fx-cursor:           hand;
 }
 .btn-outline:hover { -fx-background-color: #e8eaf6; }
 
@@ -124,7 +327,7 @@
     -fx-font-weight:       bold;
     -fx-cursor:            hand;
 }
-.btn-warning:hover { -fx-background-color: #e65100; }
+.btn-warning:hover    { -fx-background-color: #e65100; }
 .btn-warning:disabled { -fx-opacity: 0.5; }
 
 /* ── CONTENT PAGES ───────────────────────────────────────── */
@@ -150,19 +353,19 @@
 
 .table-view .column-header {
     -fx-background-color: #e8eaf6;
-    -fx-font-weight:       bold;
-    -fx-text-fill:         #1a237e;
-    -fx-padding:           8 10;
+    -fx-font-weight:      bold;
+    -fx-text-fill:        #1a237e;
+    -fx-padding:          8 10;
 }
 
 .table-view .table-row-cell:selected {
     -fx-background-color: #c5cae9;
-    -fx-text-fill:         #000;
+    -fx-text-fill:        #000;
 }
 
 .table-placeholder {
-    -fx-text-fill:   #9e9e9e;
-    -fx-font-style:  italic;
+    -fx-text-fill:  #9e9e9e;
+    -fx-font-style: italic;
 }
 
 /* ── TITLED PANE / ACTION PANEL ──────────────────────────── */
@@ -194,8 +397,8 @@
 }
 
 .status-label {
-    -fx-text-fill:  #37474f;
-    -fx-font-size:  12px;
+    -fx-text-fill: #37474f;
+    -fx-font-size: 12px;
 }
 
 /* ── COMBO BOX ───────────────────────────────────────────── */
@@ -211,6 +414,7 @@
 }
 
 /* ── SEPARATOR ───────────────────────────────────────────── */
+
 .separator .line {
     -fx-border-color: #e0e0e0;
 }

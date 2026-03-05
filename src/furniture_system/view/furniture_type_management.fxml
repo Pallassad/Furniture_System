@@ -1,73 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<!--
-    Screen: Admin – Manage Furniture Types
-    Controller: furniture_system.controller.FurnitureTypeController
--->
 <BorderPane xmlns="http://javafx.com/javafx/25"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="furniture_system.controller.FurnitureTypeController"
-            prefWidth="1000" prefHeight="680"
-            style="-fx-background-color:#f4f6f9;">
+            styleClass="content-root"
+            stylesheets="@../resources/css/admin.css"
+            prefWidth="1000" prefHeight="680">
 
     <!-- ══════════ HEADER ══════════ -->
     <top>
-        <VBox style="-fx-background-color:#2c3e50;">
+        <VBox style="-fx-background-color:#1a237e;">
             <HBox alignment="CENTER_LEFT" spacing="14"
                   style="-fx-padding:14 22;">
-                <Label text="🪑  Manage Furniture Types"
-                       style="-fx-text-fill:white;-fx-font-size:20px;-fx-font-weight:bold;"/>
+                <Label text="🪑  Manage Furniture Types" styleClass="app-title"
+                       style="-fx-font-size:20px;"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <!-- Search bar -->
                 <TextField fx:id="txtSearch"
                            promptText="Search by name, ID, or status…"
                            prefWidth="270"
-                           style="-fx-background-radius:20;-fx-padding:7 14;"/>
+                           styleClass="login-field"/>
                 <Button text="🔍 Search" onAction="#handleSearch"
-                        style="-fx-background-color:#3498db;-fx-text-fill:white;
-                               -fx-background-radius:20;-fx-cursor:hand;-fx-padding:7 16;"/>
-                <Button text="✕ Clear" onAction="#handleClearSearch"
-                        style="-fx-background-color:#7f8c8d;-fx-text-fill:white;
-                               -fx-background-radius:20;-fx-cursor:hand;-fx-padding:7 14;"/>
+                        styleClass="btn-primary"/>
+                <Button text="✕ Clear"  onAction="#handleClearSearch"
+                        styleClass="btn-secondary"/>
             </HBox>
         </VBox>
     </top>
 
     <!-- ══════════ TABLE ══════════ -->
     <center>
-        <TableView fx:id="tableView"
-                   style="-fx-background-color:white;-fx-border-color:transparent;">
+        <TableView fx:id="tableView" styleClass="table-view">
             <BorderPane.margin><Insets top="14" right="18" bottom="6" left="18"/></BorderPane.margin>
             <columns>
-                <TableColumn fx:id="colId"          text="ID"            prefWidth="55"  style="-fx-alignment:CENTER;"/>
-                <TableColumn fx:id="colName"        text="Type Name"     prefWidth="200"/>
-                <TableColumn fx:id="colDescription" text="Description"   prefWidth="290"/>
-                <TableColumn fx:id="colStatus"      text="Status"        prefWidth="110" style="-fx-alignment:CENTER;"/>
-                <TableColumn fx:id="colCreatedAt"   text="Created Date"  prefWidth="135" style="-fx-alignment:CENTER;"/>
-                <TableColumn fx:id="colActions"     text="Actions"       prefWidth="175" style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colId"          text="ID"           prefWidth="55"  style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colName"        text="Type Name"    prefWidth="200"/>
+                <TableColumn fx:id="colDescription" text="Description"  prefWidth="290"/>
+                <TableColumn fx:id="colStatus"      text="Status"       prefWidth="110" style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colCreatedAt"   text="Created Date" prefWidth="135" style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colActions"     text="Actions"      prefWidth="175" style="-fx-alignment:CENTER;"/>
             </columns>
+            <placeholder>
+                <Label text="No furniture types found." styleClass="table-placeholder"/>
+            </placeholder>
         </TableView>
     </center>
 
     <!-- ══════════ FORM (bottom) ══════════ -->
     <bottom>
-        <VBox spacing="10"
-              style="-fx-background-color:white;
-                     -fx-border-color:#dde3ee;
-                     -fx-border-width:1 0 0 0;
-                     -fx-padding:16 22 18 22;">
+        <VBox spacing="10" styleClass="action-pane"
+              style="-fx-border-width:1 0 0 0; -fx-padding:16 22 18 22;">
 
             <Label fx:id="lblFormTitle" text="➕  Add New Furniture Type"
-                   style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#2c3e50;"/>
+                   styleClass="page-title" style="-fx-font-size:14px;"/>
 
-            <Label fx:id="lblError"
-                   style="-fx-text-fill:#e74c3c;-fx-font-size:12px;"
-                   wrapText="true"/>
+            <Label fx:id="lblError" styleClass="error-label" wrapText="true"/>
 
             <GridPane hgap="18" vgap="10">
                 <columnConstraints>
@@ -77,22 +67,20 @@
                     <ColumnConstraints prefWidth="180"/>
                 </columnConstraints>
 
-                <!-- Row 0: TypeName + Status -->
-                <Label text="Type Name *"
-                       style="-fx-font-weight:bold;"
+                <!-- Row 0 -->
+                <Label text="Type Name *" styleClass="field-label"
                        GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="txtTypeName"
+                <TextField fx:id="txtTypeName" styleClass="login-field"
                            promptText="Minimum 2 characters, maximum 100 characters"
                            GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                <Label text="Status *"
-                       style="-fx-font-weight:bold;"
+                <Label text="Status *" styleClass="field-label"
                        GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                <ComboBox fx:id="cmbStatus" prefWidth="170"
+                <ComboBox fx:id="cmbStatus" prefWidth="170" styleClass="combo-box"
                           GridPane.rowIndex="0" GridPane.columnIndex="3"/>
 
-                <!-- Row 1: Description (span) -->
-                <Label text="Description"
+                <!-- Row 1 -->
+                <Label text="Description" styleClass="field-label"
                        GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                 <TextArea fx:id="txtDescription"
                           prefHeight="62" wrapText="true"
@@ -101,20 +89,15 @@
                           GridPane.columnSpan="3"/>
             </GridPane>
 
-            <!-- Buttons -->
             <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button fx:id="btnSave" text="Add" onAction="#handleSave"
-                        prefWidth="120"
-                        style="-fx-background-color:#27ae60;-fx-text-fill:white;
-                               -fx-font-weight:bold;-fx-cursor:hand;-fx-padding:9 0;"/>
-                <Button fx:id="btnDelete" text="🗑 Delete" onAction="#handleDelete"
-                        prefWidth="120"
-                        style="-fx-background-color:#e74c3c;-fx-text-fill:white;
-                               -fx-font-weight:bold;-fx-cursor:hand;-fx-padding:9 0;"/>
-                <Button fx:id="btnClear" text="🔄 Refresh" onAction="#handleClear"
-                        prefWidth="120"
-                        style="-fx-background-color:#7f8c8d;-fx-text-fill:white;
-                               -fx-cursor:hand;-fx-padding:9 0;"/>
+                <Button fx:id="btnSave"   text="Add"        onAction="#handleSave"
+                        styleClass="btn-primary"   prefWidth="120"/>
+                <Button fx:id="btnDelete" text="🗑 Delete"  onAction="#handleDelete"
+                        style="-fx-background-color:#c62828; -fx-text-fill:white;
+                               -fx-background-radius:6; -fx-padding:8 20;
+                               -fx-font-weight:bold; -fx-cursor:hand;" prefWidth="120"/>
+                <Button fx:id="btnClear"  text="🔄 Refresh" onAction="#handleClear"
+                        styleClass="btn-secondary" prefWidth="120"/>
             </HBox>
         </VBox>
     </bottom>

@@ -1,87 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <!--
-    Employee Screen – Filter Products by Type (4.4.1)
+    employee_product_filter.fxml
     Controller: furniture_system.controller.EmployeeFurnitureTypeController
-
-    Integration: embed this BorderPane into EmployeeDashboard
-    using fx:include or FXMLLoader inside EmployeeDashboardController
 -->
 <BorderPane xmlns="http://javafx.com/javafx/25"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="furniture_system.controller.EmployeeFurnitureTypeController"
-            prefWidth="960" prefHeight="600"
-            style="-fx-background-color:#f4f6f9;">
+            styleClass="content-root"
+            stylesheets="@../resources/css/emp.css"
+            prefWidth="960" prefHeight="600">
 
-    <!-- ══════ TOP BAR ══════ -->
+    <!-- ══ TOP BAR ══════════════════════════════════════════════════════ -->
     <top>
-        <VBox style="-fx-background-color:#1a252f;">
-            <HBox alignment="CENTER_LEFT" spacing="14"
-                  style="-fx-padding:13 22;">
+        <VBox style="-fx-background-color:#1b5e20;">
+            <HBox alignment="CENTER_LEFT" spacing="14" style="-fx-padding:13 22;">
                 <Label text="🛋  Product List"
-                       style="-fx-text-fill:white;-fx-font-size:18px;-fx-font-weight:bold;"/>
+                       styleClass="app-title" style="-fx-font-size:18px;"/>
             </HBox>
         </VBox>
     </top>
 
-    <!-- ══════ CENTER ══════ -->
+    <!-- ══ CENTER ════════════════════════════════════════════════════════ -->
     <center>
         <VBox spacing="0">
 
             <!-- Filter Toolbar -->
             <HBox alignment="CENTER_LEFT" spacing="12"
-                  style="-fx-background-color:#ecf0f1;
-                         -fx-padding:11 20;
-                         -fx-border-color:#dde3ee;
-                         -fx-border-width:0 0 1 0;">
-
-                <Label text="Filter by type:"
-                       style="-fx-font-weight:bold;-fx-font-size:13px;"/>
-
-                <!-- ComboBox loads ACTIVE FurnitureTypes from DB -->
+                  styleClass="status-bar"
+                  style="-fx-background-radius:0; -fx-padding:11 20;
+                         -fx-border-color:#dde3ee; -fx-border-width:0 0 1 0;">
+                <Label text="Filter by type:" styleClass="field-label"/>
                 <ComboBox fx:id="cmbTypeFilter" prefWidth="230"
-                          style="-fx-background-radius:6;"/>
-
+                          styleClass="combo-box"/>
                 <Button fx:id="btnApplyFilter" text="✔ Apply"
                         onAction="#handleFilterByType"
-                        style="-fx-background-color:#2980b9;-fx-text-fill:white;
-                               -fx-cursor:hand;-fx-padding:7 16;-fx-background-radius:6;"/>
-
+                        styleClass="btn-primary"/>
                 <Button fx:id="btnResetFilter" text="🔄 Reset"
                         onAction="#handleResetFilter"
-                        style="-fx-background-color:#7f8c8d;-fx-text-fill:white;
-                               -fx-cursor:hand;-fx-padding:7 14;-fx-background-radius:6;"/>
-
+                        styleClass="btn-secondary"/>
                 <Region HBox.hgrow="ALWAYS"/>
-
-                <Label fx:id="lblResultCount"
-                       style="-fx-text-fill:#555;-fx-font-size:12px;"/>
-
+                <Label fx:id="lblResultCount" styleClass="hint-label"/>
                 <TextField fx:id="txtProductSearch"
                            promptText="Search product…" prefWidth="210"
-                           style="-fx-background-radius:20;-fx-padding:7 12;"/>
+                           styleClass="login-field"/>
             </HBox>
 
             <!-- Products TableView -->
             <TableView fx:id="tblProducts" VBox.vgrow="ALWAYS"
-                       style="-fx-background-color:white;">
+                       styleClass="table-view">
                 <VBox.margin><Insets top="0" right="18" bottom="18" left="18"/></VBox.margin>
                 <columns>
-                    <TableColumn fx:id="colProductId"     text="ID"            prefWidth="65"  style="-fx-alignment:CENTER;"/>
-                    <TableColumn fx:id="colProductName"   text="Product Name"  prefWidth="280"/>
-                    <TableColumn fx:id="colProductType"   text="Type"          prefWidth="170"/>
-                    <TableColumn fx:id="colProductPrice"  text="Unit Price"    prefWidth="130" style="-fx-alignment:CENTER-RIGHT;"/>
-                    <TableColumn fx:id="colProductStatus" text="Status"        prefWidth="120" style="-fx-alignment:CENTER;"/>
+                    <TableColumn fx:id="colProductId"     text="ID"           prefWidth="65"  style="-fx-alignment:CENTER;"/>
+                    <TableColumn fx:id="colProductName"   text="Product Name" prefWidth="280"/>
+                    <TableColumn fx:id="colProductType"   text="Type"         prefWidth="170"/>
+                    <TableColumn fx:id="colProductPrice"  text="Unit Price"   prefWidth="130" style="-fx-alignment:CENTER-RIGHT;"/>
+                    <TableColumn fx:id="colProductStatus" text="Status"       prefWidth="120" style="-fx-alignment:CENTER;"/>
                 </columns>
                 <placeholder>
-                    <Label text="No products available."
-                           style="-fx-text-fill:#888;"/>
+                    <Label text="No products available." styleClass="table-placeholder"/>
                 </placeholder>
             </TableView>
+
         </VBox>
     </center>
 

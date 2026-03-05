@@ -1,6 +1,8 @@
 /* ============================================================
-   style.css  –  Furniture System UI Theme
-   Covers: Login, Forgot Password (Step 1/2/3), shared components
+   admin.css  –  Furniture System UI Theme (Admin)
+   Theme colour: Indigo / Blue  #1a237e · #3949ab · #5e35b1
+   Covers: Login, Forgot Password, Dashboard, Content Pages
+   Last updated: sync from 5 management FXML views
    ============================================================ */
 
 /* ── Root & Body ──────────────────────────────────────────── */
@@ -21,9 +23,17 @@
     -fx-padding: 40 0 20 0;
 }
 
+/* Login screen title (large) — also used in page headers on dark HBox */
 .app-title {
     -fx-text-fill:   white;
     -fx-font-size:   28px;
+    -fx-font-weight: bold;
+}
+
+/* Smaller variant for dark nav bars (e.g. furniture_management header) */
+.app-title-sm {
+    -fx-text-fill:   white;
+    -fx-font-size:   19px;
     -fx-font-weight: bold;
 }
 
@@ -61,8 +71,8 @@
 }
 
 .field-req {
-    -fx-text-fill:  #c62828;
-    -fx-font-size:  12px;
+    -fx-text-fill:   #c62828;
+    -fx-font-size:   12px;
     -fx-font-weight: bold;
 }
 
@@ -82,15 +92,15 @@
     -fx-effect: dropshadow(gaussian, rgba(57,73,171,0.3), 6, 0, 0, 0);
 }
 
-/* OTP field – chữ to, căn giữa */
+/* OTP field */
 .otp-field {
-    -fx-font-size:         22px;
-    -fx-font-weight:       bold;
-    -fx-alignment:         center;
-    -fx-letter-spacing:    10px;
-    -fx-text-fill:         #3949ab;
-    -fx-background-color:  #f3f4fd;
-    -fx-border-color:      #9fa8da;
+    -fx-font-size:        22px;
+    -fx-font-weight:      bold;
+    -fx-alignment:        center;
+    -fx-letter-spacing:   10px;
+    -fx-text-fill:        #3949ab;
+    -fx-background-color: #f3f4fd;
+    -fx-border-color:     #9fa8da;
 }
 
 .error-label {
@@ -107,7 +117,6 @@
     -fx-padding:   20 0 30 0;
 }
 
-/* Forgot password link */
 .btn-link {
     -fx-background-color: transparent;
     -fx-border-color:     transparent;
@@ -119,13 +128,10 @@
 }
 .btn-link:hover { -fx-text-fill: #1a237e; }
 
-/* ── FORGOT PASSWORD – STEP INDICATOR ───────────────────── */
+/* ── STEP INDICATOR ──────────────────────────────────────── */
 
-.steps-bar {
-    -fx-padding: 0 0 2 0;
-}
+.steps-bar { -fx-padding: 0 0 2 0; }
 
-/* Trạng thái dot */
 .step-dot {
     -fx-min-width:         28px;
     -fx-min-height:        28px;
@@ -168,26 +174,20 @@
     -fx-effect: dropshadow(gaussian, rgba(67,160,71,0.25), 6, 0, 0, 0);
 }
 
-/* Đường nối giữa các step */
 .step-line {
     -fx-background-color: #e8eaf6;
     -fx-pref-height:      2px;
     -fx-max-height:       2px;
 }
 
-.step-line-done {
-    -fx-background-color: #3949ab;
-}
+.step-line-done { -fx-background-color: #3949ab; }
 
-/* Nhãn tên bước */
-.steps-labels {
-    -fx-padding: 2 4 8 4;
-}
+.steps-labels { -fx-padding: 2 4 8 4; }
 
 .step-lbl {
-    -fx-font-size:  11px;
-    -fx-text-fill:  #9e9e9e;
-    -fx-alignment:  center;
+    -fx-font-size: 11px;
+    -fx-text-fill: #9e9e9e;
+    -fx-alignment: center;
 }
 
 .step-lbl-active {
@@ -200,7 +200,7 @@
     -fx-font-weight: bold;
 }
 
-/* ── FORGOT PASSWORD – INFO BOX ──────────────────────────── */
+/* ── INFO / TIP BOX ──────────────────────────────────────── */
 
 .info-box {
     -fx-background-color:  #e8eaf6;
@@ -217,26 +217,19 @@
     -fx-padding:           10 14 10 14;
 }
 
-.info-icon {
-    -fx-font-size: 16px;
-}
+.info-icon { -fx-font-size: 16px; }
 
 .info-text {
-    -fx-font-size:  13px;
-    -fx-text-fill:  #37474f;
+    -fx-font-size: 13px;
+    -fx-text-fill: #37474f;
 }
 
-/* ── FORGOT PASSWORD – SEPARATOR ─────────────────────────── */
+/* ── SEPARATOR ───────────────────────────────────────────── */
 
-.fp-separator {
-    -fx-padding: 6 0 6 0;
-}
+.fp-separator         { -fx-padding: 6 0 6 0; }
+.fp-separator .line   { -fx-border-color: #eeeeee; }
 
-.fp-separator .line {
-    -fx-border-color: #eeeeee;
-}
-
-/* ── FORGOT PASSWORD – STEP 3 SUCCESS ───────────────────── */
+/* ── STEP 3 SUCCESS ──────────────────────────────────────── */
 
 .success-circle {
     -fx-background-color:  linear-gradient(to bottom right, #43a047, #66bb6a);
@@ -261,13 +254,13 @@
 }
 
 .summary-row {
-    -fx-padding:    6 16 6 16;
-    -fx-alignment:  center-left;
+    -fx-padding:   6 16 6 16;
+    -fx-alignment: center-left;
 }
 
 .summary-lbl {
-    -fx-font-size:  13px;
-    -fx-text-fill:  #757575;
+    -fx-font-size: 13px;
+    -fx-text-fill: #757575;
 }
 
 .summary-val {
@@ -276,9 +269,7 @@
     -fx-text-fill:   #263238;
 }
 
-.summary-ok {
-    -fx-text-fill: #43a047;
-}
+.summary-ok { -fx-text-fill: #43a047; }
 
 .summary-sep .line {
     -fx-border-color: #dcedc8;
@@ -330,6 +321,51 @@
 .btn-warning:hover    { -fx-background-color: #e65100; }
 .btn-warning:disabled { -fx-opacity: 0.5; }
 
+/* Delete / danger action */
+.btn-danger {
+    -fx-background-color:  #c62828;
+    -fx-text-fill:         white;
+    -fx-background-radius: 6px;
+    -fx-padding:           8 20 8 20;
+    -fx-font-weight:       bold;
+    -fx-cursor:            hand;
+}
+.btn-danger:hover    { -fx-background-color: #b71c1c; }
+.btn-danger:disabled { -fx-opacity: 0.5; }
+
+/* Purple accent (e.g. Statistics button) */
+.btn-purple {
+    -fx-background-color:  #7b1fa2;
+    -fx-text-fill:         white;
+    -fx-background-radius: 6px;
+    -fx-padding:           8 20 8 20;
+    -fx-font-weight:       bold;
+    -fx-cursor:            hand;
+}
+.btn-purple:hover { -fx-background-color: #6a1b9a; }
+
+/* Teal accent (e.g. Purchase History button) */
+.btn-teal {
+    -fx-background-color:  #00695c;
+    -fx-text-fill:         white;
+    -fx-background-radius: 6px;
+    -fx-padding:           8 20 8 20;
+    -fx-font-weight:       bold;
+    -fx-cursor:            hand;
+}
+.btn-teal:hover { -fx-background-color: #004d40; }
+
+/* Green action button (e.g. Stock In) */
+.btn-green {
+    -fx-background-color:  #2e7d32;
+    -fx-text-fill:         white;
+    -fx-background-radius: 6px;
+    -fx-padding:           8 20 8 20;
+    -fx-font-weight:       bold;
+    -fx-cursor:            hand;
+}
+.btn-green:hover { -fx-background-color: #1b5e20; }
+
 /* ── CONTENT PAGES ───────────────────────────────────────── */
 
 .content-root {
@@ -340,6 +376,34 @@
     -fx-font-size:   20px;
     -fx-font-weight: bold;
     -fx-text-fill:   #1a237e;
+}
+
+/* Sub-section heading inside panels (stock-in, adjust, etc.) */
+.section-header-green {
+    -fx-font-size:   14px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #2e7d32;
+}
+
+.section-header-orange {
+    -fx-font-size:   14px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #e65100;
+}
+
+/* Badge / counter chip shown in page headers */
+.badge-label {
+    -fx-background-color:  #3949ab;
+    -fx-text-fill:         white;
+    -fx-padding:           4 12;
+    -fx-background-radius: 12px;
+    -fx-font-size:         12px;
+}
+
+/* Dark indigo top bar used in content page headers */
+.page-header-bar {
+    -fx-background-color: #1a237e;
+    -fx-padding:          14 22;
 }
 
 /* ── TABLE VIEW ──────────────────────────────────────────── */
@@ -368,7 +432,30 @@
     -fx-font-style: italic;
 }
 
-/* ── TITLED PANE / ACTION PANEL ──────────────────────────── */
+/* Alternating rows */
+.table-view .table-row-cell:odd {
+    -fx-background-color: #fafafa;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #e8eaf6;
+}
+
+/* Inactive row highlight (grey) */
+.table-view .table-row-cell.row-inactive {
+    -fx-background-color: #eeeeee;
+    -fx-text-fill:        #9e9e9e;
+}
+
+/* Legend swatch */
+.legend-swatch {
+    -fx-background-color:  #e8e8e8;
+    -fx-min-width:         16px;
+    -fx-min-height:        16px;
+    -fx-background-radius: 3px;
+}
+
+/* ── ACTION PANEL ────────────────────────────────────────── */
 
 .action-pane {
     -fx-background-color:  white;
@@ -380,6 +467,22 @@
 .action-pane > .title {
     -fx-font-weight: bold;
     -fx-text-fill:   #37474f;
+}
+
+/* Stock-In panel (green border accent) */
+.action-pane-green {
+    -fx-background-color:  white;
+    -fx-border-color:      #c8e6c9;
+    -fx-border-radius:     6px;
+    -fx-background-radius: 6px;
+}
+
+/* Adjust panel (orange border accent) */
+.action-pane-orange {
+    -fx-background-color:  white;
+    -fx-border-color:      #ffe0b2;
+    -fx-border-radius:     6px;
+    -fx-background-radius: 6px;
 }
 
 .hint-label {
@@ -401,6 +504,26 @@
     -fx-font-size: 12px;
 }
 
+/* ── DATE PICKER ─────────────────────────────────────────── */
+
+.date-picker {
+    -fx-background-radius: 6px;
+    -fx-border-color:      #c5cae9;
+    -fx-border-radius:     6px;
+}
+
+.date-picker:focused { -fx-border-color: #3949ab; }
+
+/* ── SPINNER ─────────────────────────────────────────────── */
+
+.spinner {
+    -fx-background-radius: 6px;
+    -fx-border-color:      #c5cae9;
+    -fx-border-radius:     6px;
+}
+
+.spinner:focused { -fx-border-color: #3949ab; }
+
 /* ── COMBO BOX ───────────────────────────────────────────── */
 
 .combo-box {
@@ -409,12 +532,62 @@
     -fx-border-radius:     6px;
 }
 
-.combo-box:focused {
-    -fx-border-color: #3949ab;
+.combo-box:focused { -fx-border-color: #3949ab; }
+
+/* ── TITLED PANE ─────────────────────────────────────────── */
+
+.titled-pane > .title {
+    -fx-background-color: #f0f2fa;
+    -fx-font-weight:      bold;
+    -fx-text-fill:        #37474f;
+    -fx-padding:          8 12;
+}
+
+.titled-pane > .title:hover {
+    -fx-background-color: #e8eaf6;
+}
+
+/* ── TEXT AREA ───────────────────────────────────────────── */
+
+.text-area {
+    -fx-background-radius: 6px;
+    -fx-border-color:      #c5cae9;
+    -fx-border-radius:     6px;
+    -fx-font-size:         13px;
+}
+
+.text-area:focused {
+    -fx-border-color:     #3949ab;
+    -fx-background-color: white;
 }
 
 /* ── SEPARATOR ───────────────────────────────────────────── */
 
-.separator .line {
-    -fx-border-color: #e0e0e0;
+.separator .line { -fx-border-color: #e0e0e0; }
+
+/* ── ADMIN SIDEBAR ───────────────────────────────────────── */
+
+.sidebar-admin {
+    -fx-background-color: #283593;
+}
+
+.sidebar-admin .sidebar-btn {
+    -fx-background-color:  transparent;
+    -fx-text-fill:         #c5cae9;
+    -fx-background-radius: 6px;
+    -fx-border-radius:     6px;
+    -fx-cursor:            hand;
+    -fx-alignment:         CENTER_LEFT;
+    -fx-padding:           10 12;
+    -fx-font-weight:       normal;
+}
+
+.sidebar-admin .sidebar-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.08);
+}
+
+.sidebar-admin .sidebar-btn-active {
+    -fx-background-color: #3949ab;
+    -fx-text-fill:        white;
+    -fx-font-weight:      bold;
 }

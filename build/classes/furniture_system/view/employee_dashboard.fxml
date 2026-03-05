@@ -2,13 +2,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
-
 <BorderPane xmlns="http://javafx.com/javafx/25"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="furniture_system.controller.EmployeeDashboardController"
             prefWidth="1100" prefHeight="680"
             style="-fx-background-color:#f5f6fa;">
-
     <!-- TOP NAV -->
     <top>
         <HBox style="-fx-background-color:#1b5e20; -fx-padding:12 20;"
@@ -25,7 +23,6 @@
                            -fx-background-radius:6; -fx-cursor:hand;"/>
         </HBox>
     </top>
-
     <!-- SIDEBAR -->
     <left>
         <VBox style="-fx-background-color:#2e7d32; -fx-pref-width:210px;"
@@ -33,7 +30,6 @@
             <padding><Insets top="16" right="8" bottom="16" left="8"/></padding>
             <Label text="MENU" style="-fx-text-fill:#a5d6a7; -fx-font-size:11px;
                                       -fx-padding:0 0 8 8;"/>
-
             <Button fx:id="btnOrders" text="🛒  Sales / Orders"
                     onAction="#showOrders"
                     maxWidth="Infinity"
@@ -41,29 +37,32 @@
                            -fx-background-radius:6; -fx-cursor:hand;
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;
                            -fx-font-weight:bold;"/>
-
             <Button fx:id="btnCustomer" text="👤  Customers"
                     onAction="#showCustomerManagement"
                     maxWidth="Infinity"
                     style="-fx-background-color:transparent; -fx-text-fill:#c8e6c9;
                            -fx-background-radius:6; -fx-cursor:hand;
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <!-- ★ MỚI: Furniture Types (Employee chỉ xem/lọc) -->
+            <!-- ★ Furniture Types (Employee chỉ xem/lọc) -->
             <Button fx:id="btnFurnitureType" text="🪑  Furniture Types"
                     onAction="#showFurnitureTypeFilter"
                     maxWidth="Infinity"
                     style="-fx-background-color:transparent; -fx-text-fill:#c8e6c9;
                            -fx-background-radius:6; -fx-cursor:hand;
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
+            <!-- ★ MỚI: Product Management -->
+            <Button fx:id="btnProducts" text="📋  Product Management"
+                    onAction="#showProducts"
+                    maxWidth="Infinity"
+                    style="-fx-background-color:transparent; -fx-text-fill:#c8e6c9;
+                           -fx-background-radius:6; -fx-cursor:hand;
+                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
             <Button fx:id="btnInventory" text="📦  Inventory Check"
                     onAction="#showInventory"
                     maxWidth="Infinity"
                     style="-fx-background-color:transparent; -fx-text-fill:#c8e6c9;
                            -fx-background-radius:6; -fx-cursor:hand;
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
             <Button fx:id="btnWarranty" text="🔧  Warranty Tickets"
                     onAction="#showWarranty"
                     maxWidth="Infinity"
@@ -72,10 +71,8 @@
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
         </VBox>
     </left>
-
     <!-- MAIN CONTENT -->
     <center>
         <StackPane fx:id="contentArea"/>
     </center>
-
 </BorderPane>

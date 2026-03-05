@@ -21,9 +21,11 @@ public class AdminDashboardController {
     @FXML private Button btnEmployee;
     @FXML private Button btnCustomer;
     @FXML private Button btnProduct;
-    @FXML private Button btnFurnitureType;   // ★ MỚI
+    @FXML private Button btnFurnitureType;
     @FXML private Button btnOrders;
     @FXML private Button btnReports;
+    @FXML private Button btnSupplier;   // ★ MỚI
+    @FXML private Button btnStock;      // ★ MỚI
 
     private List<Button> sidebarButtons;
 
@@ -46,11 +48,11 @@ public class AdminDashboardController {
 
         sidebarButtons = List.of(
             btnAuth, btnEmployee, btnCustomer,
-            btnProduct, btnFurnitureType,       // ★ MỚI
-            btnOrders, btnReports
+            btnProduct, btnFurnitureType,
+            btnOrders, btnReports,
+            btnSupplier, btnStock               // ★ MỚI
         );
 
-        // Mặc định load Auth & Authorization
         setActive(btnAuth);
         loadView("/furniture_system/view/auth_management.fxml");
     }
@@ -78,10 +80,9 @@ public class AdminDashboardController {
     @FXML
     public void showProductManagement() {
         setActive(btnProduct);
-        showPlaceholder("📦 Product Management");
+        loadView("/furniture_system/view/furniture_management.fxml"); // ★ ĐÃ CẬP NHẬT
     }
 
-    // ★ MỚI ──────────────────────────────────────────────────────────────────
     @FXML
     public void showFurnitureTypeManagement() {
         setActive(btnFurnitureType);
@@ -92,6 +93,18 @@ public class AdminDashboardController {
     public void showOrders() {
         setActive(btnOrders);
         showPlaceholder("🛒 Orders");
+    }
+
+    @FXML
+    public void showSupplierManagement() {    // ★ MỚI
+        setActive(btnSupplier);
+        loadView("/furniture_system/view/supplier_management.fxml");
+    }
+
+    @FXML
+    public void showStockManagement() {       // ★ MỚI
+        setActive(btnStock);
+        loadView("/furniture_system/view/stock_management.fxml");
     }
 
     @FXML

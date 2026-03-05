@@ -1,108 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
 <!--
-  auth_management.fxml  –  Authentication & Authorization management screen
+  auth_management.fxml
   Controller : furniture_system.controller.AuthController
   Access     : ADMIN only
+  UPDATED    : colCreatedAt removed, colEmail added.
+               TitledPane "Account Actions" removed - toan bo edit/status/role/unlock
+               da duoc gop vao dialog Edit.
 -->
 <VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="furniture_system.controller.AuthController"
-      stylesheets="@/furniture_system/resources/css/style.css"
+      stylesheets="@/furniture_system/resources/css/admin.css"
       styleClass="content-root"
       spacing="14">
 
     <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
 
-    <!-- ── Page header ──────────────────────────────────────────────────── -->
+    <!-- Page header -->
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="🔐 Authentication &amp; Authorization" styleClass="page-title"/>
+        <Label text="&#128272; Authentication &amp; Authorization" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
 
-        <!-- ADD button -->
-        <Button fx:id="btnAdd" text="➕  Add Account"
+        <Button fx:id="btnAdd" text="&#10133;  Add Account"
                 onAction="#handleAdd"
                 style="-fx-background-color:#3949ab;-fx-text-fill:white;
                        -fx-background-radius:6;-fx-padding:7 14;
                        -fx-font-weight:bold;-fx-cursor:hand;"/>
 
-        <!-- EDIT button (new) -->
-        <Button fx:id="btnEdit" text="✏  Edit Account"
+        <Button fx:id="btnEdit" text="&#9998;  Edit Account"
                 onAction="#handleEdit"
                 style="-fx-background-color:#f57c00;-fx-text-fill:white;
                        -fx-background-radius:6;-fx-padding:7 14;-fx-cursor:hand;"/>
 
-        <!-- DELETE button -->
-        <Button fx:id="btnDelete" text="🗑  Delete"
+        <Button fx:id="btnDelete" text="&#128465;  Delete"
                 onAction="#handleDelete"
                 style="-fx-background-color:#c62828;-fx-text-fill:white;
                        -fx-background-radius:6;-fx-padding:7 14;-fx-cursor:hand;"/>
 
-        <Button fx:id="btnRefresh" text="⟳  Refresh"
+        <Button fx:id="btnRefresh" text="&#8635;  Refresh"
                 onAction="#handleRefresh"
                 styleClass="btn-outline"/>
     </HBox>
 
     <Separator/>
 
-    <!-- ── Account table ────────────────────────────────────────────────── -->
+    <!-- Account table (colCreatedAt replaced with colEmail) -->
     <TableView fx:id="accountTable" VBox.vgrow="ALWAYS" tableMenuButtonVisible="true">
         <columns>
             <TableColumn fx:id="colId"        text="ID"              prefWidth="55"/>
-            <TableColumn fx:id="colUsername"  text="Username"        prefWidth="140"/>
+            <TableColumn fx:id="colUsername"  text="Username"        prefWidth="130"/>
+            <TableColumn fx:id="colEmail"     text="Email"           prefWidth="195"/>
             <TableColumn fx:id="colRole"      text="Role"            prefWidth="100"/>
             <TableColumn fx:id="colStatus"    text="Status"          prefWidth="110"/>
-            <TableColumn fx:id="colCreatedAt" text="Created At"      prefWidth="145"/>
             <TableColumn fx:id="colLastLogin" text="Last Login"      prefWidth="145"/>
-            <TableColumn fx:id="colFailed"    text="Failed Attempts" prefWidth="130"/>
+            <TableColumn fx:id="colFailed"    text="Failed Attempts" prefWidth="120"/>
         </columns>
         <placeholder>
             <Label text="No accounts found." styleClass="table-placeholder"/>
         </placeholder>
     </TableView>
 
-    <!-- ── Action panel ─────────────────────────────────────────────────── -->
-    <TitledPane text="Account Actions  (select a row first)" collapsible="false"
-                styleClass="action-pane">
-        <GridPane hgap="16" vgap="12">
-            <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
-
-            <!-- Row 0: Status update -->
-            <Label text="Update Status:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="field-label"/>
-            <ComboBox fx:id="statusCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="160"/>
-            <Button fx:id="btnUpdateStatus" text="Apply Status"
-                    onAction="#handleUpdateStatus"
-                    GridPane.columnIndex="2" GridPane.rowIndex="0"
-                    styleClass="btn-primary"/>
-
-            <!-- Row 1: Role update -->
-            <Label text="Update Role:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="field-label"/>
-            <ComboBox fx:id="roleCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="160"/>
-            <Button fx:id="btnUpdateRole" text="Apply Role"
-                    onAction="#handleUpdateRole"
-                    GridPane.columnIndex="2" GridPane.rowIndex="1"
-                    styleClass="btn-primary"/>
-
-            <!-- Row 2: Reset failed attempts -->
-            <Label text="Unlock Account:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="field-label"/>
-            <Label text="Resets FailedAttempts → 0 and re-activates the account."
-                   GridPane.columnIndex="1" GridPane.rowIndex="2"
-                   styleClass="hint-label"/>
-            <Button fx:id="btnReset" text="🔓  Reset &amp; Activate"
-                    onAction="#handleResetFailedAttempts"
-                    GridPane.columnIndex="2" GridPane.rowIndex="2"
-                    styleClass="btn-warning"/>
-
-        </GridPane>
-    </TitledPane>
-
-    <!-- ── Status bar ───────────────────────────────────────────────────── -->
+    <!-- Status bar -->
     <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
-        <Label text="ℹ"/>
+        <Label text="&#8505;"/>
         <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
     </HBox>
 

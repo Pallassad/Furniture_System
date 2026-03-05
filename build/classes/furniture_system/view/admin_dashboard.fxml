@@ -78,6 +78,22 @@
                            -fx-background-radius:6; -fx-cursor:hand;
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
 
+            <!-- ★ MỚI: Supplier Management -->
+            <Button fx:id="btnSupplier" text="🏭  Supplier Management"
+                    onAction="#showSupplierManagement"
+                    maxWidth="Infinity"
+                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
+                           -fx-background-radius:6; -fx-cursor:hand;
+                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
+
+            <!-- ★ MỚI: Stock / Inventory -->
+            <Button fx:id="btnStock" text="📋  Stock and Inventory"
+                    onAction="#showStockManagement"
+                    maxWidth="Infinity"
+                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
+                           -fx-background-radius:6; -fx-cursor:hand;
+                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
+
             <Button fx:id="btnReports" text="📊  Reports"
                     onAction="#showReports"
                     maxWidth="Infinity"
