@@ -3,53 +3,29 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!--
-  auth_management.fxml
-  Controller : furniture_system.controller.AuthController
-  Access     : ADMIN only
-  UPDATED    : colCreatedAt removed, colEmail added.
-               TitledPane "Account Actions" removed - toan bo edit/status/role/unlock
-               da duoc gop vao dialog Edit.
--->
 <VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="furniture_system.controller.AuthController"
       stylesheets="@/furniture_system/resources/css/admin.css"
       styleClass="content-root"
       spacing="14">
-
     <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
 
-    <!-- Page header -->
+    <!-- ── Page header ──────────────────────────────────────────── -->
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="&#128272; Authentication &amp; Authorization" styleClass="page-title"/>
+        <Label text="🔐 Authentication &amp; Authorization" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-
-        <Button fx:id="btnAdd" text="&#10133;  Add Account"
-                onAction="#handleAdd"
-                style="-fx-background-color:#3949ab;-fx-text-fill:white;
-                       -fx-background-radius:6;-fx-padding:7 14;
-                       -fx-font-weight:bold;-fx-cursor:hand;"/>
-
-        <Button fx:id="btnEdit" text="&#9998;  Edit Account"
-                onAction="#handleEdit"
-                style="-fx-background-color:#f57c00;-fx-text-fill:white;
-                       -fx-background-radius:6;-fx-padding:7 14;-fx-cursor:hand;"/>
-
-        <Button fx:id="btnDelete" text="&#128465;  Delete"
-                onAction="#handleDelete"
-                style="-fx-background-color:#c62828;-fx-text-fill:white;
-                       -fx-background-radius:6;-fx-padding:7 14;-fx-cursor:hand;"/>
-
-        <Button fx:id="btnRefresh" text="&#8635;  Refresh"
-                onAction="#handleRefresh"
-                styleClass="btn-outline"/>
+        <Button fx:id="btnAdd"     text="➕  Add Account"  onAction="#handleAdd"    styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"    text="✏  Edit Account"  onAction="#handleEdit"   styleClass="btn-warning"/>
+        <Button fx:id="btnDelete"  text="🗑  Delete"        onAction="#handleDelete" styleClass="btn-danger"/>
+        <Button fx:id="btnRefresh" text="⟳  Refresh"       onAction="#handleRefresh" styleClass="btn-outline"/>
     </HBox>
 
-    <Separator/>
+    <Separator styleClass="separator"/>
 
-    <!-- Account table (colCreatedAt replaced with colEmail) -->
-    <TableView fx:id="accountTable" VBox.vgrow="ALWAYS" tableMenuButtonVisible="true">
+    <!-- ── Account Table ────────────────────────────────────────── -->
+    <TableView fx:id="accountTable" VBox.vgrow="ALWAYS" styleClass="table-view"
+               tableMenuButtonVisible="true">
         <columns>
             <TableColumn fx:id="colId"        text="ID"              prefWidth="55"/>
             <TableColumn fx:id="colUsername"  text="Username"        prefWidth="130"/>
@@ -64,10 +40,9 @@
         </placeholder>
     </TableView>
 
-    <!-- Status bar -->
+    <!-- ── Status Bar ───────────────────────────────────────────── -->
     <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
-        <Label text="&#8505;"/>
+        <Label text="ℹ"/>
         <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
     </HBox>
-
 </VBox>

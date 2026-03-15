@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="furniture_system.controller.AdminSalaryManagementController"
+            styleClass="content-root"
+            stylesheets="@../resources/css/admin.css">
+
+    <!-- ══════════════════════════════════════════════
+         HEADER
+         ══════════════════════════════════════════════ -->
+    <top>
+        <HBox styleClass="page-header-bar" alignment="CENTER_LEFT" spacing="16">
+            <Label text="💰  Quản lý Lương" styleClass="app-title-sm"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtSearch"
+                       promptText="Tìm theo nhân viên, tháng (YYYY-MM), trạng thái…"
+                       prefWidth="300" styleClass="login-field"
+                       onAction="#handleSearch"/>
+            <Button text="🔍 Tìm kiếm" onAction="#handleSearch"  styleClass="btn-outline"/>
+            <Button text="↺ Làm mới"  onAction="#handleSearch"  styleClass="btn-secondary"/>
+        </HBox>
+    </top>
+
+    <!-- ══════════════════════════════════════════════
+         MAIN
+         ══════════════════════════════════════════════ -->
+    <center>
+        <SplitPane orientation="VERTICAL">
+            <padding><Insets top="12" right="16" bottom="0" left="16"/></padding>
+
+            <!-- ── TABLE ──────────────────────────────── -->
+            <VBox spacing="6" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tableSalary" VBox.vgrow="ALWAYS">
+                    <placeholder>
+                        <Label text="Không có bản ghi lương."
+                               style="-fx-text-fill:#9e9e9e; -fx-font-style:italic;"/>
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="colSalaryId"     text="#"              prefWidth="50"/>
+                        <TableColumn fx:id="colEmployee"     text="Nhân viên"      prefWidth="160"/>
+                        <TableColumn fx:id="colMonth"        text="Tháng"          prefWidth="80"/>
+                        <TableColumn fx:id="colBase"         text="Lương cơ bản"   prefWidth="120"/>
+                        <TableColumn fx:id="colAllowance"    text="Phụ cấp"        prefWidth="100"/>
+                        <TableColumn fx:id="colBonus"        text="Thưởng (+)"     prefWidth="100"/>
+                        <TableColumn fx:id="colDeduction"    text="Phạt (−)"       prefWidth="100"/>
+                        <TableColumn fx:id="colFinal"        text="Thực nhận ₫"   prefWidth="130"/>
+                        <TableColumn fx:id="colSalaryStatus" text="Trạng thái"     prefWidth="90"/>
+                        <TableColumn fx:id="colPaidDate"     text="Ngày trả"       prefWidth="90"/>
+                    </columns>
+                </TableView>
+                <Label fx:id="lblSalaryStatus" text="Sẵn sàng." styleClass="status-label"
+                       style="-fx-padding:4 8;"/>
+            </VBox>
+
+            <!-- ── FORM PANEL ──────────────────────────── -->
+            <TitledPane text="Chi tiết lương – Thêm / Cập nhật" collapsible="false">
+                <GridPane hgap="12" vgap="8">
+                    <padding><Insets top="14" right="20" bottom="14" left="20"/></padding>
+
+                    <!-- Row 0: EmployeeId | Month | Status -->
+                    <Label text="Employee ID *"
+                           GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="txtEmployeeId" promptText="vd: 1"
+                               GridPane.columnIndex="1" GridPane.rowIndex="0"
+                               styleClass="login-field" prefWidth="120"/>
+
+                    <Label text="Tháng *"
+                           GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <DatePicker fx:id="dpSalaryMonth" promptText="Chọn ngày bất kỳ trong tháng"
+                                GridPane.columnIndex="3" GridPane.rowIndex="0" prefWidth="180"/>
+
+                    <Label text="Trạng thái *"
+                           GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+                    <ComboBox fx:id="cmbSalaryStatus"
+                              GridPane.columnIndex="5" GridPane.rowIndex="0" prefWidth="130"/>
+
+                    <!-- Row 1: Base | Allowance + hint -->
+                    <Label text="Lương cơ bản *"
+                           GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="txtBaseSalary" promptText="vd: 8000000"
+                               GridPane.columnIndex="1" GridPane.rowIndex="1"
+                               styleClass="login-field" prefWidth="140"/>
+
+                    <Label text="Phụ cấp"
+                           GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                    <VBox GridPane.columnIndex="3" GridPane.rowIndex="1" spacing="2">
+                        <TextField fx:id="txtAllowance" promptText="0  hoặc  5%"
+                                   styleClass="login-field" prefWidth="160"/>
+                        <Label fx:id="lblAllowanceHint" text=""
+                               visible="false" managed="false"
+                               style="-fx-text-fill:#1565c0; -fx-font-size:11px; -fx-font-style:italic;"/>
+                    </VBox>
+
+                    <!-- Row 2: Bonus/Phạt (signed) + hint | Preview -->
+                    <Label text="Thưởng / Phạt"
+                           GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <VBox GridPane.columnIndex="1" GridPane.rowIndex="2"
+                          GridPane.columnSpan="2" spacing="2">
+                        <!-- Field chính: nhận cả +/- và % -->
+                        <TextField fx:id="txtBonus"
+                                   promptText="+500000  /  -200000  /  +10%  /  -5%"
+                                   styleClass="login-field" prefWidth="280"/>
+                        <!-- Hint label: đổi màu xanh/đỏ tuỳ thưởng/phạt -->
+                        <Label fx:id="lblBonusHint" text=""
+                               visible="false" managed="false"
+                               style="-fx-font-size:11px; -fx-font-style:italic;"/>
+                    </VBox>
+
+                    <!-- Live preview lương thực nhận -->
+                    <Label fx:id="lblFinalPreview" text="Lương thực nhận: —"
+                           GridPane.columnIndex="3" GridPane.rowIndex="2"
+                           GridPane.columnSpan="3"
+                           style="-fx-font-size:14px; -fx-font-weight:bold; -fx-text-fill:#2e7d32;"/>
+
+                    <!-- Row 3: Paid Date -->
+                    <Label text="Ngày thanh toán"
+                           GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <DatePicker fx:id="dpPaidDate" promptText="(bắt buộc khi PAID)"
+                                GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="180"/>
+
+                    <!-- Row 4: Note -->
+                    <Label text="Ghi chú"
+                           GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                    <TextArea fx:id="txtSalaryNote" promptText="(tuỳ chọn)"
+                              prefHeight="50" prefWidth="500" wrapText="true"
+                              GridPane.columnIndex="1" GridPane.rowIndex="4"
+                              GridPane.columnSpan="5"/>
+
+                    <!-- Row 5: Buttons -->
+                    <HBox spacing="10"
+                          GridPane.columnIndex="0" GridPane.rowIndex="5"
+                          GridPane.columnSpan="6">
+                        <Button fx:id="btnSalaryAdd"    text="➕ Thêm mới"   onAction="#handleSalaryAdd"    styleClass="btn-primary"/>
+                        <Button fx:id="btnSalaryUpdate" text="✏ Cập nhật"    onAction="#handleSalaryUpdate" styleClass="btn-warning"/>
+                        <Button fx:id="btnSalaryDelete" text="🗑 Xoá Draft"  onAction="#handleSalaryDelete" styleClass="btn-danger"/>
+                        <Button fx:id="btnSalaryClear"  text="✖ Xoá form"   onAction="#handleSalaryClear"  styleClass="btn-secondary"/>
+                    </HBox>
+
+                    <!-- Row 6: Hướng dẫn nhập -->
+                    <VBox GridPane.columnIndex="0" GridPane.rowIndex="6"
+                          GridPane.columnSpan="6" spacing="3">
+                        <Label text="ℹ Bản ghi PAID chỉ đọc. Chỉ xoá được bản ghi DRAFT."
+                               style="-fx-text-fill:#757575; -fx-font-size:11px; -fx-font-style:italic;"/>
+                        <Label text="💡 Thưởng/Phạt: nhập số (vd: +500000 thưởng, -200000 phạt) hoặc % lương (vd: +10% thưởng, -5% phạt)"
+                               style="-fx-text-fill:#1565c0; -fx-font-size:11px; -fx-font-style:italic;"/>
+                    </VBox>
+
+                </GridPane>
+            </TitledPane>
+        </SplitPane>
+    </center>
+</BorderPane>

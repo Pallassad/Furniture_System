@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="furniture_system.controller.AdminPromotionController"
+            styleClass="content-root"
+            stylesheets="@../resources/css/admin.css"
+            prefWidth="1280" prefHeight="800">
+
+    <top>
+        <VBox>
+
+            <!-- Page header -->
+            <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="14">
+                <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
+
+                <Label text="🎫" style="-fx-font-size:20px;"/>
+                <VBox spacing="1" HBox.hgrow="ALWAYS">
+                    <Label text="Promotion Management" styleClass="page-title"/>
+                    <Label text="Create, update and manage all discount promotions"
+                           styleClass="page-subtitle"/>
+                </VBox>
+
+                <!-- Badge: tổng số -->
+                <Label fx:id="lblCount"
+                       style="-fx-background-color:#e8eaf6; -fx-text-fill:#3949ab;
+                              -fx-padding:5 14; -fx-background-radius:20;
+                              -fx-font-size:12px; -fx-font-weight:bold;"/>
+
+                <!-- Nút Add nổi bật ở header -->
+                <Button fx:id="btnAdd" text="➕  Add New Promotion"
+                        onAction="#handleAdd"
+                        style="-fx-background-color:#3949ab; -fx-text-fill:white;
+                               -fx-font-size:13px; -fx-font-weight:bold;
+                               -fx-background-radius:8; -fx-cursor:hand;
+                               -fx-padding:9 22;"/>
+            </HBox>
+
+            <!-- Search strip -->
+            <HBox style="-fx-background-color:#f5f6fc;
+                         -fx-border-color:#dde0f0; -fx-border-width:0 0 1 0;"
+                  spacing="10" alignment="CENTER_LEFT">
+                <padding><Insets top="9" right="20" bottom="9" left="20"/></padding>
+
+                <TextField fx:id="txtSearch" styleClass="login-field"
+                           promptText="🔍  Search by code or name…"
+                           style="-fx-pref-width:255px; -fx-font-size:13px;"/>
+
+                <Label text="Status:" styleClass="form-label"/>
+                <ComboBox fx:id="cmbSearchStatus" styleClass="combo-box"
+                          style="-fx-pref-width:125px;"/>
+
+                <Label text="From:" styleClass="form-label"/>
+                <DatePicker fx:id="dpSearchFrom" styleClass="date-picker"
+                            style="-fx-pref-width:138px;"/>
+
+                <Label text="To:" styleClass="form-label"/>
+                <DatePicker fx:id="dpSearchTo" styleClass="date-picker"
+                            style="-fx-pref-width:138px;"/>
+
+                <Button text="Search" onAction="#handleSearch"
+                        styleClass="btn-primary"
+                        style="-fx-padding:7 18; -fx-font-size:12px;"/>
+                <Button text="Clear" onAction="#handleClearSearch"
+                        styleClass="btn-secondary"
+                        style="-fx-padding:7 14; -fx-font-size:12px;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblMessage" styleClass="hint-label" wrapText="false"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         CENTER: Full-width Table
+         ══════════════════════════════════════════════════════════════════ -->
+    <center>
+        <TableView fx:id="tableView" styleClass="table-view"
+                   style="-fx-background-color:white;">
+            <columns>
+                <TableColumn fx:id="colId"      text="ID"            prefWidth="55"
+                             style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colCode"    text="Code"          prefWidth="120"/>
+                <TableColumn fx:id="colName"    text="Name"          prefWidth="215"/>
+                <TableColumn fx:id="colType"    text="Type"          prefWidth="85"
+                             style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colValue"   text="Value"         prefWidth="110"
+                             style="-fx-alignment:CENTER_RIGHT;"/>
+                <TableColumn fx:id="colDates"   text="Period"        prefWidth="200"/>
+                <TableColumn fx:id="colUsage"   text="Used / Limit"  prefWidth="105"
+                             style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colStatus"  text="Status"        prefWidth="100"
+                             style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colActions" text="Actions"       prefWidth="175"
+                             style="-fx-alignment:CENTER;"/>
+            </columns>
+            <placeholder>
+                <Label text="No promotions found. Click ➕ Add New Promotion to get started."
+                       style="-fx-text-fill:#9e9e9e; -fx-font-size:13px;
+                              -fx-font-style:italic;"/>
+            </placeholder>
+        </TableView>
+    </center>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         BOTTOM: Inline form panel
+         Hiển thị khi nhấn Add hoặc Edit — nằm sát đáy, không che table.
+         Controller toggle visibility bằng pnlForm.setVisible() +
+         pnlForm.setManaged().
+         ══════════════════════════════════════════════════════════════════ -->
+    <bottom>
+        <VBox fx:id="pnlForm" visible="false" managed="false"
+              style="-fx-background-color:#ffffff;
+                     -fx-border-color:#7986cb; -fx-border-width:2 0 0 0;
+                     -fx-effect:dropshadow(gaussian,rgba(57,73,171,0.15),16,0,0,-6);">
+
+            <!-- Form title bar -->
+            <HBox style="-fx-background-color:#e8eaf6; -fx-padding:8 18;"
+                  alignment="CENTER_LEFT" spacing="12">
+                <Label fx:id="lblFormTitle" text="✚  New Promotion"
+                       style="-fx-font-size:13px; -fx-font-weight:bold;
+                              -fx-text-fill:#283593;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblFormMessage"
+                       style="-fx-font-size:12px;" wrapText="false"/>
+                <Button text="✖  Close" onAction="#handleClear"
+                        style="-fx-background-color:transparent; -fx-text-fill:#5c6bc0;
+                               -fx-cursor:hand; -fx-font-size:12px; -fx-padding:3 10;
+                               -fx-border-color:#c5cae9; -fx-border-radius:4;
+                               -fx-background-radius:4;"/>
+            </HBox>
+
+            <!-- Field row (horizontal layout = 1 hàng, không cần scroll) -->
+            <HBox spacing="14" style="-fx-padding:14 18 14 18; -fx-background-color:white;"
+                  alignment="CENTER_LEFT">
+
+                <!-- Code -->
+                <VBox spacing="3" prefWidth="125">
+                    <Label text="CODE *"
+                           style="-fx-font-size:10px; -fx-font-weight:bold;
+                                  -fx-text-fill:#7986cb; -fx-letter-spacing:0.5;"/>
+                    <TextField fx:id="txtCode" styleClass="login-field"
+                               promptText="e.g. SALE10"/>
+                </VBox>
+
+                <!-- Name -->
+                <VBox spacing="3" HBox.hgrow="ALWAYS">
+                    <Label text="NAME *"
+                           style="-fx-font-size:10px; -fx-font-weight:bold;
+                                  -fx-text-fill:#7986cb;"/>
+                    <TextField fx:id="txtName" styleClass="login-field"
+                               promptText="e.g. Summer Sale 10% Off"/>
+                </VBox>
+
+                <!-- Type -->
+                <VBox spacing="3" prefWidth="110">
+                    <Label text="TYPE *"
+                           style="-fx-font-size:10px; -fx-font-weight:bold;
+                                  -fx-text-fill:#7986cb;"/>
+                    <ComboBox fx:id="cmbDiscountType" styleClass="combo-box"
+                              maxWidth="Infinity"/>
+                </VBox>
+
+                <!-- Value -->
+                <VBox spacing="3" prefWidth="105">
+                    <Label text="VALUE *"
+                           style="-fx-font-size:10px; -fx-font-weight:bold;
+                                  -fx-text-fill:#7986cb;"/>
+                    <TextField fx:id="txtDiscountValue" styleClass="login-field"
+                               promptText="10 or 200000"/>
+                </VBox>
+
+                <Separator orientation="VERTICAL" style="-fx-opacity:0.35; -fx-padding:0 2;"/>
+
+                <!-- Start Date -->
+                <VBox spacing="3" prefWidth="138">
+                    <Label text="START DATE *"
+                           style="-fx-font-size:10px; -fx-font-weight:bold;
+                                  -fx-text-fill:#7986cb;"/>
+                    <DatePicker fx:id="dpStartDate" styleClass="date-picker"
+                                maxWidth="Infinity"/>
+                </VBox>
+
+                <!-- End Date -->
+                <VBox spacing="3" prefWidth="138">
+                    <Label text="END DATE *"
+                           style="-fx-font-size:10px; -fx-font-weight:bold;
+                                  -fx-text-fill:#7986cb;"/>
+                    <DatePicker fx:id="dpEndDate" styleClass="date-picker"
+                                maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator orientation="VERTICAL" style="-fx-opacity:0.35; -fx-padding:0 2;"/>
+
+                <!-- Min Order -->
+                <VBox spacing="3" prefWidth="128">
+                    <Label text="MIN ORDER (₫)"
+                           style="-fx-font-size:10px; -fx-font-weight:bold;
+                                  -fx-text-fill:#7986cb;"/>
+                    <TextField fx:id="txtMinOrderValue" styleClass="login-field"
+                               promptText="0 = no minimum"/>
+                </VBox>
+
+                <!-- Usage Limit -->
+                <VBox spacing="3" prefWidth="105">
+                    <Label text="USAGE LIMIT"
+                           style="-fx-font-size:10px; -fx-font-weight:bold;
+                                  -fx-text-fill:#7986cb;"/>
+                    <TextField fx:id="txtUsageLimit" styleClass="login-field"
+                               promptText="blank = ∞"/>
+                </VBox>
+
+                <!-- Status -->
+                <VBox spacing="3" prefWidth="118">
+                    <Label text="STATUS *"
+                           style="-fx-font-size:10px; -fx-font-weight:bold;
+                                  -fx-text-fill:#7986cb;"/>
+                    <ComboBox fx:id="cmbStatus" styleClass="combo-box"
+                              maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator orientation="VERTICAL" style="-fx-opacity:0.35; -fx-padding:0 2;"/>
+
+                <!-- Action buttons (stacked vertically, compact) -->
+                <VBox spacing="6" alignment="CENTER" prefWidth="148">
+                    <Button fx:id="btnUpdate" text="✏  Update"
+                            onAction="#handleUpdate"
+                            maxWidth="Infinity" disable="true"
+                            style="-fx-background-color:#e65100; -fx-text-fill:white;
+                                   -fx-font-size:12px; -fx-font-weight:bold;
+                                   -fx-background-radius:6; -fx-cursor:hand;
+                                   -fx-padding:8 0;"/>
+                    <Button fx:id="btnClear" text="✖  Cancel"
+                            onAction="#handleClear"
+                            maxWidth="Infinity" styleClass="btn-secondary"
+                            style="-fx-font-size:12px; -fx-padding:7 0;"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </bottom>
+
+</BorderPane>

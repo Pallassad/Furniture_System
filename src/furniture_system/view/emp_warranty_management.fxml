@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="furniture_system.controller.EmpWarrantyController"
+            styleClass="content-root">
+
+    <!-- ── HEADER ── -->
+    <top>
+        <HBox style="-fx-background-color:#2e7d32; -fx-padding:14 22;"
+              alignment="CENTER_LEFT" spacing="16">
+            <Label text="🔧  Warranty &amp; Repair Tickets" styleClass="app-title-sm"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="↺ Refresh" onAction="#handleRefresh" styleClass="btn-secondary"/>
+        </HBox>
+    </top>
+
+    <!-- ── MAIN: split left/right ── -->
+    <center>
+        <SplitPane orientation="HORIZONTAL" dividerPositions="0.58">
+            <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+
+            <!-- LEFT: Assigned tickets table -->
+            <VBox spacing="8">
+                <Label text="My Assigned Tickets" styleClass="page-title"/>
+
+                <!-- FIX: placeholder as Node element, not String attribute -->
+                <TableView fx:id="tableWarranty" VBox.vgrow="ALWAYS">
+                    <placeholder>
+                        <Label text="No tickets assigned."
+                               style="-fx-text-fill:#9e9e9e; -fx-font-style:italic;"/>
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="colTicketId"  text="#"        prefWidth="50"/>
+                        <TableColumn fx:id="colOrderId"   text="Order"    prefWidth="60"/>
+                        <TableColumn fx:id="colProduct"   text="Product"  prefWidth="170"/>
+                        <TableColumn fx:id="colCustomer"  text="Customer" prefWidth="130"/>
+                        <TableColumn fx:id="colStatus"    text="Status"   prefWidth="110"/>
+                        <TableColumn fx:id="colCost"      text="Cost"     prefWidth="100"/>
+                        <TableColumn fx:id="colCreatedAt" text="Created"  prefWidth="90"/>
+                    </columns>
+                </TableView>
+
+                <Label fx:id="lblEmpStatus" text="Ready." styleClass="status-label"
+                       style="-fx-padding:4 8;"/>
+            </VBox>
+
+            <!-- RIGHT: Create + Update panels -->
+            <VBox spacing="12">
+
+                <!-- CREATE TICKET -->
+                <TitledPane text="➕  Create New Ticket" collapsible="true" expanded="true">
+                    <GridPane hgap="10" vgap="9">
+                        <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+
+                        <Label text="Order ID *"    GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtNewOrderId" promptText="Completed order ID"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                   styleClass="login-field" prefWidth="160"/>
+
+                        <Label text="Product ID *"  GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtNewProductId" promptText="Product ID"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                   styleClass="login-field" prefWidth="160"/>
+
+                        <Label text="Customer ID *" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextField fx:id="txtNewCustomerId" promptText="Customer ID"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="2"
+                                   styleClass="login-field" prefWidth="160"/>
+
+                        <Label text="Issue Desc *"  GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <TextArea fx:id="txtNewIssueDesc" promptText="Describe the defect…"
+                                  prefHeight="70" wrapText="true"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="220"/>
+
+                        <Label text="Note"          GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <TextArea fx:id="txtNewNote" promptText="(optional)"
+                                  prefHeight="45" wrapText="true"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="4" prefWidth="220"/>
+
+                        <Button fx:id="btnCreate" text="➕ Create Ticket" onAction="#handleCreate"
+                                styleClass="btn-primary"
+                                GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                    </GridPane>
+                </TitledPane>
+
+                <!-- UPDATE TICKET -->
+                <TitledPane text="✏  Update Ticket Status" collapsible="true" expanded="true">
+                    <GridPane hgap="10" vgap="9">
+                        <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+
+                        <Label text="Ticket ID *"   GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtUpdTicketId" promptText="Auto-filled on selection"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                   styleClass="login-field" prefWidth="160"/>
+
+                        <Label text="New Status *"  GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <ComboBox fx:id="cmbUpdStatus"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="180"/>
+
+                        <Label text="Cost (₫)"      GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextField fx:id="txtUpdCost" promptText="0 = free warranty"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="2"
+                                   styleClass="login-field" prefWidth="160"/>
+
+                        <Label text="Note"          GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <TextArea fx:id="txtUpdNote" promptText="(optional)"
+                                  prefHeight="50" wrapText="true"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="220"/>
+
+                        <Button fx:id="btnUpdateTicket" text="✏ Update Ticket"
+                                onAction="#handleUpdateTicket"
+                                styleClass="btn-warning"
+                                GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                    </GridPane>
+                </TitledPane>
+
+                <!-- Legend -->
+                <HBox spacing="16" style="-fx-padding:4 8;">
+                    <Label text="💡 Cost = 0 → Free warranty   |   Cost &gt; 0 → Chargeable repair"
+                           style="-fx-text-fill:#757575; -fx-font-size:11px; -fx-font-style:italic;"/>
+                </HBox>
+
+            </VBox>
+        </SplitPane>
+    </center>
+
+</BorderPane>

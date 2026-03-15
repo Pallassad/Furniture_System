@@ -20,9 +20,10 @@ public class EmployeeDashboardController {
     @FXML private Button btnOrders;
     @FXML private Button btnCustomer;
     @FXML private Button btnFurnitureType;
-    @FXML private Button btnProducts;      // ★ MỚI
+    @FXML private Button btnProducts;
     @FXML private Button btnInventory;
     @FXML private Button btnWarranty;
+    @FXML private Button btnDeliveryAddress;
 
     private List<Button> sidebarButtons;
 
@@ -46,12 +47,15 @@ public class EmployeeDashboardController {
         sidebarButtons = List.of(
             btnOrders, btnCustomer,
             btnFurnitureType,
-            btnProducts,                        // ★ MỚI
-            btnInventory, btnWarranty
+            btnProducts,
+            btnInventory,
+            btnDeliveryAddress,
+            btnWarranty
         );
 
-        setActive(btnOrders);
-        showPlaceholder("🛒 Sales / Orders");
+        // ✅ Default landing page → Customers
+        setActive(btnCustomer);
+        loadView("/furniture_system/view/customer_management.fxml");
     }
 
     // ── Sidebar handlers ──────────────────────────────────────────────────────
@@ -59,7 +63,7 @@ public class EmployeeDashboardController {
     @FXML
     public void showOrders() {
         setActive(btnOrders);
-        showPlaceholder("🛒 Sales / Orders");
+        loadView("/furniture_system/view/employee_order_management.fxml");
     }
 
     @FXML
@@ -75,7 +79,7 @@ public class EmployeeDashboardController {
     }
 
     @FXML
-    public void showProducts() {                // ★ MỚI
+    public void showProducts() {
         setActive(btnProducts);
         loadView("/furniture_system/view/employee_furniture_management.fxml");
     }
@@ -83,13 +87,19 @@ public class EmployeeDashboardController {
     @FXML
     public void showInventory() {
         setActive(btnInventory);
-        loadView("/furniture_system/view/employee_stock_view.fxml"); // ★ ĐÃ CẬP NHẬT
+        loadView("/furniture_system/view/employee_stock_view.fxml");
+    }
+
+    @FXML
+    public void showDeliveryAddressManagement() {
+        setActive(btnDeliveryAddress);
+        loadView("/furniture_system/view/employee_delivery_address_management.fxml");
     }
 
     @FXML
     public void showWarranty() {
         setActive(btnWarranty);
-        showPlaceholder("🔧 Warranty Tickets");
+        loadView("/furniture_system/view/emp_warranty_management.fxml");
     }
 
     // ── Logout ────────────────────────────────────────────────────────────────

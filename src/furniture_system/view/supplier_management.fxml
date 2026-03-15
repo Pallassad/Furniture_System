@@ -8,15 +8,16 @@
       fx:controller="furniture_system.controller.SupplierController"
       spacing="12"
       styleClass="content-root"
-      stylesheets="@../resources/css/admin.css"
-      style="-fx-padding:20;">
+      stylesheets="@../resources/css/admin.css">
+    <padding><Insets topRightBottomLeft="20"/></padding>
 
     <Label text="🏭 Supplier Relationship Management" styleClass="page-title"/>
 
-    <!-- ══ Add / Edit Supplier Form ══════════════════════════════════════ -->
-    <TitledPane text="Add / Edit Supplier" expanded="true" collapsible="true"
-                style="-fx-font-weight:bold;">
-        <VBox spacing="10" styleClass="action-pane" style="-fx-padding:16;">
+    <!-- ── Add / Edit Supplier Form ─────────────────────────────── -->
+    <TitledPane text="Add / Edit Supplier" expanded="true" collapsible="true">
+        <VBox spacing="10" styleClass="action-pane">
+            <padding><Insets topRightBottomLeft="16"/></padding>
+
             <GridPane hgap="14" vgap="8">
                 <columnConstraints>
                     <ColumnConstraints minWidth="100" prefWidth="110"/>
@@ -25,7 +26,6 @@
                     <ColumnConstraints hgrow="ALWAYS" prefWidth="200"/>
                 </columnConstraints>
 
-                <!-- Row 0 -->
                 <Label text="Name *"  styleClass="field-label"
                        GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                 <TextField fx:id="txtName"  promptText="Min 2 characters"
@@ -38,7 +38,6 @@
                            styleClass="login-field"
                            GridPane.columnIndex="3" GridPane.rowIndex="0"/>
 
-                <!-- Row 1 -->
                 <Label text="Email"    styleClass="field-label"
                        GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                 <TextField fx:id="txtEmail" promptText="Optional, unique"
@@ -50,7 +49,6 @@
                 <ComboBox fx:id="cbStatus" maxWidth="Infinity" styleClass="combo-box"
                           GridPane.columnIndex="3" GridPane.rowIndex="1"/>
 
-                <!-- Row 2 -->
                 <Label text="Address"  styleClass="field-label"
                        GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                 <TextField fx:id="txtAddress" promptText="Optional (max 255 chars)"
@@ -62,15 +60,13 @@
             <Label fx:id="lblFormError" text="" wrapText="true" styleClass="error-label"/>
 
             <HBox spacing="10">
-                <Button fx:id="btnSave"  text="Add Supplier" onAction="#handleSave"
-                        styleClass="btn-primary"/>
-                <Button fx:id="btnClear" text="Clear"        onAction="#handleClear"
-                        styleClass="btn-secondary"/>
+                <Button fx:id="btnSave"  text="Add Supplier" onAction="#handleSave"  styleClass="btn-primary"/>
+                <Button fx:id="btnClear" text="Clear"        onAction="#handleClear" styleClass="btn-secondary"/>
             </HBox>
         </VBox>
     </TitledPane>
 
-    <!-- ══ Supplier Table ════════════════════════════════════════════════ -->
+    <!-- ── Search + Table ───────────────────────────────────────── -->
     <HBox spacing="10" alignment="CENTER_LEFT">
         <TextField fx:id="txtSearch"
                    promptText="🔍 Search by name, phone, email, status…"
@@ -78,8 +74,7 @@
         <Button text="Search" onAction="#handleSearch" styleClass="btn-primary"/>
     </HBox>
 
-    <TableView fx:id="tblSuppliers" prefHeight="200" VBox.vgrow="SOMETIMES"
-               styleClass="table-view">
+    <TableView fx:id="tblSuppliers" prefHeight="200" VBox.vgrow="SOMETIMES" styleClass="table-view">
         <placeholder>
             <Label text="No suppliers found." styleClass="table-placeholder"/>
         </placeholder>
@@ -97,11 +92,12 @@
         </columnResizePolicy>
     </TableView>
 
-    <!-- ══ Link Supplier ↔ Product ════════════════════════════════════════ -->
+    <!-- ── Link Supplier ↔ Product ──────────────────────────────── -->
     <TitledPane text="Link Supplier to Product (select a supplier above first)"
-                expanded="true" collapsible="true"
-                style="-fx-font-weight:bold;">
-        <VBox spacing="10" styleClass="action-pane" style="-fx-padding:16;">
+                expanded="true" collapsible="true">
+        <VBox spacing="10" styleClass="action-pane">
+            <padding><Insets topRightBottomLeft="16"/></padding>
+
             <HBox spacing="12" alignment="CENTER_LEFT">
                 <Label text="Product *"      styleClass="field-label"/>
                 <ComboBox fx:id="cbProduct" prefWidth="220" promptText="Choose product…"
@@ -115,16 +111,12 @@
                 <TextField fx:id="txtLeadDays" promptText="0"
                            prefWidth="70" styleClass="login-field"/>
 
-                <Button text="Link Product" onAction="#handleLinkProduct"
-                        style="-fx-background-color:#2e7d32; -fx-text-fill:white;
-                               -fx-font-weight:bold; -fx-background-radius:6;
-                               -fx-padding:8 16; -fx-cursor:hand;"/>
+                <Button text="Link Product" onAction="#handleLinkProduct" styleClass="btn-green"/>
             </HBox>
 
             <Label fx:id="lblLinkError" text="" styleClass="error-label"/>
 
-            <TableView fx:id="tblLinks" prefHeight="150" VBox.vgrow="NEVER"
-                       styleClass="table-view">
+            <TableView fx:id="tblLinks" prefHeight="150" VBox.vgrow="NEVER" styleClass="table-view">
                 <columns>
                     <TableColumn fx:id="colLinkProduct" text="Product"      prefWidth="240"/>
                     <TableColumn fx:id="colLinkPrice"   text="Import Price" prefWidth="130"/>
@@ -138,9 +130,8 @@
         </VBox>
     </TitledPane>
 
-    <!-- Status Bar -->
+    <!-- ── Status Bar ───────────────────────────────────────────── -->
     <HBox styleClass="status-bar">
         <Label fx:id="lblStatus" text="Ready." styleClass="status-label"/>
     </HBox>
-
 </VBox>

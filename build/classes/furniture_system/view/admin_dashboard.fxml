@@ -63,7 +63,6 @@
                            -fx-background-radius:6; -fx-cursor:hand;
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
 
-            <!-- ★ MỚI: Furniture Type Management -->
             <Button fx:id="btnFurnitureType" text="🪑  Furniture Types"
                     onAction="#showFurnitureTypeManagement"
                     maxWidth="Infinity"
@@ -78,7 +77,14 @@
                            -fx-background-radius:6; -fx-cursor:hand;
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
 
-            <!-- ★ MỚI: Supplier Management -->
+            <!-- ★ MỚI -->
+            <Button fx:id="btnPromotion" text="🎫  Promotion Management"
+                    onAction="#showPromotionManagement"
+                    maxWidth="Infinity"
+                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
+                           -fx-background-radius:6; -fx-cursor:hand;
+                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
+
             <Button fx:id="btnSupplier" text="🏭  Supplier Management"
                     onAction="#showSupplierManagement"
                     maxWidth="Infinity"
@@ -86,9 +92,29 @@
                            -fx-background-radius:6; -fx-cursor:hand;
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
 
-            <!-- ★ MỚI: Stock / Inventory -->
             <Button fx:id="btnStock" text="📋  Stock and Inventory"
                     onAction="#showStockManagement"
+                    maxWidth="Infinity"
+                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
+                           -fx-background-radius:6; -fx-cursor:hand;
+                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
+
+            <Button fx:id="btnSalary" text="💰  Salary Management"
+                    onAction="#showSalaryManagement"
+                    maxWidth="Infinity"
+                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
+                           -fx-background-radius:6; -fx-cursor:hand;
+                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
+
+            <Button fx:id="btnWarranty" text="🔧  Warranty &amp; Repair"
+                    onAction="#showWarrantyManagement"
+                    maxWidth="Infinity"
+                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
+                           -fx-background-radius:6; -fx-cursor:hand;
+                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
+
+            <Button fx:id="btnDeliveryAddress" text="📍  Delivery Addresses"
+                    onAction="#showDeliveryAddressManagement"
                     maxWidth="Infinity"
                     style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
                            -fx-background-radius:6; -fx-cursor:hand;

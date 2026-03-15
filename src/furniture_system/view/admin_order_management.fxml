@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.AdminOrderController"
+      spacing="14"
+      styleClass="content-root"
+      stylesheets="@/furniture_system/resources/css/admin.css">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+
+    <!-- ── Page Header ──────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="🛒 Order &amp; Invoice Management" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <Separator styleClass="separator"/>
+
+    <!-- ── Search Toolbar ───────────────────────────────────────── -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="tfSearchOrderId"
+                   promptText="Order ID"
+                   prefWidth="90"
+                   styleClass="login-field"/>
+        <TextField fx:id="tfSearchCustomerId"
+                   promptText="Customer ID"
+                   prefWidth="108"
+                   styleClass="login-field"/>
+        <TextField fx:id="tfSearchEmployeeId"
+                   promptText="Employee ID"
+                   prefWidth="108"
+                   styleClass="login-field"/>
+        <ComboBox fx:id="cbSearchStatus"
+                  promptText="Status"
+                  prefWidth="130"
+                  styleClass="combo-box"/>
+        <DatePicker fx:id="dpFrom"
+                    promptText="From"
+                    prefWidth="138"
+                    styleClass="date-picker"/>
+        <DatePicker fx:id="dpTo"
+                    promptText="To"
+                    prefWidth="138"
+                    styleClass="date-picker"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnReset"  text="⟳  Reset"  onAction="#onReset"  styleClass="btn-outline"/>
+        <Button fx:id="btnSearch" text="🔍  Search" onAction="#onSearch" styleClass="btn-primary"/>
+    </HBox>
+
+    <!-- ── Orders Table ─────────────────────────────────────────── -->
+    <TableView fx:id="tblOrders" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <columns>
+            <TableColumn fx:id="colOrderId"  text="#"        prefWidth="55"/>
+            <TableColumn fx:id="colCustomer" text="Customer" prefWidth="170"/>
+            <TableColumn fx:id="colEmployee" text="Employee" prefWidth="145"/>
+            <TableColumn fx:id="colDate"     text="Date"     prefWidth="145"/>
+            <TableColumn fx:id="colStatus"   text="Status"   prefWidth="115"/>
+            <TableColumn fx:id="colFinal"    text="Total"    prefWidth="130"/>
+            <TableColumn fx:id="colActions"  text="Actions"  prefWidth="150"/>
+        </columns>
+        <placeholder>
+            <Label text="No orders found." styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Detail + Billing panel (toggle khi chọn row) ────────── -->
+    <VBox fx:id="pnlOrderDetail" spacing="0" managed="false" visible="false"
+          style="-fx-background-color:white; -fx-background-radius:8;
+                 -fx-border-color:#c5cae9; -fx-border-radius:8; -fx-border-width:1;">
+
+        <!-- Panel header: title + status update inline -->
+        <HBox style="-fx-background-color:#e8eaf6; -fx-padding:8 16;"
+              alignment="CENTER_LEFT" spacing="10">
+            <Label text="📋" style="-fx-font-size:14px;"/>
+            <Label fx:id="lblDetailOrderId"
+                   style="-fx-font-size:13px; -fx-font-weight:bold; -fx-text-fill:#283593;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="New status:" styleClass="form-label"/>
+            <ComboBox fx:id="cbNewStatus" prefWidth="165" styleClass="combo-box"/>
+            <TextArea fx:id="taStatusNote" prefHeight="34" prefWidth="210"
+                      promptText="Note (required past PAID)…"
+                      style="-fx-font-size:11px;"/>
+            <Button fx:id="btnUpdateStatus" text="✔  Update"
+                    styleClass="btn-primary" onAction="#onUpdateStatus"
+                    style="-fx-padding:6 16; -fx-font-size:12px;"/>
+        </HBox>
+
+        <!-- Body: items table (left) + billing form (right) -->
+        <HBox spacing="0">
+
+            <!-- Order lines -->
+            <VBox spacing="6" HBox.hgrow="ALWAYS"
+                  style="-fx-padding:12 14; -fx-border-color:#e8eaf6; -fx-border-width:0 1 0 0;">
+                <Label text="ORDER ITEMS"
+                       style="-fx-font-size:10px; -fx-font-weight:bold; -fx-text-fill:#7986cb;"/>
+                <TableView fx:id="tblLines" prefHeight="160" styleClass="data-table-sm">
+                    <columns>
+                        <TableColumn fx:id="colProduct"   text="Product"    prefWidth="210"/>
+                        <TableColumn fx:id="colQty"       text="Qty"        prefWidth="55"/>
+                        <TableColumn fx:id="colUnitPrice" text="Unit Price" prefWidth="125"/>
+                        <TableColumn fx:id="colLineTotal" text="Subtotal"   prefWidth="125"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="No items." style="-fx-text-fill:#9e9e9e; -fx-font-size:12px;"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+
+            <!-- Billing -->
+            <VBox fx:id="pnlBilling" spacing="8" prefWidth="380"
+                  style="-fx-padding:12 16;">
+                <Label text="💳  INVOICE &amp; PAYMENT"
+                       style="-fx-font-size:10px; -fx-font-weight:bold; -fx-text-fill:#7986cb;"/>
+                <Label fx:id="lblBillingStatus"
+                       style="-fx-font-size:11px; -fx-text-fill:#546e7a;
+                              -fx-background-color:#f5f6fc; -fx-padding:4 10;
+                              -fx-background-radius:4;" wrapText="true"/>
+
+                <GridPane hgap="10" vgap="7">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120" prefWidth="130"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+                    <Label text="Payment Method:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="form-label"/>
+                    <ComboBox fx:id="cbPayMethod" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                              maxWidth="Infinity" styleClass="combo-box"/>
+
+                    <Label text="Amount:"          GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="form-label"/>
+                    <TextField fx:id="tfPaidAmount" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                               promptText="0" maxWidth="Infinity" styleClass="login-field"/>
+
+                    <Label text="Invoice Status:"  GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="form-label"/>
+                    <ComboBox fx:id="cbBillingStatus" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                              maxWidth="Infinity" styleClass="combo-box"/>
+
+                    <Label text="Note:"            GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="form-label"/>
+                    <TextArea fx:id="taBillingNote" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                              prefHeight="46" promptText="Optional…"
+                              style="-fx-font-size:11px;"/>
+                </GridPane>
+
+                <HBox>
+                    <Button fx:id="btnSaveBilling" text="💾  Save Invoice"
+                            styleClass="btn-success" onAction="#onSaveBilling"
+                            style="-fx-padding:7 18; -fx-font-size:12px;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- ── Status Bar ───────────────────────────────────────────── -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
+        <Label text="ℹ"/>
+        <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
+    </HBox>
+
+</VBox>

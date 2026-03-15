@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="furniture_system.controller.AdminWarrantyManagementController"
+            styleClass="content-root"
+            stylesheets="@../resources/css/admin.css">
+
+    <!-- ── HEADER ── -->
+    <top>
+        <HBox styleClass="page-header-bar" alignment="CENTER_LEFT" spacing="16">
+            <Label text="🔧  Warranty &amp; Repair Management" styleClass="app-title-sm"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtSearch" promptText="Search by ticket, customer, product, status…"
+                       prefWidth="300" styleClass="login-field"
+                       onAction="#handleSearch"/>
+            <Button text="🔍 Search" onAction="#handleSearch" styleClass="btn-outline"/>
+            <Button text="↺ Refresh" onAction="#handleSearch" styleClass="btn-secondary"/>
+        </HBox>
+    </top>
+
+    <!-- ── MAIN ── -->
+    <center>
+        <SplitPane orientation="VERTICAL">
+            <padding>
+                <Insets top="12" right="16" bottom="0" left="16"/>
+            </padding>
+
+            <!-- TABLE -->
+            <VBox spacing="6" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tableWarranty" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colTicketId"  text="#"           prefWidth="50"/>
+                        <TableColumn fx:id="colOrderId"   text="Order"       prefWidth="60"/>
+                        <TableColumn fx:id="colProduct"   text="Product"     prefWidth="180"/>
+                        <TableColumn fx:id="colCustomer"  text="Customer"    prefWidth="150"/>
+                        <TableColumn fx:id="colHandler"   text="Handler"     prefWidth="130"/>
+                        <TableColumn fx:id="colStatus"    text="Status"      prefWidth="110"/>
+                        <TableColumn fx:id="colCost"      text="Cost"        prefWidth="100"/>
+                        <TableColumn fx:id="colCreatedAt" text="Created"     prefWidth="100"/>
+                    </columns>
+                </TableView>
+                <Label fx:id="lblStatus" text="Ready." styleClass="status-label"
+                       style="-fx-padding:4 8;"/>
+            </VBox>
+
+            <!-- FORM PANEL -->
+            <TitledPane text="Ticket Details – Add / Update" collapsible="false">
+                <GridPane hgap="12" vgap="10">
+                    <padding>
+                        <Insets top="14" right="20" bottom="14" left="20"/>
+                    </padding>
+
+                    <!-- Row 0: OrderId, ProductId, CustomerId -->
+                    <Label text="Order ID *"     GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="txtOrderId" promptText="e.g. 5"
+                               GridPane.columnIndex="1" GridPane.rowIndex="0"
+                               styleClass="login-field" prefWidth="100"/>
+
+                    <Label text="Product ID *"   GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <TextField fx:id="txtProductId" promptText="e.g. 3"
+                               GridPane.columnIndex="3" GridPane.rowIndex="0"
+                               styleClass="login-field" prefWidth="100"/>
+
+                    <Label text="Customer ID *"  GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+                    <TextField fx:id="txtCustomerId" promptText="e.g. 1"
+                               GridPane.columnIndex="5" GridPane.rowIndex="0"
+                               styleClass="login-field" prefWidth="100"/>
+
+                    <!-- Row 1: HandlerId, Status, Cost -->
+                    <Label text="Handler Emp ID" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="txtHandlerId" promptText="(optional)"
+                               GridPane.columnIndex="1" GridPane.rowIndex="1"
+                               styleClass="login-field" prefWidth="100"/>
+
+                    <Label text="Status *"       GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                    <ComboBox fx:id="cmbStatus"  GridPane.columnIndex="3" GridPane.rowIndex="1"
+                              prefWidth="150"/>
+
+                    <Label text="Cost (₫)"       GridPane.columnIndex="4" GridPane.rowIndex="1"/>
+                    <TextField fx:id="txtCost" promptText="0"
+                               GridPane.columnIndex="5" GridPane.rowIndex="1"
+                               styleClass="login-field" prefWidth="120"/>
+
+                    <!-- Row 2: IssueDesc -->
+                    <Label text="Issue Desc *"   GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <TextArea fx:id="txtIssueDesc" promptText="Describe the defect / issue…"
+                              prefHeight="70" prefWidth="460" wrapText="true"
+                              GridPane.columnIndex="1" GridPane.rowIndex="2"
+                              GridPane.columnSpan="5"/>
+
+                    <!-- Row 3: Note -->
+                    <Label text="Note"           GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <TextArea fx:id="txtNote" promptText="(optional)"
+                              prefHeight="50" prefWidth="460" wrapText="true"
+                              GridPane.columnIndex="1" GridPane.rowIndex="3"
+                              GridPane.columnSpan="5"/>
+
+                    <!-- Row 4: Buttons -->
+                    <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="4"
+                          GridPane.columnSpan="5">
+                        <Button fx:id="btnAdd"    text="➕ Add Ticket"    onAction="#handleAdd"    styleClass="btn-primary"/>
+                        <Button fx:id="btnUpdate" text="✏ Update"         onAction="#handleUpdate" styleClass="btn-warning"/>
+                        <Button fx:id="btnCancel" text="🚫 Cancel/Reject" onAction="#handleCancel" styleClass="btn-danger"/>
+                        <Button fx:id="btnClear"  text="✖ Clear"          onAction="#handleClear"  styleClass="btn-secondary"/>
+                    </HBox>
+                </GridPane>
+            </TitledPane>
+        </SplitPane>
+    </center>
+</BorderPane>

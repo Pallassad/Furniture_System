@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+    employee_delivery_address_management.fxml
+    Controller: furniture_system.controller.EmployeeDeliveryAddressController
+-->
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.EmployeeDeliveryAddressController"
+      spacing="10" styleClass="sub-panel">
+    <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Delivery Address" styleClass="section-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblSelectedAddress" text="No address selected"
+               styleClass="selected-badge" wrapText="true" maxWidth="320"/>
+    </HBox>
+
+    <Separator/>
+
+    <!-- Address Table -->
+    <!-- FIX: placeholder must be a child Node element, NOT a plain String attribute -->
+    <TableView fx:id="tblAddresses" prefHeight="220">
+        <placeholder>
+            <Label text="No active addresses for this customer."
+                   style="-fx-text-fill:#9e9e9e; -fx-font-style:italic;"/>
+        </placeholder>
+        <columns>
+            <TableColumn fx:id="colId"       text="ID"       prefWidth="45"/>
+            <TableColumn fx:id="colReceiver" text="Receiver" prefWidth="130"/>
+            <TableColumn fx:id="colPhone"    text="Phone"    prefWidth="105"/>
+            <TableColumn fx:id="colAddress"  text="Address"  prefWidth="180"/>
+            <TableColumn fx:id="colWard"     text="Ward"     prefWidth="90"/>
+            <TableColumn fx:id="colDistrict" text="District" prefWidth="100"/>
+            <TableColumn fx:id="colCity"     text="City"     prefWidth="110"/>
+            <TableColumn fx:id="colDefault"  text="Default"  prefWidth="65"/>
+        </columns>
+    </TableView>
+
+    <!-- Action bar -->
+    <HBox spacing="8">
+        <Button fx:id="btnSelect" text="✔ Use This Address"
+                onAction="#onSelect" styleClass="btn-success" disable="true"/>
+        <Button text="＋ Add New Address"
+                onAction="#onShowAddForm" styleClass="btn-primary"/>
+    </HBox>
+
+    <!-- ── Add-address Form (hidden) ───────────────────────────────────── -->
+    <VBox fx:id="addFormPanel" spacing="10" visible="false" managed="false"
+          styleClass="inner-form-panel">
+        <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+        <Label text="New Delivery Address" styleClass="form-title"/>
+        <Separator/>
+
+        <GridPane hgap="10" vgap="8">
+            <Label text="Receiver Name *"      GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="form-label"/>
+            <TextField fx:id="txtReceiverName" promptText="Full name" prefWidth="220"
+                       GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+            <Label text="Phone * (9–11 digits)" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="form-label"/>
+            <TextField fx:id="txtPhone"          promptText="e.g. 0901234567"
+                       GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+            <Label text="Address Line *"        GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="form-label"/>
+            <TextField fx:id="txtAddressLine"   promptText="House no., street"
+                       GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+            <Label text="Ward *"                GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="form-label"/>
+            <TextField fx:id="txtWard"          promptText="e.g. Ward 1"
+                       GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+            <Label text="District *"            GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="form-label"/>
+            <TextField fx:id="txtDistrict"      promptText="e.g. District 3"
+                       GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+            <Label text="City *"                GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="form-label"/>
+            <TextField fx:id="txtCity"          promptText="e.g. Ho Chi Minh City"
+                       GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+            <CheckBox fx:id="chkDefault" text="Set as Default"
+                      GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        </GridPane>
+
+        <Label fx:id="lblError" text="" styleClass="error-label" wrapText="true"/>
+
+        <HBox spacing="8">
+            <Button text="💾 Save Address" onAction="#onSaveNewAddress" styleClass="btn-success"/>
+            <Button text="✕ Cancel"        onAction="#onCancelAdd"      styleClass="btn-outline"/>
+        </HBox>
+    </VBox>
+
+</VBox>

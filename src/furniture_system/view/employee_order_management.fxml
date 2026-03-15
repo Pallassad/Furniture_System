@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="furniture_system.controller.EmployeeOrderController"
+            styleClass="root-pane"
+            stylesheets="@/furniture_system/resources/css/emp.css"
+            prefWidth="1280" prefHeight="800">
+
+    <!-- ── TOP: Header ──────────────────────────────────────────────────── -->
+    <top>
+        <HBox styleClass="page-header" alignment="CENTER_LEFT" spacing="14">
+            <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
+            <Label text="🛒" style="-fx-font-size:20px;"/>
+            <VBox spacing="1" HBox.hgrow="ALWAYS">
+                <Label text="My Orders" styleClass="page-title"/>
+                <Label text="Create and track your own sales orders" styleClass="page-subtitle"/>
+            </VBox>
+            <Button text="＋  New Order" styleClass="btn-primary"
+                    onAction="#onShowCreateOrder"
+                    style="-fx-background-color:#3949ab; -fx-text-fill:white;
+                           -fx-font-size:13px; -fx-font-weight:bold;
+                           -fx-background-radius:8; -fx-cursor:hand;
+                           -fx-padding:9 22;"/>
+        </HBox>
+    </top>
+
+    <!-- ── CENTER: SplitPane — order list left, panels right ────────────── -->
+    <center>
+        <SplitPane dividerPositions="0.40">
+
+            <!-- ══ LEFT: My Orders Table ══════════════════════════════════ -->
+            <VBox style="-fx-background-color:white;">
+                <Label text="Order List"
+                       style="-fx-font-size:12px; -fx-font-weight:bold;
+                              -fx-text-fill:#7986cb; -fx-padding:10 16 6 16;"/>
+                <TableView fx:id="tblMyOrders" VBox.vgrow="ALWAYS" styleClass="data-table"
+                           style="-fx-background-color:white;">
+                    <columns>
+                        <TableColumn fx:id="colOrderId"  text="#"        prefWidth="55"  style="-fx-alignment:CENTER;"/>
+                        <TableColumn fx:id="colCustomer" text="Customer" prefWidth="155"/>
+                        <TableColumn fx:id="colDate"     text="Date"     prefWidth="130"/>
+                        <TableColumn fx:id="colStatus"   text="Status"   prefWidth="110" style="-fx-alignment:CENTER;"/>
+                        <TableColumn fx:id="colFinal"    text="Total"    prefWidth="115" style="-fx-alignment:CENTER_RIGHT;"/>
+                        <TableColumn fx:id="colActions"  text=""         prefWidth="80"  style="-fx-alignment:CENTER;"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="No orders yet."
+                               style="-fx-text-fill:#9e9e9e; -fx-font-size:13px; -fx-font-style:italic;"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+
+            <!-- ══ RIGHT: Create Form + Detail + Billing ══════════════════ -->
+            <ScrollPane fitToWidth="true"
+                        style="-fx-background-color:#f8f9ff; -fx-background:transparent;">
+                <VBox spacing="12">
+                    <padding><Insets topRightBottomLeft="14"/></padding>
+
+                    <!-- ── CREATE ORDER CARD ── -->
+                    <VBox fx:id="pnlCreateOrder" spacing="10"
+                          style="-fx-background-color:white; -fx-background-radius:8;
+                                 -fx-border-color:#c5cae9; -fx-border-radius:8;
+                                 -fx-border-width:1; -fx-padding:14;">
+
+                        <!-- Card header -->
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="🛒" style="-fx-font-size:16px;"/>
+                            <Label text="New Order"
+                                   style="-fx-font-size:14px; -fx-font-weight:bold;
+                                          -fx-text-fill:#283593;"/>
+                        </HBox>
+
+                        <Separator style="-fx-opacity:0.4;"/>
+
+                        <!-- Meta fields -->
+                        <Label text="ORDER INFO"
+                               style="-fx-font-size:10px; -fx-font-weight:bold;
+                                      -fx-text-fill:#7986cb;"/>
+
+                        <GridPane hgap="12" vgap="9">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="125" prefWidth="135"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+
+                            <Label text="Customer *" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                   styleClass="form-label"/>
+                            <ComboBox fx:id="cbCustomer" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                      maxWidth="Infinity"/>
+
+                            <Label text="Delivery Address *" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                                   styleClass="form-label" wrapText="true"/>
+                            <ComboBox fx:id="cbAddress" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                      maxWidth="Infinity"/>
+
+                            <Label text="Promotion" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                                   styleClass="form-label"/>
+                            <ComboBox fx:id="cbPromo" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                                      maxWidth="Infinity"/>
+
+                            <Label text="Note" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                                   styleClass="form-label"/>
+                            <TextArea fx:id="taNote" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                                      prefHeight="52" promptText="Optional note…"
+                                      style="-fx-font-size:12px;"/>
+                        </GridPane>
+
+                        <Separator style="-fx-opacity:0.4;"/>
+
+                        <!-- Add product line -->
+                        <Label text="PRODUCTS"
+                               style="-fx-font-size:10px; -fx-font-weight:bold;
+                                      -fx-text-fill:#7986cb;"/>
+
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <ComboBox fx:id="cbProduct" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                      promptText="Select a product…"/>
+                            <TextField fx:id="tfQty" prefWidth="72" promptText="Qty"
+                                       styleClass="login-field"/>
+                            <Button fx:id="btnAddLine" text="＋ Add"
+                                    styleClass="btn-secondary" onAction="#onAddLine"
+                                    style="-fx-padding:7 14; -fx-font-size:12px;"/>
+                        </HBox>
+
+                        <!-- Draft lines table -->
+                        <TableView fx:id="tblDraftLines" prefHeight="145" styleClass="data-table-sm"
+                                   style="-fx-background-color:white;">
+                            <columns>
+                                <TableColumn fx:id="colDraftProduct" text="Product"    prefWidth="185"/>
+                                <TableColumn fx:id="colDraftQty"     text="Qty"        prefWidth="50"  style="-fx-alignment:CENTER;"/>
+                                <TableColumn fx:id="colDraftPrice"   text="Unit Price" prefWidth="110" style="-fx-alignment:CENTER_RIGHT;"/>
+                                <TableColumn fx:id="colDraftTotal"   text="Subtotal"   prefWidth="105" style="-fx-alignment:CENTER_RIGHT;"/>
+                                <TableColumn fx:id="colDraftRemove"  text=""           prefWidth="60"  style="-fx-alignment:CENTER;"/>
+                            </columns>
+                            <placeholder>
+                                <Label text="No products added yet."
+                                       style="-fx-text-fill:#9e9e9e; -fx-font-size:12px;"/>
+                            </placeholder>
+                        </TableView>
+
+                        <!-- Totals -->
+                        <VBox style="-fx-background-color:#f5f6fc; -fx-background-radius:6;
+                                     -fx-padding:10 14; -fx-border-color:#e0e3f0;
+                                     -fx-border-radius:6; -fx-border-width:1;">
+                            <GridPane hgap="16" vgap="5" alignment="CENTER_RIGHT">
+                                <Label text="Subtotal:"
+                                       GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                       style="-fx-font-size:12px; -fx-text-fill:#546e7a;"/>
+                                <Label fx:id="lblSubTotal"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                       style="-fx-font-size:12px; -fx-text-fill:#37474f;"/>
+
+                                <Label text="Discount:"
+                                       GridPane.columnIndex="0" GridPane.rowIndex="1"
+                                       style="-fx-font-size:12px; -fx-text-fill:#546e7a;"/>
+                                <Label fx:id="lblDiscount"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                       style="-fx-font-size:12px; -fx-text-fill:#e53935; -fx-font-weight:bold;"/>
+
+                                <Separator GridPane.columnIndex="0" GridPane.rowIndex="2"
+                                           GridPane.columnSpan="2" maxWidth="Infinity"/>
+
+                                <Label text="Total:"
+                                       GridPane.columnIndex="0" GridPane.rowIndex="3"
+                                       style="-fx-font-size:13px; -fx-font-weight:bold; -fx-text-fill:#283593;"/>
+                                <Label fx:id="lblFinalTotal"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="3"
+                                       style="-fx-font-size:14px; -fx-font-weight:bold; -fx-text-fill:#1a237e;"/>
+                            </GridPane>
+                        </VBox>
+
+                        <HBox>
+                            <Button fx:id="btnCreateOrder" text="✔  Confirm Order"
+                                    styleClass="btn-success" onAction="#onCreateOrder"
+                                    style="-fx-padding:9 24; -fx-font-size:13px; -fx-font-weight:bold;"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- ── ORDER DETAIL CARD ── -->
+                    <VBox fx:id="pnlDetail" spacing="10"
+                          style="-fx-background-color:white; -fx-background-radius:8;
+                                 -fx-border-color:#e0e3f0; -fx-border-radius:8;
+                                 -fx-border-width:1; -fx-padding:14;">
+
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="📋" style="-fx-font-size:16px;"/>
+                            <Label fx:id="lblDetailTitle"
+                                   style="-fx-font-size:14px; -fx-font-weight:bold;
+                                          -fx-text-fill:#283593;"/>
+                        </HBox>
+
+                        <Separator style="-fx-opacity:0.4;"/>
+
+                        <Label text="ORDER ITEMS"
+                               style="-fx-font-size:10px; -fx-font-weight:bold;
+                                      -fx-text-fill:#7986cb;"/>
+
+                        <TableView fx:id="tblDetailLines" prefHeight="145" styleClass="data-table-sm"
+                                   style="-fx-background-color:white;">
+                            <columns>
+                                <TableColumn fx:id="colDetailProduct" text="Product"    prefWidth="185"/>
+                                <TableColumn fx:id="colDetailQty"     text="Qty"        prefWidth="50"  style="-fx-alignment:CENTER;"/>
+                                <TableColumn fx:id="colDetailPrice"   text="Unit Price" prefWidth="110" style="-fx-alignment:CENTER_RIGHT;"/>
+                                <TableColumn fx:id="colDetailTotal"   text="Subtotal"   prefWidth="110" style="-fx-alignment:CENTER_RIGHT;"/>
+                            </columns>
+                            <placeholder><Label text="No items." style="-fx-text-fill:#9e9e9e; -fx-font-size:12px;"/></placeholder>
+                        </TableView>
+
+                        <Separator style="-fx-opacity:0.4;"/>
+
+                        <Label text="UPDATE STATUS"
+                               style="-fx-font-size:10px; -fx-font-weight:bold;
+                                      -fx-text-fill:#7986cb;"/>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="New status:" styleClass="form-label" minWidth="95"/>
+                            <ComboBox fx:id="cbUpdateStatus" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                            <Button fx:id="btnUpdateStatus" text="✔  Update"
+                                    styleClass="btn-primary" onAction="#onUpdateStatus"
+                                    style="-fx-padding:7 18; -fx-font-size:12px;"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- ── BILLING CARD ── -->
+                    <VBox fx:id="pnlBilling" spacing="10"
+                          style="-fx-background-color:white; -fx-background-radius:8;
+                                 -fx-border-color:#e0e3f0; -fx-border-radius:8;
+                                 -fx-border-width:1; -fx-padding:14;">
+
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="💳" style="-fx-font-size:16px;"/>
+                            <Label text="Invoice"
+                                   style="-fx-font-size:14px; -fx-font-weight:bold;
+                                          -fx-text-fill:#283593;"/>
+                        </HBox>
+
+                        <Label fx:id="lblBillingInfo"
+                               style="-fx-font-size:12px; -fx-text-fill:#546e7a;
+                                      -fx-background-color:#f5f6fc; -fx-padding:5 10;
+                                      -fx-background-radius:4;"/>
+
+                        <Separator style="-fx-opacity:0.4;"/>
+
+                        <GridPane hgap="12" vgap="9">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="120" prefWidth="130"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+
+                            <Label text="Payment Method:" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                   styleClass="form-label"/>
+                            <ComboBox fx:id="cbPayMethod" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                      maxWidth="Infinity"/>
+
+                            <Label text="Amount Collected:" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                                   styleClass="form-label"/>
+                            <TextField fx:id="tfPaidAmount" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                       promptText="0" maxWidth="Infinity" styleClass="login-field"/>
+
+                            <Label text="Invoice Status:" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                                   styleClass="form-label"/>
+                            <ComboBox fx:id="cbBillingStatus" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                                      maxWidth="Infinity"/>
+
+                            <Label text="Note:" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                                   styleClass="form-label"/>
+                            <TextArea fx:id="taBillingNote" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                                      prefHeight="52" promptText="Optional note…"
+                                      style="-fx-font-size:12px;"/>
+                        </GridPane>
+
+                        <HBox>
+                            <Button fx:id="btnSaveBilling" text="💾  Save Invoice"
+                                    styleClass="btn-success" onAction="#onSaveBilling"
+                                    style="-fx-padding:8 20; -fx-font-size:12px;"/>
+                        </HBox>
+                    </VBox>
+
+                </VBox>
+            </ScrollPane>
+        </SplitPane>
+    </center>
+</BorderPane>

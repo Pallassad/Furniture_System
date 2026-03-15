@@ -6,50 +6,35 @@
 <VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="furniture_system.controller.CustomerController"
-      spacing="12"
+      spacing="14"
       styleClass="content-root"
-      stylesheets="@../resources/css/admin.css"
-      style="-fx-padding:20 24 16 24;">
+      stylesheets="@../resources/css/admin.css">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
 
-    <!-- ── Page header ──────────────────────────────────────────────────── -->
+    <!-- ── Page Header ──────────────────────────────────────────── -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label text="👤 Customer Management" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnStats" text="📊  Statistics"
-                onAction="#handleStats"
-                style="-fx-background-color:#7b1fa2; -fx-text-fill:white;
-                       -fx-background-radius:6; -fx-padding:7 14; -fx-cursor:hand;"/>
+        <Button fx:id="btnStats" text="📊  Statistics" onAction="#handleStats" styleClass="btn-purple"/>
     </HBox>
 
     <Separator styleClass="separator"/>
 
-    <!-- ── Toolbar ──────────────────────────────────────────────────────── -->
+    <!-- ── Toolbar ──────────────────────────────────────────────── -->
     <HBox spacing="8" alignment="CENTER_LEFT">
         <TextField fx:id="searchField"
                    promptText="🔍  Search by name / phone / email / status / ID..."
                    prefWidth="380"
                    styleClass="login-field"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnRefresh" text="⟳  Refresh"
-                onAction="#handleRefresh"
-                styleClass="btn-outline"/>
-        <Button fx:id="btnAdd" text="➕  Add Customer"
-                onAction="#handleAdd"
-                styleClass="btn-primary"/>
-        <Button fx:id="btnEdit" text="✏  Edit"
-                onAction="#handleEdit"
-                styleClass="btn-warning"/>
-        <Button fx:id="btnDelete" text="🗑  Remove"
-                onAction="#handleDelete"
-                style="-fx-background-color:#c62828; -fx-text-fill:white;
-                       -fx-background-radius:6; -fx-padding:8 20; -fx-cursor:hand;"/>
-        <Button fx:id="btnHistory" text="🛒  Purchase History"
-                onAction="#handleHistory"
-                style="-fx-background-color:#00695c; -fx-text-fill:white;
-                       -fx-background-radius:6; -fx-padding:8 20; -fx-cursor:hand;"/>
+        <Button fx:id="btnRefresh" text="⟳  Refresh"         onAction="#handleRefresh" styleClass="btn-outline"/>
+        <Button fx:id="btnAdd"     text="➕  Add Customer"    onAction="#handleAdd"     styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"    text="✏  Edit"             onAction="#handleEdit"    styleClass="btn-warning"/>
+        <Button fx:id="btnDelete"  text="🗑  Remove"          onAction="#handleDelete"  styleClass="btn-danger"/>
+        <Button fx:id="btnHistory" text="🛒  Purchase History" onAction="#handleHistory" styleClass="btn-teal"/>
     </HBox>
 
-    <!-- ── Table ────────────────────────────────────────────────────────── -->
+    <!-- ── Table ────────────────────────────────────────────────── -->
     <TableView fx:id="customerTable" VBox.vgrow="ALWAYS" styleClass="table-view">
         <columns>
             <TableColumn fx:id="colId"        text="ID"         prefWidth="60"/>
@@ -65,19 +50,17 @@
         </placeholder>
     </TableView>
 
-    <!-- ── Legend ───────────────────────────────────────────────────────── -->
-    <HBox spacing="18" alignment="CENTER_LEFT" style="-fx-padding:2 0 0 4;">
+    <!-- ── Legend ───────────────────────────────────────────────── -->
+    <HBox spacing="18" alignment="CENTER_LEFT">
         <HBox spacing="6" alignment="CENTER_LEFT">
-            <Label style="-fx-background-color:#e8e8e8; -fx-min-width:16px;
-                          -fx-min-height:16px; -fx-background-radius:3;"/>
+            <Label styleClass="legend-swatch"/>
             <Label text="INACTIVE" styleClass="hint-label"/>
         </HBox>
     </HBox>
 
-    <!-- ── Status bar ───────────────────────────────────────────────────── -->
+    <!-- ── Status Bar ───────────────────────────────────────────── -->
     <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
         <Label text="ℹ"/>
         <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
     </HBox>
-
 </VBox>

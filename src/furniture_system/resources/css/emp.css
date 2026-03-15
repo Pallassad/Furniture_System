@@ -512,3 +512,267 @@
     -fx-text-fill:        white;
     -fx-font-weight:      bold;
 }
+/* ============================================================
+   ORDER MANAGEMENT & BILLING – Employee additions
+   Classes used by: employee_order_management.fxml
+   Theme colour kept consistent with Green  #2e7d32
+   ============================================================ */
+
+/* ── Root pane ───────────────────────────────────────────── */
+.root-pane {
+    -fx-background-color: #f5f6fa;
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+.page-header {
+    -fx-background-color: #ffffff;
+    -fx-border-color:     #e2e8f0;
+    -fx-border-width:     0 0 1 0;
+}
+
+/* .page-title already in emp.css – kept green, no override */
+
+/* ── Panel left ──────────────────────────────────────────── */
+.panel-left { -fx-background-color: #f8fafc; }
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+    -fx-background-color:  #ffffff;
+    -fx-border-color:      #c8e6c9;
+    -fx-border-radius:     8;
+    -fx-background-radius: 8;
+    -fx-padding:           14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 4, 0, 0, 2);
+}
+
+/* ── Section headings ────────────────────────────────────── */
+.section-title {
+    -fx-font-size:   14px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #2e7d32;
+}
+
+.section-subtitle {
+    -fx-font-size:   13px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #388e3c;
+}
+
+/* ── Data tables ─────────────────────────────────────────── */
+.data-table {
+    -fx-border-color:      #c8e6c9;
+    -fx-border-radius:     6;
+    -fx-background-color:  white;
+    -fx-background-radius: 6;
+}
+
+.data-table .column-header {
+    -fx-background-color: #e8f5e9;
+    -fx-font-weight:      bold;
+    -fx-font-size:        12px;
+    -fx-text-fill:        #1b5e20;
+}
+
+.data-table .table-row-cell:odd      { -fx-background-color: #fafafa; }
+.data-table .table-row-cell:selected { -fx-background-color: #c8e6c9; -fx-text-fill: #1b5e20; }
+
+.data-table-sm {
+    -fx-border-color: #c8e6c9;
+    -fx-font-size:    12px;
+}
+
+.data-table-sm .column-header {
+    -fx-background-color: #f1f8e9;
+    -fx-font-weight:      bold;
+    -fx-text-fill:        #2e7d32;
+}
+
+.data-table-sm .table-row-cell:selected { -fx-background-color: #c8e6c9; -fx-text-fill: #1b5e20; }
+
+/* ── Status badges ───────────────────────────────────────── */
+.status-badge {
+    -fx-font-weight:       bold;
+    -fx-font-size:         11px;
+    -fx-padding:           2 8 2 8;
+    -fx-background-radius: 12;
+}
+
+.status-draft      { -fx-background-color: #e2e8f0; -fx-text-fill: #475569; }
+.status-confirmed  { -fx-background-color: #dbeafe; -fx-text-fill: #1e40af; }
+.status-paid       { -fx-background-color: #dcfce7; -fx-text-fill: #166534; }
+.status-delivering { -fx-background-color: #fef9c3; -fx-text-fill: #854d0e; }
+.status-completed  { -fx-background-color: #d1fae5; -fx-text-fill: #065f46; }
+.status-cancelled  { -fx-background-color: #fee2e2; -fx-text-fill: #991b1b; }
+.status-returned   { -fx-background-color: #fce7f3; -fx-text-fill: #9d174d; }
+
+/* ── Billing info label ──────────────────────────────────── */
+.billing-info {
+    -fx-font-size:         12px;
+    -fx-text-fill:         #37474f;
+    -fx-background-color:  #e8f5e9;
+    -fx-padding:           6 10 6 10;
+    -fx-background-radius: 4;
+}
+
+/* ── Success button ──────────────────────────────────────── */
+.btn-success {
+    -fx-background-color:  #2e7d32;
+    -fx-text-fill:         white;
+    -fx-font-weight:       bold;
+    -fx-background-radius: 6px;
+    -fx-padding:           8 20 8 20;
+    -fx-cursor:            hand;
+}
+.btn-success:hover    { -fx-background-color: #1b5e20; }
+.btn-success:disabled { -fx-opacity: 0.5; }
+
+/* ── Small inline buttons ────────────────────────────────── */
+.btn-primary-sm {
+    -fx-background-color:  #388e3c;
+    -fx-text-fill:         white;
+    -fx-font-size:         11px;
+    -fx-background-radius: 4px;
+    -fx-padding:           3 10 3 10;
+    -fx-cursor:            hand;
+}
+.btn-primary-sm:hover { -fx-background-color: #2e7d32; }
+
+.btn-danger-sm {
+    -fx-background-color:  #c62828;
+    -fx-text-fill:         white;
+    -fx-font-size:         11px;
+    -fx-background-radius: 4px;
+    -fx-padding:           3 10 3 10;
+    -fx-cursor:            hand;
+}
+.btn-danger-sm:hover { -fx-background-color: #b71c1c; }
+
+/* ── Order totals ────────────────────────────────────────── */
+.total-label {
+    -fx-font-size:  13px;
+    -fx-text-fill:  #546e7a;
+}
+
+.total-value {
+    -fx-font-size:   13px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #263238;
+}
+
+.total-discount {
+    -fx-font-size:   13px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #c62828;
+}
+
+.total-label-bold {
+    -fx-font-size:   14px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #1b5e20;
+}
+
+.total-final {
+    -fx-font-size:   16px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #2e7d32;
+}
+
+/* ============================================================
+   ORDER FXML – Supplemental classes (employee_order_management)
+   Theme colour: Green  #2e7d32
+   ============================================================ */
+
+/* Page subtitle */
+.page-subtitle {
+    -fx-font-size:  12px;
+    -fx-text-fill:  #81c784;
+    -fx-font-style: italic;
+}
+
+/* Search card (employee doesn't have search pane, but kept for consistency) */
+.search-card {
+    -fx-background-color:  #ffffff;
+    -fx-border-color:      #a5d6a7;
+    -fx-border-radius:     8;
+    -fx-background-radius: 8;
+    -fx-padding:           12 14 12 14;
+}
+
+.search-card-title {
+    -fx-font-size:   13px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #2e7d32;
+}
+
+/* Search fields */
+.search-field {
+    -fx-background-radius: 5px;
+    -fx-border-color:      #a5d6a7;
+    -fx-border-radius:     5px;
+    -fx-font-size:         12px;
+    -fx-padding:           4 8 4 8;
+}
+.search-field:focused {
+    -fx-border-color:     #388e3c;
+    -fx-background-color: white;
+}
+
+/* Form row labels */
+.form-label {
+    -fx-font-size:   12px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #37474f;
+}
+
+/* Card icon (emoji prefix) */
+.card-icon {
+    -fx-font-size: 17px;
+}
+
+/* Section label inside card */
+.section-label {
+    -fx-font-size:   12px;
+    -fx-font-weight: bold;
+    -fx-text-fill:   #4e7d52;
+    -fx-padding:     2 0 0 0;
+}
+
+/* Note textarea */
+.note-area {
+    -fx-background-radius: 5px;
+    -fx-border-color:      #a5d6a7;
+    -fx-border-radius:     5px;
+    -fx-font-size:         12px;
+}
+.note-area:focused {
+    -fx-border-color:     #388e3c;
+    -fx-background-color: white;
+}
+
+/* Quantity field */
+.qty-field {
+    -fx-background-radius: 5px;
+    -fx-border-color:      #a5d6a7;
+    -fx-border-radius:     5px;
+    -fx-font-size:         13px;
+    -fx-alignment:         center;
+}
+.qty-field:focused { -fx-border-color: #2e7d32; }
+
+/* Totals summary box */
+.totals-box {
+    -fx-background-color:  #f1f8e9;
+    -fx-background-radius: 6;
+    -fx-padding:           10 14 10 14;
+    -fx-border-color:      #c8e6c9;
+    -fx-border-radius:     6;
+}
+
+/* Status-update inner block */
+.update-block {
+    -fx-background-color:  #f9fdf9;
+    -fx-background-radius: 6;
+    -fx-border-color:      #c8e6c9;
+    -fx-border-radius:     6;
+    -fx-padding:           10 12 10 12;
+}

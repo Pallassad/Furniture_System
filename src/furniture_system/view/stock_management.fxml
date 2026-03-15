@@ -8,15 +8,15 @@
       fx:controller="furniture_system.controller.StockController"
       spacing="12"
       styleClass="content-root"
-      stylesheets="@../resources/css/admin.css"
-      style="-fx-padding:20;">
+      stylesheets="@../resources/css/admin.css">
+    <padding><Insets topRightBottomLeft="20"/></padding>
 
     <Label text="📋 Inventory / Stock Management" styleClass="page-title"/>
 
-    <!-- SECTION 1: Current Stock Levels -->
-    <TitledPane text="Current Stock Levels" expanded="true" collapsible="true"
-                style="-fx-font-weight:bold;">
-        <VBox spacing="8" styleClass="action-pane" style="-fx-padding:14;">
+    <!-- ── Section 1: Current Stock Levels ─────────────────────── -->
+    <TitledPane text="Current Stock Levels" expanded="true" collapsible="true">
+        <VBox spacing="8" styleClass="action-pane">
+            <padding><Insets topRightBottomLeft="14"/></padding>
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Label text="Rows highlighted in orange are below reorder level."
                        styleClass="hint-label" style="-fx-text-fill:#e65100;"/>
@@ -24,8 +24,7 @@
                 <Button text="Refresh" onAction="#handleRefreshStock" styleClass="btn-primary"/>
             </HBox>
 
-            <TableView fx:id="tblStock" prefHeight="200" VBox.vgrow="SOMETIMES"
-                       styleClass="table-view">
+            <TableView fx:id="tblStock" prefHeight="200" VBox.vgrow="SOMETIMES" styleClass="table-view">
                 <columns>
                     <TableColumn fx:id="colStockProduct" text="Product"       prefWidth="260"/>
                     <TableColumn fx:id="colStockQty"     text="Quantity"      prefWidth="100"/>
@@ -40,13 +39,14 @@
         </VBox>
     </TitledPane>
 
-    <!-- SECTION 2: Stock In / Adjust side by side -->
+    <!-- ── Section 2: Stock In / Adjust ─────────────────────────── -->
     <HBox spacing="14">
+
         <!-- Stock In -->
-        <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="action-pane"
-              style="-fx-padding:14; -fx-border-color:#c8e6c9;">
-            <Label text="Stock In (Receive Inventory)"
-                   style="-fx-font-weight:bold; -fx-text-fill:#2e7d32; -fx-font-size:14px;"/>
+        <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="action-pane-green">
+            <padding><Insets topRightBottomLeft="14"/></padding>
+            <Label text="Stock In (Receive Inventory)" styleClass="section-header-green"/>
+
             <GridPane hgap="10" vgap="8">
                 <columnConstraints>
                     <ColumnConstraints minWidth="90"/>
@@ -70,18 +70,16 @@
                            styleClass="login-field"
                            GridPane.columnIndex="1" GridPane.rowIndex="2"/>
             </GridPane>
+
             <Label fx:id="lblInError" text="" styleClass="error-label"/>
-            <Button text="Record Stock In" onAction="#handleStockIn"
-                    style="-fx-background-color:#2e7d32; -fx-text-fill:white;
-                           -fx-font-weight:bold; -fx-background-radius:6;
-                           -fx-padding:8 18; -fx-cursor:hand;"/>
+            <Button text="Record Stock In" onAction="#handleStockIn" styleClass="btn-green"/>
         </VBox>
 
         <!-- Adjust Stock -->
-        <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="action-pane"
-              style="-fx-padding:14; -fx-border-color:#ffe0b2;">
-            <Label text="Adjust Stock (Correction / Audit)"
-                   style="-fx-font-weight:bold; -fx-text-fill:#e65100; -fx-font-size:14px;"/>
+        <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="action-pane-orange">
+            <padding><Insets topRightBottomLeft="14"/></padding>
+            <Label text="Adjust Stock (Correction / Audit)" styleClass="section-header-orange"/>
+
             <GridPane hgap="10" vgap="8">
                 <columnConstraints>
                     <ColumnConstraints minWidth="90"/>
@@ -105,32 +103,30 @@
                            styleClass="login-field"
                            GridPane.columnIndex="1" GridPane.rowIndex="2"/>
             </GridPane>
+
             <Label fx:id="lblAdjError" text="" styleClass="error-label"/>
-            <Button text="Apply Adjustment" onAction="#handleAdjust"
-                    styleClass="btn-warning"/>
+            <Button text="Apply Adjustment" onAction="#handleAdjust" styleClass="btn-warning"/>
         </VBox>
     </HBox>
 
-    <!-- SECTION 3: Stock Movement Log -->
-    <TitledPane text="Stock Movement Log" expanded="true" collapsible="true"
-                style="-fx-font-weight:bold;">
-        <VBox spacing="10" styleClass="action-pane" style="-fx-padding:14;">
+    <!-- ── Section 3: Stock Movement Log ────────────────────────── -->
+    <TitledPane text="Stock Movement Log" expanded="true" collapsible="true">
+        <VBox spacing="10" styleClass="action-pane">
+            <padding><Insets topRightBottomLeft="14"/></padding>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Product:" styleClass="field-label"/>
                 <ComboBox fx:id="cbLogProduct" prefWidth="180" promptText="All products"
                           styleClass="combo-box"/>
                 <Label text="Type:"    styleClass="field-label"/>
-                <ComboBox fx:id="cbLogType"    prefWidth="130"
-                          styleClass="combo-box"/>
+                <ComboBox fx:id="cbLogType"    prefWidth="130" styleClass="combo-box"/>
                 <Label text="From:"    styleClass="field-label"/>
-                <DatePicker fx:id="dpFrom" prefWidth="140"/>
+                <DatePicker fx:id="dpFrom" prefWidth="140" styleClass="date-picker"/>
                 <Label text="To:"      styleClass="field-label"/>
-                <DatePicker fx:id="dpTo"   prefWidth="140"/>
+                <DatePicker fx:id="dpTo"   prefWidth="140" styleClass="date-picker"/>
                 <Button text="Filter" onAction="#handleFilterLog" styleClass="btn-primary"/>
             </HBox>
 
-            <TableView fx:id="tblLog" prefHeight="220" VBox.vgrow="ALWAYS"
-                       styleClass="table-view">
+            <TableView fx:id="tblLog" prefHeight="220" VBox.vgrow="ALWAYS" styleClass="table-view">
                 <columns>
                     <TableColumn fx:id="colLogId"      text="ID"      prefWidth="55"/>
                     <TableColumn fx:id="colLogProduct" text="Product" prefWidth="200"/>
@@ -145,14 +141,14 @@
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
+
             <Label text="Only IN and ADJUST entries can be deleted. Deletion reverses the stock change and is irreversible."
                    styleClass="hint-label"/>
         </VBox>
     </TitledPane>
 
-    <!-- Status Bar -->
+    <!-- ── Status Bar ───────────────────────────────────────────── -->
     <HBox styleClass="status-bar">
         <Label fx:id="lblStatus" text="Ready." styleClass="status-label"/>
     </HBox>
-
 </VBox>

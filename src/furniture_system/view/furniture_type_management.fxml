@@ -10,38 +10,37 @@
             stylesheets="@../resources/css/admin.css"
             prefWidth="1000" prefHeight="680">
 
-    <!-- ══════════ HEADER ══════════ -->
+    <!-- ── Page Header ──────────────────────────────────────────── -->
     <top>
-        <VBox style="-fx-background-color:#1a237e;">
-            <HBox alignment="CENTER_LEFT" spacing="14"
-                  style="-fx-padding:14 22;">
-                <Label text="🪑  Manage Furniture Types" styleClass="app-title"
-                       style="-fx-font-size:20px;"/>
+        <VBox styleClass="content-root">
+            <padding><Insets top="20" right="24" bottom="0" left="24"/></padding>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="🪑 Manage Furniture Types" styleClass="page-title"/>
                 <Region HBox.hgrow="ALWAYS"/>
-
                 <TextField fx:id="txtSearch"
-                           promptText="Search by name, ID, or status…"
+                           promptText="🔍 Search by name, ID, or status…"
                            prefWidth="270"
                            styleClass="login-field"/>
-                <Button text="🔍 Search" onAction="#handleSearch"
-                        styleClass="btn-primary"/>
-                <Button text="✕ Clear"  onAction="#handleClearSearch"
-                        styleClass="btn-secondary"/>
+                <Button text="Search" onAction="#handleSearch"      styleClass="btn-primary"/>
+                <Button text="✕ Clear" onAction="#handleClearSearch" styleClass="btn-secondary"/>
             </HBox>
+            <Separator styleClass="separator">
+                <VBox.margin><Insets top="14"/></VBox.margin>
+            </Separator>
         </VBox>
     </top>
 
-    <!-- ══════════ TABLE ══════════ -->
+    <!-- ── Table ────────────────────────────────────────────────── -->
     <center>
         <TableView fx:id="tableView" styleClass="table-view">
-            <BorderPane.margin><Insets top="14" right="18" bottom="6" left="18"/></BorderPane.margin>
+            <BorderPane.margin><Insets top="10" right="18" bottom="6" left="18"/></BorderPane.margin>
             <columns>
-                <TableColumn fx:id="colId"          text="ID"           prefWidth="55"  style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colId"          text="ID"           prefWidth="55"/>
                 <TableColumn fx:id="colName"        text="Type Name"    prefWidth="200"/>
                 <TableColumn fx:id="colDescription" text="Description"  prefWidth="290"/>
-                <TableColumn fx:id="colStatus"      text="Status"       prefWidth="110" style="-fx-alignment:CENTER;"/>
-                <TableColumn fx:id="colCreatedAt"   text="Created Date" prefWidth="135" style="-fx-alignment:CENTER;"/>
-                <TableColumn fx:id="colActions"     text="Actions"      prefWidth="175" style="-fx-alignment:CENTER;"/>
+                <TableColumn fx:id="colStatus"      text="Status"       prefWidth="110"/>
+                <TableColumn fx:id="colCreatedAt"   text="Created Date" prefWidth="135"/>
+                <TableColumn fx:id="colActions"     text="Actions"      prefWidth="175"/>
             </columns>
             <placeholder>
                 <Label text="No furniture types found." styleClass="table-placeholder"/>
@@ -49,13 +48,13 @@
         </TableView>
     </center>
 
-    <!-- ══════════ FORM (bottom) ══════════ -->
+    <!-- ── Form (Bottom) ────────────────────────────────────────── -->
     <bottom>
-        <VBox spacing="10" styleClass="action-pane"
-              style="-fx-border-width:1 0 0 0; -fx-padding:16 22 18 22;">
+        <VBox spacing="10" styleClass="action-pane">
+            <padding><Insets top="16" right="22" bottom="18" left="22"/></padding>
 
             <Label fx:id="lblFormTitle" text="➕  Add New Furniture Type"
-                   styleClass="page-title" style="-fx-font-size:14px;"/>
+                   styleClass="page-title"/>
 
             <Label fx:id="lblError" styleClass="error-label" wrapText="true"/>
 
@@ -67,7 +66,6 @@
                     <ColumnConstraints prefWidth="180"/>
                 </columnConstraints>
 
-                <!-- Row 0 -->
                 <Label text="Type Name *" styleClass="field-label"
                        GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                 <TextField fx:id="txtTypeName" styleClass="login-field"
@@ -79,12 +77,11 @@
                 <ComboBox fx:id="cmbStatus" prefWidth="170" styleClass="combo-box"
                           GridPane.rowIndex="0" GridPane.columnIndex="3"/>
 
-                <!-- Row 1 -->
                 <Label text="Description" styleClass="field-label"
                        GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <TextArea fx:id="txtDescription"
-                          prefHeight="62" wrapText="true"
+                <TextArea fx:id="txtDescription" prefHeight="62" wrapText="true"
                           promptText="Short description (optional)…"
+                          styleClass="text-area"
                           GridPane.rowIndex="1" GridPane.columnIndex="1"
                           GridPane.columnSpan="3"/>
             </GridPane>
@@ -93,13 +90,10 @@
                 <Button fx:id="btnSave"   text="Add"        onAction="#handleSave"
                         styleClass="btn-primary"   prefWidth="120"/>
                 <Button fx:id="btnDelete" text="🗑 Delete"  onAction="#handleDelete"
-                        style="-fx-background-color:#c62828; -fx-text-fill:white;
-                               -fx-background-radius:6; -fx-padding:8 20;
-                               -fx-font-weight:bold; -fx-cursor:hand;" prefWidth="120"/>
+                        styleClass="btn-danger"    prefWidth="120"/>
                 <Button fx:id="btnClear"  text="🔄 Refresh" onAction="#handleClear"
                         styleClass="btn-secondary" prefWidth="120"/>
             </HBox>
         </VBox>
     </bottom>
-
 </BorderPane>

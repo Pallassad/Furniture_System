@@ -13,10 +13,10 @@
       fx:controller="furniture_system.controller.EmployeeController"
       spacing="12"
       styleClass="content-root"
-      stylesheets="@../resources/css/emp.css"
-      style="-fx-padding:20 24 16 24;">
+      stylesheets="@../resources/css/admin.css">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
 
-    <!-- ── Page header ──────────────────────────────────────────────────── -->
+    <!-- ── Page Header ──────────────────────────────────────────── -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label text="👥 Employee Management" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
@@ -26,23 +26,19 @@
 
     <Separator styleClass="separator"/>
 
-    <!-- ── Toolbar ──────────────────────────────────────────────────────── -->
+    <!-- ── Toolbar ──────────────────────────────────────────────── -->
     <HBox spacing="8" alignment="CENTER_LEFT">
         <TextField fx:id="searchField"
                    promptText="🔍  Search by name / phone / email / position / status..."
                    prefWidth="380" styleClass="login-field"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnRefresh" text="⟳  Refresh"
-                onAction="#handleRefresh" styleClass="btn-outline"/>
-        <Button fx:id="btnAdd"     text="➕  Add Employee"
-                onAction="#handleAdd"    styleClass="btn-primary"/>
-        <Button fx:id="btnEdit"    text="✏  Edit"
-                onAction="#handleEdit"   styleClass="btn-warning"/>
-        <Button fx:id="btnDelete"  text="🗑  Remove"
-                onAction="#handleDelete" styleClass="btn-danger"/>
+        <Button fx:id="btnRefresh" text="⟳  Refresh"    onAction="#handleRefresh" styleClass="btn-outline"/>
+        <Button fx:id="btnAdd"     text="➕  Add Employee" onAction="#handleAdd"    styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"    text="✏  Edit"          onAction="#handleEdit"   styleClass="btn-warning"/>
+        <Button fx:id="btnDelete"  text="🗑  Remove"       onAction="#handleDelete" styleClass="btn-danger"/>
     </HBox>
 
-    <!-- ── Table ────────────────────────────────────────────────────────── -->
+    <!-- ── Table ────────────────────────────────────────────────── -->
     <TableView fx:id="employeeTable" VBox.vgrow="ALWAYS" styleClass="table-view">
         <columns>
             <TableColumn fx:id="colId"       text="ID"        prefWidth="55"/>
@@ -60,8 +56,9 @@
         </placeholder>
     </TableView>
 
-    <!-- ── Legend ───────────────────────────────────────────────────────── -->
-    <HBox spacing="18" alignment="CENTER_LEFT" style="-fx-padding:4 0 0 4;">
+    <!-- ── Legend ───────────────────────────────────────────────── -->
+    <HBox spacing="18" alignment="CENTER_LEFT">
+        <padding><Insets top="4" left="4"/></padding>
         <HBox spacing="6" alignment="CENTER_LEFT">
             <Label styleClass="legend-swatch"
                    style="-fx-background-color:#ffe0e0;"/>
@@ -73,7 +70,7 @@
         </HBox>
     </HBox>
 
-    <!-- ── Status bar ───────────────────────────────────────────────────── -->
+    <!-- ── Status Bar ───────────────────────────────────────────── -->
     <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
         <Label text="ℹ"/>
         <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>

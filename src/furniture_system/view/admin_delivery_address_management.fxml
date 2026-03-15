@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+    admin_delivery_address_management.fxml
+    Controller: furniture_system.controller.AdminDeliveryAddressController
+-->
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="furniture_system.controller.AdminDeliveryAddressController"
+            styleClass="main-content"
+            stylesheets="@../resources/css/admin.css">
+
+    <!-- ── TOP: Header + Stats ─────────────────────────────────────────── -->
+    <top>
+        <VBox spacing="6" styleClass="page-header">
+            <padding>
+                <Insets top="16" right="20" bottom="12" left="20"/>
+            </padding>
+
+            <Label text="Delivery Address Management" styleClass="page-title"/>
+
+            <HBox spacing="24">
+                <Label fx:id="lblTopCity"     text="Top City: —"             styleClass="stat-chip"/>
+                <Label fx:id="lblDefaultRate" text="Default address used: —" styleClass="stat-chip"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ── CENTER: Toolbar + Table ────────────────────────────────────── -->
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="0" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- Toolbar -->
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <TextField fx:id="txtSearch"
+                           promptText="Search by name / city / district / status…"
+                           prefWidth="320" onAction="#onSearch" styleClass="search-field"/>
+                <Button text="🔍 Search"     onAction="#onSearch"      styleClass="btn-primary"/>
+                <Button text="✕ Clear"       onAction="#onClearSearch" styleClass="btn-outline"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="＋ Add"         onAction="#onAdd"         styleClass="btn-success"/>
+                <Button text="✎ Edit"         onAction="#onEdit"        styleClass="btn-primary"/>
+                <Button text="⭐ Set Default" onAction="#onSetDefault"  styleClass="btn-warning"/>
+                <Button text="⊘ Deactivate"  onAction="#onDelete"      styleClass="btn-danger"/>
+            </HBox>
+
+            <!-- Table -->
+            <!-- FIX: placeholder must be a child Node element, NOT a plain String attribute -->
+            <TableView fx:id="tblAddresses" VBox.vgrow="ALWAYS">
+                <placeholder>
+                    <Label text="No addresses found."
+                           style="-fx-text-fill:#9e9e9e; -fx-font-style:italic;"/>
+                </placeholder>
+                <columns>
+                    <TableColumn fx:id="colId"       text="ID"       prefWidth="50"/>
+                    <TableColumn fx:id="colCustomer" text="Customer" prefWidth="140"/>
+                    <TableColumn fx:id="colReceiver" text="Receiver" prefWidth="140"/>
+                    <TableColumn fx:id="colPhone"    text="Phone"    prefWidth="110"/>
+                    <TableColumn fx:id="colAddress"  text="Address"  prefWidth="200"/>
+                    <TableColumn fx:id="colWard"     text="Ward"     prefWidth="100"/>
+                    <TableColumn fx:id="colDistrict" text="District" prefWidth="110"/>
+                    <TableColumn fx:id="colCity"     text="City"     prefWidth="120"/>
+                    <TableColumn fx:id="colDefault"  text="Default"  prefWidth="70"/>
+                    <TableColumn fx:id="colStatus"   text="Status"   prefWidth="80"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+    <!-- ── RIGHT: Add/Edit Form (hidden by default) ────────────────────── -->
+    <right>
+        <VBox fx:id="formPanel" spacing="12" prefWidth="320"
+              visible="false" managed="false" styleClass="form-panel">
+            <padding>
+                <Insets top="16" right="16" bottom="16" left="16"/>
+            </padding>
+
+            <Label fx:id="lblFormTitle" text="Address Form" styleClass="form-title"/>
+            <Separator/>
+
+            <Label text="Customer *" styleClass="form-label"/>
+            <ComboBox fx:id="cmbCustomer" prefWidth="290" promptText="Select customer"/>
+
+            <Label text="Receiver Name *" styleClass="form-label"/>
+            <TextField fx:id="txtReceiverName" promptText="Full name of receiver"/>
+
+            <Label text="Phone * (9–11 digits)" styleClass="form-label"/>
+            <TextField fx:id="txtPhone" promptText="e.g. 0901234567"/>
+
+            <Label text="Address Line *" styleClass="form-label"/>
+            <TextField fx:id="txtAddressLine" promptText="House number, street name"/>
+
+            <Label text="Ward *" styleClass="form-label"/>
+            <TextField fx:id="txtWard" promptText="e.g. Ward 1"/>
+
+            <Label text="District *" styleClass="form-label"/>
+            <TextField fx:id="txtDistrict" promptText="e.g. District 1"/>
+
+            <Label text="City *" styleClass="form-label"/>
+            <TextField fx:id="txtCity" promptText="e.g. Ho Chi Minh City"/>
+
+            <CheckBox fx:id="chkDefault" text="Set as Default Address"/>
+
+            <Label text="Status *" styleClass="form-label"/>
+            <ComboBox fx:id="cmbStatus" prefWidth="290"/>
+
+            <Label fx:id="lblError" text="" styleClass="error-label" wrapText="true"/>
+
+            <Separator/>
+            <HBox spacing="8">
+                <Button text="💾 Save"  onAction="#onSave"
+                        styleClass="btn-success" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="✕ Cancel" onAction="#onCancel"
+                        styleClass="btn-outline"  HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            </HBox>
+        </VBox>
+    </right>
+
+</BorderPane>

@@ -10,50 +10,46 @@
             stylesheets="@../resources/css/admin.css"
             prefWidth="1260" prefHeight="790">
 
-    <!-- HEADER -->
-    <top>
-        <HBox alignment="CENTER_LEFT" spacing="14"
-              style="-fx-background-color:#1a237e; -fx-padding:14 22;">
-            <Label text="🛋 Furniture Management"
-                   styleClass="app-title" style="-fx-font-size:19px;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblCount"
-                   style="-fx-background-color:#3949ab; -fx-text-fill:white;
-                          -fx-padding:4 12; -fx-background-radius:12; -fx-font-size:12px;"/>
-        </HBox>
-    </top>
-
-    <!-- BODY -->
     <center>
         <SplitPane dividerPositions="0.60" orientation="HORIZONTAL"
-                   style="-fx-background-color:#f5f6fa; -fx-padding:0;">
+                   styleClass="content-root">
 
-            <!-- LEFT: Table panel -->
-            <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true"
-                        style="-fx-background-color:transparent;">
-                <VBox spacing="12" style="-fx-padding:16;">
-                    <!-- Search bar -->
+            <!-- LEFT: Table -->
+            <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true">
+                <VBox spacing="12">
+                    <padding><Insets topRightBottomLeft="20"/></padding>
+
+                    <!-- Page Header -->
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="🛋 Furniture Management" styleClass="page-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblCount" styleClass="badge-label"/>
+                    </HBox>
+
+                    <Separator styleClass="separator"/>
+
+                    <!-- Search Bar -->
                     <HBox spacing="8" alignment="CENTER_LEFT">
                         <TextField fx:id="txtSearch" styleClass="login-field"
                                    promptText="🔍 Search by name / type / supplier / status / ID…"
                                    HBox.hgrow="ALWAYS"/>
-                        <Button text="Search" onAction="#handleSearch" styleClass="btn-primary"/>
+                        <Button text="Search" onAction="#handleSearch"      styleClass="btn-primary"/>
                         <Button text="Clear"  onAction="#handleClearSearch" styleClass="btn-secondary"/>
                     </HBox>
 
                     <Label fx:id="lblMessage" wrapText="true" maxWidth="Infinity"
-                           style="-fx-font-size:12px;"/>
+                           styleClass="hint-label"/>
 
                     <TableView fx:id="tableView" VBox.vgrow="ALWAYS" styleClass="table-view">
                         <columns>
-                            <TableColumn fx:id="colId"       text="ID"              prefWidth="55"/>
-                            <TableColumn fx:id="colName"     text="Product Name"    prefWidth="220"/>
-                            <TableColumn fx:id="colType"     text="Category"        prefWidth="140"/>
-                            <TableColumn fx:id="colSupplier" text="Supplier"        prefWidth="160"/>
-                            <TableColumn fx:id="colPrice"    text="Price"           prefWidth="130"/>
-                            <TableColumn fx:id="colWarranty" text="Warranty (mo)"   prefWidth="110"/>
-                            <TableColumn fx:id="colStatus"   text="Status"          prefWidth="110"/>
-                            <TableColumn fx:id="colActions"  text="Actions"         prefWidth="170"/>
+                            <TableColumn fx:id="colId"       text="ID"            prefWidth="55"/>
+                            <TableColumn fx:id="colName"     text="Product Name"  prefWidth="220"/>
+                            <TableColumn fx:id="colType"     text="Category"      prefWidth="140"/>
+                            <TableColumn fx:id="colSupplier" text="Supplier"      prefWidth="160"/>
+                            <TableColumn fx:id="colPrice"    text="Price"         prefWidth="130"/>
+                            <TableColumn fx:id="colWarranty" text="Warranty (mo)" prefWidth="110"/>
+                            <TableColumn fx:id="colStatus"   text="Status"        prefWidth="110"/>
+                            <TableColumn fx:id="colActions"  text="Actions"       prefWidth="170"/>
                         </columns>
                         <placeholder>
                             <Label text="No products found." styleClass="table-placeholder"/>
@@ -62,13 +58,12 @@
                 </VBox>
             </ScrollPane>
 
-            <!-- RIGHT: Form panel -->
-            <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true"
-                        style="-fx-background-color:transparent;">
-                <VBox spacing="14" style="-fx-padding:24 20;">
-                    <Label text="Product Details" styleClass="page-title"
-                           style="-fx-font-size:18px;"/>
+            <!-- RIGHT: Form -->
+            <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true">
+                <VBox spacing="14">
+                    <padding><Insets top="24" right="20" bottom="20" left="20"/></padding>
 
+                    <Label text="Product Details" styleClass="page-title"/>
                     <Separator styleClass="separator"/>
 
                     <VBox spacing="4">
@@ -98,7 +93,7 @@
                     <VBox spacing="4">
                         <Label text="Warranty (months)" styleClass="field-label"/>
                         <Spinner fx:id="spnWarranty" min="0" max="999" initialValue="0"
-                                 editable="true"/>
+                                 editable="true" styleClass="spinner"/>
                     </VBox>
 
                     <VBox spacing="4">
@@ -109,7 +104,8 @@
                     <VBox spacing="4" VBox.vgrow="ALWAYS">
                         <Label text="Description" styleClass="field-label"/>
                         <TextArea fx:id="txtDescription" wrapText="true" prefRowCount="5"
-                                  promptText="Optional — product details, materials, dimensions…"/>
+                                  promptText="Optional — product details, materials, dimensions…"
+                                  styleClass="text-area"/>
                     </VBox>
 
                     <Label fx:id="lblFormMessage" wrapText="true" maxWidth="Infinity"

@@ -55,6 +55,20 @@ public class EmployeeDAO {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    /**
+     * Tìm Employee theo AccountId — dùng trong LoginController sau khi
+     * xác thực thành công để lưu vào SessionManager.
+     *
+     * @param accountId  AccountId của Account vừa đăng nhập
+     * @return Employee tương ứng, hoặc null nếu chưa liên kết
+     */
+    public Employee findByAccountId(int accountId) {
+        List<Employee> list = query(
+                SELECT_BASE + "WHERE e.AccountId = ?",
+                ps -> ps.setInt(1, accountId));
+        return list.isEmpty() ? null : list.get(0);
+    }
+
     /** Check if AccountId already linked to another employee (for unique constraint). */
     public boolean isAccountLinked(int accountId, int excludeEmployeeId) {
         String sql = "SELECT COUNT(*) FROM Employee WHERE AccountId = ? AND EmployeeId <> ?";
@@ -162,10 +176,10 @@ public class EmployeeDAO {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // STATISTICS  (báo cáo tổng hợp)
+    // STATISTICS
     // ─────────────────────────────────────────────────────────────────────────
 
-    /** Số nhân viên theo từng Position. Returns [ [position, count], ... ] */
+    /** Số nhân viên theo từng Position. */
     public List<Object[]> countByPosition() {
         String sql = "SELECT Position, COUNT(*) AS cnt FROM Employee GROUP BY Position ORDER BY cnt DESC";
         List<Object[]> rows = new ArrayList<>();

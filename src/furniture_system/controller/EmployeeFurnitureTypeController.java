@@ -1,166 +1,150 @@
 package furniture_system.controller;
 
 import furniture_system.model.FurnitureType;
+import furniture_system.model.Product;
 import furniture_system.service.FurnitureTypeService;
+import furniture_system.service.ProductService;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.scene.control.cell.PropertyValueFactory;
 
-/**
- * Controller for Employee – Function 4.4.1 Filter Products by Furniture Type.
- *
- * Integrate into your existing EmployeeDashboardController:
- *   1. Copy the @FXML fields + methods into that class
- *   2. Call loadFurnitureTypeFilter() from initialize()
- *   3. Connect handleFilterByType() with your real ProductService (see TODO below)
- */
 public class EmployeeFurnitureTypeController implements Initializable {
 
-    // ── Furniture Type Filter ─────────────────────────────────────────────────
     @FXML private ComboBox<FurnitureType> cmbTypeFilter;
     @FXML private Button btnApplyFilter;
     @FXML private Button btnResetFilter;
 
-    // ── Products TableView (replace Object with your actual Product model) ───
-    @FXML private TableView<Object>           tblProducts;
-    @FXML private TableColumn<Object, Integer> colProductId;
-    @FXML private TableColumn<Object, String>  colProductName;
-    @FXML private TableColumn<Object, String>  colProductType;
-    @FXML private TableColumn<Object, Double>  colProductPrice;
-    @FXML private TableColumn<Object, String>  colProductStatus;
+    @FXML private TableView<Product> tblProducts;
+    @FXML private TableColumn<Product, Integer> colProductId;
+    @FXML private TableColumn<Product, String> colProductName;
+    @FXML private TableColumn<Product, String> colProductType;
+    @FXML private TableColumn<Product, BigDecimal> colProductPrice;
+    @FXML private TableColumn<Product, String> colProductStatus;
 
-    // ── Search ────────────────────────────────────────────────────────────────
     @FXML private TextField txtProductSearch;
-    @FXML private Label     lblResultCount;
+    @FXML private Label lblResultCount;
 
-    private final FurnitureTypeService furnitureTypeService = new FurnitureTypeService();
+    private final FurnitureTypeService typeService = new FurnitureTypeService();
+    private final ProductService productService = new ProductService();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupProductTable();
         loadFurnitureTypeFilter();
-        loadAllProducts();
+        loadAllProducts();  // Load dữ liệu thật ngay khi mở trang
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  Load ACTIVE types into ComboBox
-    // ════════════════════════════════════════════════════════════════════════
+    // Load các loại nội thất ACTIVE vào ComboBox
     private void loadFurnitureTypeFilter() {
         try {
-            List<FurnitureType> types = furnitureTypeService.getActive();
+            List<FurnitureType> types = typeService.getActive();
 
-            // First element: "— All Types —"
+            // Thêm option "Tất cả"
             FurnitureType allOption = new FurnitureType();
             allOption.setTypeId(0);
-            allOption.setTypeName("— All Types —");
+            allOption.setTypeName("— Tất cả loại —");
             types.add(0, allOption);
 
             cmbTypeFilter.setItems(FXCollections.observableArrayList(types));
             cmbTypeFilter.setValue(allOption);
 
-            // Listener: filter immediately when selecting from ComboBox (no button required)
+            // Tự động lọc khi thay đổi lựa chọn
             cmbTypeFilter.setOnAction(e -> handleFilterByType());
-
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Category Loading Error", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Lỗi tải loại nội thất", e.getMessage());
         }
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  Filter products by selected TypeId (4.4.1)
-    // ════════════════════════════════════════════════════════════════════════
+    // Lọc sản phẩm theo loại + tìm kiếm theo tên
     @FXML
     private void handleFilterByType() {
         FurnitureType selected = cmbTypeFilter.getValue();
+        String keyword = txtProductSearch.getText().trim();
 
-        if (selected == null || selected.getTypeId() == 0) {
-            loadAllProducts();
-            return;
+        try {
+            List<Product> filtered;
+
+            if (selected == null || selected.getTypeId() == 0) {
+                // Tất cả loại + tìm kiếm theo tên (dùng method có sẵn)
+                filtered = productService.searchActiveProducts(keyword, null, null);
+            } else {
+                // Theo loại cụ thể + tìm kiếm theo tên
+                // Vì ProductService chưa có getByType, ta dùng searchActiveProducts với keyword
+                // và lọc thêm theo typeId ở đây (cách tạm thời)
+                List<Product> allBySearch = productService.searchActiveProducts(keyword, null, null);
+                filtered = allBySearch.stream()
+                        .filter(p -> p.getTypeId() == selected.getTypeId())
+                        .toList();
+            }
+
+            tblProducts.setItems(FXCollections.observableArrayList(filtered));
+            updateResultCount(filtered.size());
+        } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi lọc sản phẩm", e.getMessage());
         }
-
-        int selectedTypeId = selected.getTypeId();
-
-        /*
-         * ══════════════════════════════════════════════════════════════
-         *  TODO: Replace the section below with your actual ProductService
-         *
-         *  Example:
-         *    List<Product> products = productService.getByType(selectedTypeId);
-         *    tblProducts.setItems(FXCollections.observableArrayList(products));
-         *    updateResultCount(products.size());
-         *
-         *  Corresponding SQL:
-         *    SELECT p.ProductId, p.Name, ft.TypeName, p.Price, p.Status
-         *    FROM Product p
-         *    JOIN FurnitureType ft ON ft.TypeId = p.TypeId
-         *    WHERE p.TypeId = @TypeId
-         *    AND   p.Status <> 'INACTIVE'
-         *    ORDER BY p.Name
-         * ══════════════════════════════════════════════════════════════
-         */
-        System.out.println("[Employee] Filtering products by TypeId = " + selectedTypeId
-                         + " (" + selected.getTypeName() + ")");
-
-        // Placeholder – remove this line after connecting ProductService
-        tblProducts.setItems(FXCollections.observableArrayList());
-        updateResultCount(0);
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  Reset filter
-    // ════════════════════════════════════════════════════════════════════════
+    // Reset filter về mặc định
     @FXML
     private void handleResetFilter() {
-        loadFurnitureTypeFilter();
+        cmbTypeFilter.setValue(cmbTypeFilter.getItems().get(0)); // "Tất cả"
+        txtProductSearch.clear();
         loadAllProducts();
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  Load all products (no filter)
-    // ════════════════════════════════════════════════════════════════════════
+    // Load tất cả sản phẩm ACTIVE
     private void loadAllProducts() {
-        /*
-         * TODO: replace with productService.getAll()
-         *    List<Product> products = productService.getAll();
-         *    tblProducts.setItems(FXCollections.observableArrayList(products));
-         *    updateResultCount(products.size());
-         */
-        tblProducts.setItems(FXCollections.observableArrayList());
-        updateResultCount(0);
+        try {
+            List<Product> activeProducts = productService.getActiveProducts();
+            tblProducts.setItems(FXCollections.observableArrayList(activeProducts));
+            updateResultCount(activeProducts.size());
+        } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi tải sản phẩm", e.getMessage());
+        }
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  Table setup
-    // ════════════════════════════════════════════════════════════════════════
+    // Cấu hình bảng sản phẩm
     private void setupProductTable() {
-        /*
-         * TODO: bind PropertyValueFactory to your actual Product model
-         *
-         *   colProductId.setCellValueFactory(new PropertyValueFactory<>("productId"));
-         *   colProductName.setCellValueFactory(new PropertyValueFactory<>("name"));
-         *   colProductType.setCellValueFactory(new PropertyValueFactory<>("typeName"));
-         *   colProductPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
-         *   colProductStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-         */
-        tblProducts.setPlaceholder(new Label("No products available."));
+        colProductId.setCellValueFactory(new PropertyValueFactory<>("productId"));
+        colProductName.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        // Hiển thị tên loại (typeName) thay vì ID
+        colProductType.setCellValueFactory(cell -> 
+            new SimpleStringProperty(cell.getValue().getTypeName() != null 
+                ? cell.getValue().getTypeName() : "—"));
+
+        colProductPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+        colProductStatus.setCellValueFactory(cell -> new SimpleStringProperty("Active"));
+
+        // Format giá tiền đẹp
+        colProductPrice.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(BigDecimal price, boolean empty) {
+                super.updateItem(price, empty);
+                setText(empty || price == null ? "—" : String.format("%,.0f ₫", price));
+            }
+        });
+
+        tblProducts.setPlaceholder(new Label("Không có sản phẩm nào."));
     }
 
     private void updateResultCount(int count) {
-        if (lblResultCount != null)
-            lblResultCount.setText("Results: " + count + " products");
+        lblResultCount.setText("Kết quả: " + count + " sản phẩm");
     }
 
-    // ── Utility ──────────────────────────────────────────────────────────────
     private void showAlert(Alert.AlertType type, String title, String msg) {
-        Alert a = new Alert(type, msg, ButtonType.OK);
-        a.setTitle(title); 
-        a.setHeaderText(null); 
-        a.showAndWait();
+        Alert alert = new Alert(type, msg, ButtonType.OK);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.showAndWait();
     }
 }

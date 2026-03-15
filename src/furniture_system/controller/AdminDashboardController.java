@@ -23,9 +23,13 @@ public class AdminDashboardController {
     @FXML private Button btnProduct;
     @FXML private Button btnFurnitureType;
     @FXML private Button btnOrders;
+    @FXML private Button btnPromotion;        // ← MỚI
     @FXML private Button btnReports;
-    @FXML private Button btnSupplier;   // ★ MỚI
-    @FXML private Button btnStock;      // ★ MỚI
+    @FXML private Button btnSupplier;
+    @FXML private Button btnStock;
+    @FXML private Button btnSalary;
+    @FXML private Button btnWarranty;
+    @FXML private Button btnDeliveryAddress;
 
     private List<Button> sidebarButtons;
 
@@ -39,6 +43,8 @@ public class AdminDashboardController {
             "-fx-background-radius:6; -fx-cursor:hand; " +
             "-fx-alignment:CENTER_LEFT; -fx-padding:10 12; -fx-font-weight:normal;";
 
+    // ── Init ──────────────────────────────────────────────────────────────────
+
     @FXML
     public void initialize() {
         if (SessionManager.getInstance().getCurrentAccount() != null) {
@@ -49,8 +55,11 @@ public class AdminDashboardController {
         sidebarButtons = List.of(
             btnAuth, btnEmployee, btnCustomer,
             btnProduct, btnFurnitureType,
-            btnOrders, btnReports,
-            btnSupplier, btnStock               // ★ MỚI
+            btnOrders, btnPromotion,           // ← MỚI
+            btnSupplier, btnStock,
+            btnSalary, btnWarranty,
+            btnDeliveryAddress,
+            btnReports
         );
 
         setActive(btnAuth);
@@ -80,7 +89,7 @@ public class AdminDashboardController {
     @FXML
     public void showProductManagement() {
         setActive(btnProduct);
-        loadView("/furniture_system/view/furniture_management.fxml"); // ★ ĐÃ CẬP NHẬT
+        loadView("/furniture_system/view/furniture_management.fxml");
     }
 
     @FXML
@@ -92,19 +101,43 @@ public class AdminDashboardController {
     @FXML
     public void showOrders() {
         setActive(btnOrders);
-        showPlaceholder("🛒 Orders");
+        loadView("/furniture_system/view/admin_order_management.fxml");
     }
 
     @FXML
-    public void showSupplierManagement() {    // ★ MỚI
+    public void showPromotionManagement() {       // ← MỚI
+        setActive(btnPromotion);
+        loadView("/furniture_system/view/admin_promotion_management.fxml");
+    }
+
+    @FXML
+    public void showSupplierManagement() {
         setActive(btnSupplier);
         loadView("/furniture_system/view/supplier_management.fxml");
     }
 
     @FXML
-    public void showStockManagement() {       // ★ MỚI
+    public void showStockManagement() {
         setActive(btnStock);
         loadView("/furniture_system/view/stock_management.fxml");
+    }
+
+    @FXML
+    public void showSalaryManagement() {
+        setActive(btnSalary);
+        loadView("/furniture_system/view/admin_salary_management.fxml");
+    }
+
+    @FXML
+    public void showWarrantyManagement() {
+        setActive(btnWarranty);
+        loadView("/furniture_system/view/admin_warranty_management.fxml");
+    }
+
+    @FXML
+    public void showDeliveryAddressManagement() {
+        setActive(btnDeliveryAddress);
+        loadView("/furniture_system/view/admin_delivery_address_management.fxml");
     }
 
     @FXML
@@ -149,6 +182,7 @@ public class AdminDashboardController {
             Parent view = FXMLLoader.load(url);
             contentArea.getChildren().setAll(view);
         } catch (IOException e) {
+            e.printStackTrace();
             showPlaceholder("⚠ Error loading: " + e.getMessage());
         }
     }
