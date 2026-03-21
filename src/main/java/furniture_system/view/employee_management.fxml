@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+  employee_management.fxml
+  Controller: furniture_system.controller.EmployeeController
+  Access: ADMIN only
+-->
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.EmployeeController"
+      spacing="12"
+      styleClass="content-root"
+      stylesheets="@../resources/css/admin.css">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+
+    <!-- ── Page Header ──────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="👥 Employee Management" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnStats" text="📊  Statistics"
+                onAction="#handleStats" styleClass="btn-purple"/>
+    </HBox>
+
+    <Separator styleClass="separator"/>
+
+    <!-- ── Toolbar ──────────────────────────────────────────────── -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField"
+                   promptText="🔍  Search by name / phone / email / position / status..."
+                   prefWidth="380" styleClass="login-field"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnRefresh" text="⟳  Refresh"    onAction="#handleRefresh" styleClass="btn-outline"/>
+        <Button fx:id="btnAdd"     text="➕  Add Employee" onAction="#handleAdd"    styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"    text="✏  Edit"          onAction="#handleEdit"   styleClass="btn-warning"/>
+        <Button fx:id="btnDelete"  text="🗑  Remove"       onAction="#handleDelete" styleClass="btn-danger"/>
+    </HBox>
+
+    <!-- ── Table ────────────────────────────────────────────────── -->
+    <TableView fx:id="employeeTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <columns>
+            <TableColumn fx:id="colId"       text="ID"        prefWidth="55"/>
+            <TableColumn fx:id="colFullName" text="Full Name" prefWidth="170"/>
+            <TableColumn fx:id="colPhone"    text="Phone"     prefWidth="115"/>
+            <TableColumn fx:id="colEmail"    text="Email"     prefWidth="185"/>
+            <TableColumn fx:id="colPosition" text="Position"  prefWidth="110"/>
+            <TableColumn fx:id="colStatus"   text="Status"    prefWidth="100"/>
+            <TableColumn fx:id="colDob"      text="DOB"       prefWidth="100"/>
+            <TableColumn fx:id="colAccount"  text="Account"   prefWidth="120"/>
+            <TableColumn fx:id="colHiredAt"  text="Hired At"  prefWidth="145"/>
+        </columns>
+        <placeholder>
+            <Label text="No employees found." styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Legend ───────────────────────────────────────────────── -->
+    <HBox spacing="18" alignment="CENTER_LEFT">
+        <padding><Insets top="4" left="4"/></padding>
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <Label styleClass="legend-swatch"
+                   style="-fx-background-color:#ffe0e0;"/>
+            <Label text="SUSPENDED" styleClass="hint-label"/>
+        </HBox>
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <Label styleClass="legend-swatch"/>
+            <Label text="INACTIVE"  styleClass="hint-label"/>
+        </HBox>
+    </HBox>
+
+    <!-- ── Status Bar ───────────────────────────────────────────── -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
+        <Label text="ℹ"/>
+        <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
+    </HBox>
+
+</VBox>

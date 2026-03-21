@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.AdminWarrantyManagementController"
+      stylesheets="@/furniture_system/resources/css/admin.css"
+      styleClass="content-root"
+      spacing="14">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="🔧 Warranty &amp; Repair Management" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnAdd"          text="➕  Add Ticket"      onAction="#handleAdd"          styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"         text="✏  Edit"             onAction="#handleEdit"         styleClass="btn-warning"/>
+        <Button fx:id="btnCancelTicket" text="🚫  Cancel/Reject"   onAction="#handleCancelTicket" styleClass="btn-danger"/>
+        <Button                         text="⟳  Refresh"         onAction="#handleRefresh"      styleClass="btn-outline"/>
+    </HBox>
+
+    <Separator styleClass="separator"/>
+
+    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="txtSearch" styleClass="login-field"
+                   promptText="🔍 Search by ticket ID, customer, product, status…"
+                   HBox.hgrow="ALWAYS"/>
+        <Button text="Search" onAction="#handleSearch"  styleClass="btn-primary"/>
+        <Button text="Clear"  onAction="#handleRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <!-- ── Warranty Table ───────────────────────────────────────────────── -->
+    <TableView fx:id="tableWarranty" VBox.vgrow="ALWAYS" styleClass="table-view"
+               tableMenuButtonVisible="true">
+        <columns>
+            <TableColumn fx:id="colTicketId"  text="#"        prefWidth="55"/>
+            <TableColumn fx:id="colOrderId"   text="Order"    prefWidth="70"/>
+            <TableColumn fx:id="colProduct"   text="Product"  prefWidth="210"/>
+            <TableColumn fx:id="colCustomer"  text="Customer" prefWidth="160"/>
+            <TableColumn fx:id="colHandler"   text="Handler"  prefWidth="140"/>
+            <TableColumn fx:id="colStatus"    text="Status"   prefWidth="120"/>
+            <TableColumn fx:id="colCost"      text="Cost"     prefWidth="115"/>
+            <TableColumn fx:id="colCreatedAt" text="Created"  prefWidth="110"/>
+        </columns>
+        <placeholder>
+            <Label text="No warranty tickets found." styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ"/>
+        <Label fx:id="lblStatus" text="Ready." styleClass="status-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="💡 Cancel/Reject disabled for COMPLETED, CANCELLED, or REJECTED tickets."
+               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+    </HBox>
+</VBox>

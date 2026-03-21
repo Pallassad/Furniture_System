@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.EmployeeFurnitureController"
+      stylesheets="@/furniture_system/resources/css/emp.css"
+      styleClass="content-root"
+      spacing="14">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="🛋 Furniture Catalog" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnViewDetail" text="🔍  View Details" onAction="#handleViewDetail" styleClass="btn-primary"/>
+        <Button fx:id="btnRefresh"    text="⟳  Refresh"      onAction="#handleRefresh"    styleClass="btn-outline"/>
+    </HBox>
+
+    <Separator styleClass="separator"/>
+
+    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="txtSearch" styleClass="login-field"
+                   promptText="🔍 Search by product name or category…"
+                   HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtMinPrice" styleClass="login-field"
+                   promptText="Min price" prefWidth="110"/>
+        <Label text="–" style="-fx-text-fill:#555;"/>
+        <TextField fx:id="txtMaxPrice" styleClass="login-field"
+                   promptText="Max price" prefWidth="110"/>
+        <Button text="Search" onAction="#handleSearch"  styleClass="btn-primary"/>
+        <Button text="Reset"  onAction="#handleRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <!-- ── Product Table ────────────────────────────────────────────────── -->
+    <TableView fx:id="productTable" VBox.vgrow="ALWAYS" styleClass="table-view"
+               tableMenuButtonVisible="true">
+        <columns>
+            <TableColumn fx:id="colId"       text="ID"              prefWidth="55"/>
+            <TableColumn fx:id="colName"     text="Product Name"    prefWidth="240"/>
+            <TableColumn fx:id="colType"     text="Category"        prefWidth="150"/>
+            <TableColumn fx:id="colSupplier" text="Supplier"        prefWidth="160"/>
+            <TableColumn fx:id="colPrice"    text="Price"           prefWidth="140"/>
+            <TableColumn fx:id="colWarranty" text="Warranty (mo)"   prefWidth="110"/>
+            <TableColumn fx:id="colStatus"   text="Status"          prefWidth="90"/>
+        </columns>
+        <placeholder>
+            <Label text="No active products found." styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ"/>
+        <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="💡 Double-click a row to view product details."
+               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+    </HBox>
+</VBox>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.AdminSalaryManagementController"
+      stylesheets="@/furniture_system/resources/css/admin.css"
+      styleClass="content-root"
+      spacing="14">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="💰 Salary Management" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnAdd"    text="➕  Add New"    onAction="#handleAdd"     styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"   text="✏  Edit"     onAction="#handleEdit"    styleClass="btn-warning"/>
+        <Button fx:id="btnDelete" text="🗑  Delete Draft"   onAction="#handleDelete"  styleClass="btn-danger"/>
+        <Button                   text="⟳  Refresh"     onAction="#handleRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <Separator styleClass="separator"/>
+
+    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="txtSearch" styleClass="login-field"
+                   promptText="🔍 Search by employee, month (YYYY-MM), status…"
+                   HBox.hgrow="ALWAYS"/>
+        <Button text="Search" onAction="#handleSearch"  styleClass="btn-primary"/>
+        <Button text="Clear"      onAction="#handleRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <!-- ── Salary Table ─────────────────────────────────────────────────── -->
+    <TableView fx:id="tableSalary" VBox.vgrow="ALWAYS" styleClass="table-view"
+               tableMenuButtonVisible="true">
+        <columns>
+            <TableColumn fx:id="colSalaryId"     text="#"             prefWidth="55"/>
+            <TableColumn fx:id="colEmployee"     text="Employee"     prefWidth="170"/>
+            <TableColumn fx:id="colMonth"        text="Month"         prefWidth="85"/>
+            <TableColumn fx:id="colBase"         text="Base Salary"  prefWidth="130"/>
+            <TableColumn fx:id="colAllowance"    text="Allowance"       prefWidth="110"/>
+            <TableColumn fx:id="colBonus"        text="Bonus (+)"    prefWidth="115"/>
+            <TableColumn fx:id="colDeduction"    text="Penalty (−)"      prefWidth="110"/>
+            <TableColumn fx:id="colFinal"        text="Net Pay ₫"  prefWidth="135"/>
+            <TableColumn fx:id="colSalaryStatus" text="Status"    prefWidth="100"/>
+            <TableColumn fx:id="colPaidDate"     text="Paid Date"      prefWidth="100"/>
+        </columns>
+        <placeholder>
+            <Label text="No salary records found." styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ"/>
+        <Label fx:id="lblSalaryStatus" text="Ready." styleClass="status-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="💡 PAID records are read-only. Only DRAFT records can be deleted."
+               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+    </HBox>
+</VBox>

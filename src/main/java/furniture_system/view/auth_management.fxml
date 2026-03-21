@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.AuthController"
+      stylesheets="@/furniture_system/resources/css/admin.css"
+      styleClass="content-root"
+      spacing="14">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+
+    <!-- ── Page header ──────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="🔐 Authentication &amp; Authorization" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnAdd"     text="➕  Add Account"  onAction="#handleAdd"    styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"    text="✏  Edit Account"  onAction="#handleEdit"   styleClass="btn-warning"/>
+        <Button fx:id="btnDelete"  text="🗑  Delete"        onAction="#handleDelete" styleClass="btn-danger"/>
+        <Button fx:id="btnRefresh" text="⟳  Refresh"       onAction="#handleRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <Separator styleClass="separator"/>
+
+    <!-- ── Account Table ────────────────────────────────────────── -->
+    <TableView fx:id="accountTable" VBox.vgrow="ALWAYS" styleClass="table-view"
+               tableMenuButtonVisible="true">
+        <columns>
+            <TableColumn fx:id="colId"        text="ID"              prefWidth="55"/>
+            <TableColumn fx:id="colUsername"  text="Username"        prefWidth="130"/>
+            <TableColumn fx:id="colEmail"     text="Email"           prefWidth="195"/>
+            <TableColumn fx:id="colRole"      text="Role"            prefWidth="100"/>
+            <TableColumn fx:id="colStatus"    text="Status"          prefWidth="110"/>
+            <TableColumn fx:id="colLastLogin" text="Last Login"      prefWidth="145"/>
+            <TableColumn fx:id="colFailed"    text="Failed Attempts" prefWidth="120"/>
+        </columns>
+        <placeholder>
+            <Label text="No accounts found." styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Status Bar ───────────────────────────────────────────── -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ"/>
+        <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
+    </HBox>
+</VBox>

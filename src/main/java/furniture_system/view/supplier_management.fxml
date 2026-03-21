@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.SupplierController"
+      stylesheets="@/furniture_system/resources/css/admin.css"
+      styleClass="content-root"
+      spacing="14">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="🏭 Supplier Management" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnAdd"         text="➕  Add Supplier"      onAction="#handleAdd"         styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"        text="✏  Edit"               onAction="#handleEdit"        styleClass="btn-warning"/>
+        <Button fx:id="btnDeactivate"  text="🗑  Deactivate"         onAction="#handleDeactivate"  styleClass="btn-danger"/>
+        <Button fx:id="btnManageLinks" text="🔗  Manage Products"    onAction="#handleManageLinks" styleClass="btn-outline"/>
+        <Button                        text="⟳  Refresh"            onAction="#handleRefresh"     styleClass="btn-outline"/>
+    </HBox>
+
+    <Separator styleClass="separator"/>
+
+    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="txtSearch" styleClass="login-field"
+                   promptText="🔍 Search by name, phone, email, status…"
+                   HBox.hgrow="ALWAYS"/>
+        <Button text="Search" onAction="#handleSearch"  styleClass="btn-primary"/>
+        <Button text="Clear"  onAction="#handleRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <!-- ── Supplier Table ───────────────────────────────────────────────── -->
+    <TableView fx:id="tblSuppliers" VBox.vgrow="ALWAYS" styleClass="table-view"
+               tableMenuButtonVisible="true">
+        <columns>
+            <TableColumn fx:id="colSuppId"      text="ID"      prefWidth="55"/>
+            <TableColumn fx:id="colSuppName"    text="Name"    prefWidth="200"/>
+            <TableColumn fx:id="colSuppPhone"   text="Phone"   prefWidth="130"/>
+            <TableColumn fx:id="colSuppEmail"   text="Email"   prefWidth="210"/>
+            <TableColumn fx:id="colSuppAddress" text="Address" prefWidth="230"/>
+            <TableColumn fx:id="colSuppStatus"  text="Status"  prefWidth="100"/>
+        </columns>
+        <placeholder>
+            <Label text="No suppliers found." styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ"/>
+        <Label fx:id="lblStatus" text="Ready." styleClass="status-label"/>
+    </HBox>
+</VBox>

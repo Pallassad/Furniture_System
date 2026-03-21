@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.AdminOrderController"
+      stylesheets="@/furniture_system/resources/css/admin.css"
+      styleClass="content-root"
+      spacing="14">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="🛒 Order &amp; Invoice Management" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnViewDetail"    text="📋  View Detail"     onAction="#handleViewDetail"    styleClass="btn-primary"/>
+        <Button fx:id="btnUpdateStatus"  text="✏  Update Status"   onAction="#handleUpdateStatus"  styleClass="btn-warning"/>
+        <Button fx:id="btnManageBilling" text="💳  Manage Invoice"  onAction="#handleManageBilling" styleClass="btn-success"/>
+        <Button fx:id="btnCancelOrder"   text="✖  Cancel Order"    onAction="#handleCancelOrder"   styleClass="btn-danger"/>
+        <Button                          text="⟳  Refresh"         onAction="#onRefresh"           styleClass="btn-outline"/>
+    </HBox>
+
+    <Separator styleClass="separator"/>
+
+    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="tfSearchOrderId"    promptText="Order ID"    prefWidth="90"  styleClass="login-field"/>
+        <TextField fx:id="tfSearchCustomerId" promptText="Customer ID" prefWidth="108" styleClass="login-field"/>
+        <TextField fx:id="tfSearchEmployeeId" promptText="Employee ID" prefWidth="108" styleClass="login-field"/>
+        <ComboBox  fx:id="cbSearchStatus"     promptText="Status"      prefWidth="130" styleClass="combo-box"/>
+        <DatePicker fx:id="dpFrom" promptText="From" prefWidth="138" styleClass="date-picker"/>
+        <DatePicker fx:id="dpTo"   promptText="To"   prefWidth="138" styleClass="date-picker"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="⟳  Reset"  onAction="#onReset"  styleClass="btn-outline"/>
+        <Button text="🔍  Search" onAction="#onSearch" styleClass="btn-primary"/>
+    </HBox>
+
+    <!-- ── Orders Table ─────────────────────────────────────────────────── -->
+    <TableView fx:id="tblOrders" VBox.vgrow="ALWAYS" styleClass="table-view"
+               tableMenuButtonVisible="true">
+        <columns>
+            <TableColumn fx:id="colOrderId"  text="#"         prefWidth="60"/>
+            <TableColumn fx:id="colCustomer" text="Customer"  prefWidth="185"/>
+            <TableColumn fx:id="colEmployee" text="Employee"  prefWidth="155"/>
+            <TableColumn fx:id="colDate"     text="Date"      prefWidth="150"/>
+            <TableColumn fx:id="colStatus"   text="Status"    prefWidth="120"/>
+            <TableColumn fx:id="colFinal"    text="Total"     prefWidth="140"/>
+        </columns>
+        <placeholder>
+            <Label text="No orders found." styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ"/>
+        <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="💡 Double-click a row to view order detail."
+               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+    </HBox>
+</VBox>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <!-- Khi nhan Run (F6), NetBeans se chay mvn javafx:run thay vi exec:exec -->
+    <action>
+        <actionName>run</actionName>
+        <goals>
+            <goal>javafx:run</goal>
+        </goals>
+    </action>
+    <!-- Debug cung tuong tu -->
+    <action>
+        <actionName>debug</actionName>
+        <goals>
+            <goal>javafx:run</goal>
+        </goals>
+        <properties>
+            <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+        </properties>
+    </action>
+</actions>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="furniture_system.controller.AdminDeliveryAddressController"
+      stylesheets="@/furniture_system/resources/css/admin.css"
+      styleClass="content-root"
+      spacing="14">
+    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="📍 Delivery Address Management" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnAdd"        text="➕  Add Address"    onAction="#onAdd"        styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"       text="✏  Edit"            onAction="#onEdit"       styleClass="btn-warning"/>
+        <Button fx:id="btnSetDefault" text="⭐  Set Default"    onAction="#onSetDefault" styleClass="btn-outline"/>
+        <Button fx:id="btnDeactivate" text="🗑  Deactivate"     onAction="#onDelete"     styleClass="btn-danger"/>
+        <Button                       text="⟳  Refresh"        onAction="#handleRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <!-- ── Stats Bar ────────────────────────────────────────────────────── -->
+    <HBox spacing="24" alignment="CENTER_LEFT"
+          style="-fx-background-color:#e8eaf6;-fx-background-radius:6;-fx-padding:8 14;">
+        <Label fx:id="lblTopCity"     text="Top City: —"             style="-fx-font-size:12px;-fx-text-fill:#3949ab;-fx-font-weight:bold;"/>
+        <Label fx:id="lblDefaultRate" text="Default address used: —" style="-fx-font-size:12px;-fx-text-fill:#3949ab;-fx-font-weight:bold;"/>
+    </HBox>
+
+    <Separator styleClass="separator"/>
+
+    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="txtSearch" styleClass="login-field"
+                   promptText="🔍 Search by name, city, district, status…"
+                   HBox.hgrow="ALWAYS"/>
+        <Button text="Search" onAction="#onSearch"      styleClass="btn-primary"/>
+        <Button text="Clear"  onAction="#handleRefresh" styleClass="btn-outline"/>
+    </HBox>
+
+    <!-- ── Address Table ────────────────────────────────────────────────── -->
+    <TableView fx:id="tblAddresses" VBox.vgrow="ALWAYS" styleClass="table-view"
+               tableMenuButtonVisible="true">
+        <columns>
+            <TableColumn fx:id="colId"       text="ID"       prefWidth="55"/>
+            <TableColumn fx:id="colCustomer" text="Customer" prefWidth="150"/>
+            <TableColumn fx:id="colReceiver" text="Receiver" prefWidth="150"/>
+            <TableColumn fx:id="colPhone"    text="Phone"    prefWidth="120"/>
+            <TableColumn fx:id="colAddress"  text="Address"  prefWidth="200"/>
+            <TableColumn fx:id="colDistrict" text="District" prefWidth="120"/>
+            <TableColumn fx:id="colCity"     text="City"     prefWidth="130"/>
+            <TableColumn fx:id="colDefault"  text="Default"  prefWidth="70"/>
+            <TableColumn fx:id="colStatus"   text="Status"   prefWidth="90"/>
+        </columns>
+        <placeholder>
+            <Label text="No addresses found." styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ"/>
+        <Label fx:id="lblStatus" text="Ready." styleClass="status-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="💡 Green rows = default address  |  Grey rows = inactive"
+               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+    </HBox>
+</VBox>

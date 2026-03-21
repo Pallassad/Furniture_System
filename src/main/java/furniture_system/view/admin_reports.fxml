@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="furniture_system.controller.AdminReportsController"
+            fx:id="scrollPane"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            style="-fx-background-color:#f5f6fa; -fx-background:#f5f6fa;">
+
+    <VBox fx:id="rootVBox"
+          spacing="20"
+          style="-fx-background-color:#f5f6fa;">
+        <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+    </VBox>
+
+</ScrollPane>
