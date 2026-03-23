@@ -65,7 +65,7 @@
                            -fx-background-radius:6; -fx-cursor:hand;
                            -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
 
-            <Button fx:id="btnProduct" text="📦  Product Management"
+            <Button fx:id="btnProduct" text="📦  Furniture Management"
                     onAction="#showProductManagement"
                     maxWidth="Infinity"
                     style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
