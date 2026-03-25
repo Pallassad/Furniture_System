@@ -139,6 +139,33 @@ public class PromotionDAO {
         }
     }
 
+    /**
+     * Kiểm tra Promotion còn được sử dụng bởi Order nào không.
+     */
+    public boolean hasLinkedOrders(int promoId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM [Order] WHERE PromoId = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, promoId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    /**
+     * Hard-delete Promotion.
+     * Chỉ gọi khi không còn Order nào tham chiếu.
+     */
+    public void hardDelete(int promoId) throws SQLException {
+        String sql = "DELETE FROM Promotion WHERE PromoId = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, promoId);
+            ps.executeUpdate();
+        }
+    }
+
     // ================= MAPPING =================
     private List<Promotion> mapList(ResultSet rs) throws SQLException {
         List<Promotion> list = new ArrayList<>();

@@ -5,6 +5,8 @@ import furniture_system.model.Account;
 import furniture_system.model.Employee;
 import furniture_system.model.Employee.Position;
 import furniture_system.model.Employee.Status;
+import static furniture_system.model.Employee.Status.INACTIVE;
+import static furniture_system.model.Employee.Status.SUSPENDED;
 import furniture_system.service.EmployeeService;
 import javafx.beans.property.*;
 import javafx.collections.*;
@@ -158,21 +160,27 @@ public class EmployeeController {
         if (sel == null) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Remove employee [" + sel.getFullName() + "]?\n\n" +
-                "• If they have Orders/Salary → Status will be set to INACTIVE.\n" +
-                "• Otherwise the record will be permanently deleted.",
+                "Xoá vĩnh viễn nhân viên [" + sel.getFullName() + "]?\n\n" +
+                "⚠ Yêu cầu trước khi xoá:\n" +
+                "  • Tất cả đơn hàng đã được xoá\n" +
+                "  • Không còn lương PAID/PENDING\n" +
+                "  • Không còn phiếu bảo hành đang xử lý\n" +
+                "  • Không có lịch sử xuất/nhập kho\n\n" +
+                "Lương DRAFT (nếu có) sẽ tự động bị xoá.",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirm Remove");
+        confirm.setTitle("Xác nhận xoá nhân viên");
         confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
-                String result = service.removeEmployee(sel.getEmployeeId());
-                setStatus(result.equals("SOFT_DELETED")
-                        ? "Employee set to INACTIVE (has related data)."
-                        : "Employee permanently deleted.");
+                service.removeEmployee(sel.getEmployeeId());
+                setStatus("Đã xoá nhân viên [" + sel.getFullName() + "] vĩnh viễn.");
                 loadAll();
-            } catch (Exception e) { showError("Delete failed", e.getMessage()); }
+            } catch (IllegalStateException e) {
+                showError("Không thể xoá", e.getMessage());
+            } catch (Exception e) {
+                showError("Lỗi xoá", e.getMessage());
+            }
         });
     }
 

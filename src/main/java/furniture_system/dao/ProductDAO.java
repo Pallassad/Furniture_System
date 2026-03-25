@@ -194,6 +194,78 @@ public class ProductDAO {
     }
 
     // ══════════════════════════════════════════════════════════════════════
+    // HARD-DELETE
+    // ══════════════════════════════════════════════════════════════════════
+
+    /**
+     * Xoá cứng Product.
+     * Phải kiểm tra hasOrderLines() và hasWarrantyTickets() trước khi gọi.
+     * Stock và StockLog của product sẽ bị cascade-delete ở DB,
+     * hoặc gọi deleteRelatedStock() trước.
+     */
+    public boolean hardDelete(int productId) throws SQLException {
+        // Xoá SupplierProduct links trước (không có CASCADE ở FK)
+        String delSP = "DELETE FROM SupplierProduct WHERE ProductId = ?";
+        try (Connection c = DatabaseConfig.getConnection()) {
+            c.setAutoCommit(false);
+            try {
+                try (PreparedStatement ps = c.prepareStatement(delSP)) {
+                    ps.setInt(1, productId);
+                    ps.executeUpdate();
+                }
+                // Xoá StockLog
+                try (PreparedStatement ps = c.prepareStatement(
+                        "DELETE FROM StockLog WHERE ProductId = ?")) {
+                    ps.setInt(1, productId);
+                    ps.executeUpdate();
+                }
+                // Xoá Stock
+                try (PreparedStatement ps = c.prepareStatement(
+                        "DELETE FROM Stock WHERE ProductId = ?")) {
+                    ps.setInt(1, productId);
+                    ps.executeUpdate();
+                }
+                // Xoá Product
+                int rows;
+                try (PreparedStatement ps = c.prepareStatement(
+                        "DELETE FROM Product WHERE ProductId = ?")) {
+                    ps.setInt(1, productId);
+                    rows = ps.executeUpdate();
+                }
+                c.commit();
+                return rows > 0;
+            } catch (SQLException ex) {
+                c.rollback();
+                throw ex;
+            }
+        }
+    }
+
+    /** Kiểm tra Product còn được tham chiếu bởi OrderLine không. */
+    public boolean hasOrderLines(int productId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM OrderLine WHERE ProductId = ?";
+        try (Connection c = DatabaseConfig.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    /** Kiểm tra Product còn WarrantyTicket nào không. */
+    public boolean hasWarrantyTickets(int productId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM WarrantyTicket WHERE ProductId = ?";
+        try (Connection c = DatabaseConfig.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
     // SOFT-DELETE  →  Status = 'INACTIVE'
     // ══════════════════════════════════════════════════════════════════════
     public boolean deactivate(int productId) throws SQLException {

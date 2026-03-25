@@ -226,6 +226,19 @@ public class DeliveryAddressDAO {
     }
 
     /**
+     * Hard-delete: xoá vĩnh viễn địa chỉ.
+     * Chỉ gọi khi không còn Order nào tham chiếu (kiểm tra qua isLinkedToOrder trước).
+     */
+    public boolean hardDelete(int addressId) throws SQLException {
+        String sql = "DELETE FROM DeliveryAddress WHERE AddressId = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, addressId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
      * Set a specific address as default for a customer.
      * Unsets all other defaults atomically.
      */

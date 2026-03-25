@@ -49,18 +49,41 @@ public class EmployeeService {
 
     // ── 3.3.4 Delete / Deactivate ─────────────────────────────────────────────
     /**
-     * Soft-delete: sets Status = INACTIVE.
-     * Hard-delete: only if no related Orders or Salary records.
+     * Xoá nhân viên:
+     *  - Nếu còn Order/Salary PAID/WarrantyTicket active/StockLog → báo lỗi chi tiết
+     *  - Nếu chỉ còn Salary DRAFT → tự động xoá Salary DRAFT rồi xoá Employee
+     *  - Nếu không còn dữ liệu → hard-delete
      */
     public String removeEmployee(int employeeId) {
         requireAdmin();
-        if (dao.hasRelatedData(employeeId)) {
-            dao.updateStatus(employeeId, Status.INACTIVE);
-            return "SOFT_DELETED"; // caller shows appropriate message
-        } else {
-            dao.delete(employeeId);
-            return "HARD_DELETED";
-        }
+
+        // 1. Kiểm tra Order
+        if (dao.hasOrders(employeeId))
+            throw new IllegalStateException(
+                "Nhân viên này còn đơn hàng. Vui lòng xoá tất cả đơn hàng trước.");
+
+        // 2. Kiểm tra Salary PAID / PENDING
+        if (dao.hasNonDraftSalary(employeeId))
+            throw new IllegalStateException(
+                "Nhân viên này còn bản ghi lương đã PAID hoặc PENDING. Không thể xoá.");
+
+        // 3. Kiểm tra WarrantyTicket đang active
+        if (dao.hasActiveWarrantyTickets(employeeId))
+            throw new IllegalStateException(
+                "Nhân viên này còn phiếu bảo hành đang xử lý. " +
+                "Vui lòng hoàn tất hoặc giao lại phiếu bảo hành trước.");
+
+        // 4. Kiểm tra StockLog
+        if (dao.hasStockLogs(employeeId))
+            throw new IllegalStateException(
+                "Nhân viên này có lịch sử xuất/nhập kho. Không thể xoá vì ảnh hưởng kiểm toán.");
+
+        // 5. Xoá Salary DRAFT còn lại (nếu có)
+        dao.deleteDraftSalaries(employeeId);
+
+        // 6. Hard-delete
+        dao.delete(employeeId);
+        return "HARD_DELETED";
     }
 
     public boolean updateStatus(int employeeId, Status newStatus) {

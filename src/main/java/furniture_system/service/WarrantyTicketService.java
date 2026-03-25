@@ -148,6 +148,24 @@ public class WarrantyTicketService {
         return dao.cancel(ticketId, "REJECTED");
     }
 
+    // ── DELETE ────────────────────────────────────────────────────────────────
+
+    /**
+     * Xoá cứng một WarrantyTicket.
+     * Chỉ cho phép khi Status đã terminal: COMPLETED, CANCELLED hoặc REJECTED.
+     *
+     * @throws IllegalStateException nếu ticket chưa terminal
+     */
+    public void delete(int ticketId) throws SQLException {
+        WarrantyTicket existing = requireExists(ticketId);
+        if (!TERMINAL_STATUSES.contains(existing.getStatus()))
+            throw new IllegalStateException(
+                "Chỉ có thể xoá phiếu bảo hành ở trạng thái COMPLETED, CANCELLED hoặc REJECTED. " +
+                "Trạng thái hiện tại: " + existing.getStatus());
+        if (dao.hardDelete(ticketId) == 0)
+            throw new SQLException("Xoá phiếu bảo hành #" + ticketId + " thất bại.");
+    }
+
     // ── PRIVATE VALIDATORS ────────────────────────────────────────────────────
 
     private void validateForCreate(WarrantyTicket t) {

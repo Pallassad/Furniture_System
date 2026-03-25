@@ -84,6 +84,23 @@ public class BillingDAO {
     }
 
     // ─────────────────────────────────────────────────────────────────────
+    //  DELETE
+    // ─────────────────────────────────────────────────────────────────────
+
+    /**
+     * Xoá cứng một Billing record.
+     * Chỉ gọi khi BillingStatus = UNPAID hoặc VOID (kiểm tra ở Service).
+     */
+    public boolean delete(int invoiceId) throws SQLException {
+        String sql = "DELETE FROM Billing WHERE InvoiceId = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, invoiceId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
     //  UPDATE
     // ─────────────────────────────────────────────────────────────────────
 

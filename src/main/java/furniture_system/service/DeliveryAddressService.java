@@ -80,19 +80,26 @@ public class DeliveryAddressService {
     }
 
     /**
-     * Soft-delete or hard-delete guard.
-     * If the address is linked to an Order, sets Status = INACTIVE.
-     * Otherwise still sets INACTIVE (no hard-delete per business rule).
+     * Xoá địa chỉ:
+     *  - Nếu có Order tham chiếu → soft-delete (Status = INACTIVE)
+     *  - Nếu không có Order → hard-delete
      *
      * @throws SQLException on DB error
      */
     public void deleteAddress(int addressId) throws SQLException {
         DeliveryAddress existing = dao.findById(addressId);
         if (existing == null)
-            throw new IllegalArgumentException("Address not found (AddressId=" + addressId + ").");
-        // Always soft-delete — hard delete is forbidden by business rule
-        if (!dao.softDelete(addressId))
-            throw new SQLException("Soft-delete failed for AddressId=" + addressId);
+            throw new IllegalArgumentException("Không tìm thấy địa chỉ (AddressId=" + addressId + ").");
+
+        if (dao.isLinkedToOrder(addressId)) {
+            // Soft-delete: đang được dùng bởi Order
+            if (!dao.softDelete(addressId))
+                throw new SQLException("Soft-delete thất bại cho AddressId=" + addressId);
+        } else {
+            // Hard-delete
+            if (!dao.hardDelete(addressId))
+                throw new SQLException("Xoá địa chỉ thất bại (AddressId=" + addressId + ").");
+        }
     }
 
     /**

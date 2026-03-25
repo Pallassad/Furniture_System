@@ -1,6 +1,7 @@
 package furniture_system.controller;
 
 import furniture_system.dao.WarrantyTicketDAO;
+import furniture_system.service.WarrantyTicketService;
 import furniture_system.model.WarrantyTicket;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -36,13 +37,15 @@ public class AdminWarrantyManagementController {
     @FXML private Button    btnAdd;
     @FXML private Button    btnEdit;
     @FXML private Button    btnCancelTicket;
+    @FXML private Button    btnDelete;
     @FXML private Label     lblStatus;
 
     private static final List<String> STATUSES = List.of(
             "CREATED", "RECEIVED", "PROCESSING", "WAITING_PART",
             "COMPLETED", "REJECTED", "CANCELLED");
 
-    private final WarrantyTicketDAO          dao  = new WarrantyTicketDAO();
+    private final WarrantyTicketDAO          dao              = new WarrantyTicketDAO();
+    private final WarrantyTicketService      warrantyService  = new WarrantyTicketService();
     private final ObservableList<WarrantyTicket> data = FXCollections.observableArrayList();
 
     // ══════════════════════════════════════════════════════════════════════
@@ -59,9 +62,13 @@ public class AdminWarrantyManagementController {
                     boolean canCancel = has &&
                             !List.of("COMPLETED","CANCELLED","REJECTED").contains(sel.getStatus());
                     btnCancelTicket.setDisable(!canCancel);
+                    boolean canDelete = has &&
+                            List.of("COMPLETED","CANCELLED","REJECTED").contains(sel.getStatus());
+                    btnDelete.setDisable(!canDelete);
                 });
         btnEdit.setDisable(true);
         btnCancelTicket.setDisable(true);
+        btnDelete.setDisable(true);
     }
 
     // ── Table setup ────────────────────────────────────────────────────────
@@ -288,6 +295,30 @@ public class AdminWarrantyManagementController {
                 setStatus("Ticket #" + sel.getTicketId() + " → " + choice, false);
                 loadAll();
             } catch (Exception ex) { alert(Alert.AlertType.ERROR, "Error", ex.getMessage()); }
+        });
+    }
+
+    // ==================== DELETE (hard-delete terminal tickets) ====================
+    @FXML public void handleDelete() {
+        WarrantyTicket sel = tableWarranty.getSelectionModel().getSelectedItem();
+        if (sel == null) return;
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+            "Xoá vĩnh viễn phiếu bảo hành #" + sel.getTicketId()
+            + " [" + nvl(sel.getProductName()) + "]?\n\n"
+            + "⚠ Hành động này không thể hoàn tác.",
+            ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Xác nhận xoá phiếu bảo hành");
+        confirm.setHeaderText(null);
+        confirm.showAndWait().ifPresent(btn -> {
+            if (btn != ButtonType.YES) return;
+            try {
+                warrantyService.delete(sel.getTicketId());
+                setStatus("Đã xoá phiếu bảo hành #" + sel.getTicketId() + ".", false);
+                loadAll();
+            } catch (Exception ex) {
+                alert(Alert.AlertType.ERROR, "Không thể xoá", ex.getMessage());
+            }
         });
     }
 

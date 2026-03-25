@@ -199,6 +199,19 @@ public class WarrantyTicketDAO {
     // ── DELETE / CANCEL ───────────────────────────────────────────────────────
 
     /**
+     * Xoá cứng một WarrantyTicket.
+     * Chỉ gọi khi Status đã terminal (COMPLETED/CANCELLED/REJECTED) — kiểm tra ở Service.
+     */
+    public int hardDelete(int ticketId) throws SQLException {
+        String sql = "DELETE FROM WarrantyTicket WHERE TicketId = ?";
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, ticketId);
+            return ps.executeUpdate();
+        }
+    }
+
+    /**
      * Soft-delete by setting Status to CANCELLED or REJECTED.
      *
      * @param newStatus must be 'CANCELLED' or 'REJECTED'

@@ -120,6 +120,62 @@ public class EmployeeDAO {
         } catch (SQLException e) { throw new RuntimeException("hasRelatedData failed", e); }
     }
 
+    /** Kiểm tra nhân viên còn Order nào không (bất kỳ status). */
+    public boolean hasOrders(int employeeId) {
+        String sql = "SELECT COUNT(*) FROM [Order] WHERE EmployeeId = ?";
+        try (Connection c = DatabaseConfig.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        } catch (SQLException e) { throw new RuntimeException("hasOrders failed", e); }
+    }
+
+    /** Kiểm tra nhân viên còn Salary không phải DRAFT (PAID/PENDING). */
+    public boolean hasNonDraftSalary(int employeeId) {
+        String sql = "SELECT COUNT(*) FROM Salary WHERE EmployeeId = ? AND Status <> 'DRAFT'";
+        try (Connection c = DatabaseConfig.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        } catch (SQLException e) { throw new RuntimeException("hasNonDraftSalary failed", e); }
+    }
+
+    /** Kiểm tra nhân viên còn WarrantyTicket đang active (chưa terminal). */
+    public boolean hasActiveWarrantyTickets(int employeeId) {
+        String sql = "SELECT COUNT(*) FROM WarrantyTicket " +
+                "WHERE HandlerEmployeeId = ? " +
+                "AND Status NOT IN ('COMPLETED','CANCELLED','REJECTED')";
+        try (Connection c = DatabaseConfig.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        } catch (SQLException e) { throw new RuntimeException("hasActiveWarrantyTickets failed", e); }
+    }
+
+    /** Kiểm tra nhân viên có StockLog nào không. */
+    public boolean hasStockLogs(int employeeId) {
+        String sql = "SELECT COUNT(*) FROM StockLog WHERE ActorId = ?";
+        try (Connection c = DatabaseConfig.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        } catch (SQLException e) { throw new RuntimeException("hasStockLogs failed", e); }
+    }
+
+    /** Xoá toàn bộ Salary DRAFT của nhân viên (gọi trước khi xoá Employee). */
+    public void deleteDraftSalaries(int employeeId) {
+        String sql = "DELETE FROM Salary WHERE EmployeeId = ? AND Status = 'DRAFT'";
+        try (Connection c = DatabaseConfig.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+            ps.executeUpdate();
+        } catch (SQLException e) { throw new RuntimeException("deleteDraftSalaries failed", e); }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // CREATE  3.3.2
     // ─────────────────────────────────────────────────────────────────────────

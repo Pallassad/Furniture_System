@@ -62,19 +62,19 @@ public class CustomerService {
 
     // ── 3.10.4  Delete / Deactivate ───────────────────────────────────────────
     /**
-     * Soft-delete: sets INACTIVE if customer has orders.
-     * Hard-delete: permanently removes if no orders.
-     * Returns "SOFT" or "HARD".
+     * Xoá khách hàng:
+     *  - Nếu còn Order → báo lỗi, không xoá (phải xoá Order trước)
+     *  - Nếu không còn Order → hard-delete (DeliveryAddress cascade theo FK hoặc xoá thủ công)
      */
     public String removeCustomer(int customerId) {
         requireAdmin();
-        if (dao.hasOrders(customerId)) {
-            dao.updateStatus(customerId, Status.INACTIVE);
-            return "SOFT";
-        } else {
-            dao.delete(customerId);
-            return "HARD";
-        }
+        if (dao.hasOrders(customerId))
+            throw new IllegalStateException(
+                "Khách hàng này còn đơn hàng. Vui lòng xoá tất cả đơn hàng của khách hàng trước.");
+        // Xoá DeliveryAddress không còn liên kết Order
+        dao.deleteUnlinkedAddresses(customerId);
+        dao.delete(customerId);
+        return "HARD";
     }
 
     public boolean updateStatus(int customerId, Status newStatus) {

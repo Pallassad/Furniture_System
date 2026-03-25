@@ -129,6 +129,20 @@ public class CustomerDAO {
         } catch (SQLException e) { throw new RuntimeException("delete customer failed", e); }
     }
 
+    /**
+     * Xoá DeliveryAddress của customer mà không còn Order nào tham chiếu.
+     * Gọi trước khi hard-delete Customer.
+     */
+    public void deleteUnlinkedAddresses(int customerId) {
+        String sql = "DELETE FROM DeliveryAddress WHERE CustomerId = ? " +
+                "AND AddressId NOT IN (SELECT AddressId FROM [Order])";
+        try (Connection c = DatabaseConfig.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.executeUpdate();
+        } catch (SQLException e) { throw new RuntimeException("deleteUnlinkedAddresses failed", e); }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // PURCHASE HISTORY  4.9.3
     // ─────────────────────────────────────────────────────────────────────────

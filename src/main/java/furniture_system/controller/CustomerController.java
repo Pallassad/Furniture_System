@@ -191,21 +191,22 @@ public class CustomerController {
         Customer sel = customerTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Remove customer [" + sel.getFullName() + "]?\n\n" +
-                "• Has orders → set INACTIVE\n• No orders → permanently deleted",
+                "Xoá vĩnh viễn khách hàng [" + sel.getFullName() + "]?\n\n" +
+                "⚠ Yêu cầu: tất cả đơn hàng của khách hàng phải được xoá trước.\n" +
+                "Các địa chỉ giao hàng không còn liên kết Order sẽ bị xoá theo.",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirm Remove");
+        confirm.setTitle("Xác nhận xoá khách hàng");
         confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
-                String r = service.removeCustomer(sel.getCustomerId());
-                setStatus(r.equals("SOFT")
-                        ? "Customer set to INACTIVE (has order history)."
-                        : "Customer permanently deleted.");
+                service.removeCustomer(sel.getCustomerId());
+                setStatus("Đã xoá vĩnh viễn khách hàng [" + sel.getFullName() + "].");
                 loadAll();
+            } catch (IllegalStateException e) {
+                showError("Không thể xoá", e.getMessage());
             } catch (Exception e) {
-                showError("Remove failed", e.getMessage());
+                showError("Lỗi xoá", e.getMessage());
             }
         });
     }

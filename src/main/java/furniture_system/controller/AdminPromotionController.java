@@ -48,6 +48,7 @@ public class AdminPromotionController {
     @FXML private Button btnAdd;
     @FXML private Button btnEdit;
     @FXML private Button btnDisable;
+    @FXML private Button btnDelete;
     @FXML private Label  statusBarLabel;
 
     private final PromotionService           svc  = new PromotionService();
@@ -66,9 +67,11 @@ public class AdminPromotionController {
             btnEdit.setDisable(!has);
             boolean canDisable = has && !"DISABLED".equals(sel.getStatus());
             btnDisable.setDisable(!canDisable);
+            btnDelete.setDisable(!has);
         });
         btnEdit.setDisable(true);
         btnDisable.setDisable(true);
+        btnDelete.setDisable(true);
     }
 
     // ── Column setup ───────────────────────────────────────────────────────
@@ -332,6 +335,30 @@ public class AdminPromotionController {
                 setStatus("Promotion [" + sel.getCode() + "] disabled.");
                 loadData();
             } catch (Exception ex) { alert(Alert.AlertType.ERROR, "Error", ex.getMessage()); }
+        });
+    }
+
+    // ==================== HARD DELETE ====================
+    @FXML public void handleDelete() {
+        Promotion sel = promoTable.getSelectionModel().getSelectedItem();
+        if (sel == null) return;
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Xoá vĩnh viễn mã khuyến mãi \"" + sel.getCode() + "\"?\n\n"
+                + "⚠ Hành động này không thể hoàn tác.\n"
+                + "Yêu cầu: mã này chưa được dùng trong bất kỳ đơn hàng nào.",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Xác nhận xoá khuyến mãi"); confirm.setHeaderText(null);
+        confirm.showAndWait().ifPresent(btn -> {
+            if (btn != ButtonType.YES) return;
+            try {
+                svc.deletePromotion(sel.getPromoId());
+                setStatus("Đã xoá vĩnh viễn mã [" + sel.getCode() + "].");
+                loadData();
+            } catch (IllegalStateException ex) {
+                alert(Alert.AlertType.ERROR, "Không thể xoá", ex.getMessage());
+            } catch (Exception ex) {
+                alert(Alert.AlertType.ERROR, "Lỗi xoá", ex.getMessage());
+            }
         });
     }
 

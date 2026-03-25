@@ -41,6 +41,7 @@ public class AdminFurnitureController {
     @FXML private Button btnAdd;
     @FXML private Button btnEdit;
     @FXML private Button btnDeactivate;
+    @FXML private Button btnDelete;
     @FXML private Button btnRefresh;
 
     // ── Services ───────────────────────────────────────────────────────────
@@ -61,9 +62,11 @@ public class AdminFurnitureController {
                     boolean has = sel != null;
                     btnEdit.setDisable(!has);
                     btnDeactivate.setDisable(!has);
+                    btnDelete.setDisable(!has);
                 });
         btnEdit.setDisable(true);
         btnDeactivate.setDisable(true);
+        btnDelete.setDisable(true);
     }
 
     // ── Column setup ───────────────────────────────────────────────────────
@@ -315,6 +318,32 @@ public class AdminFurnitureController {
                 loadProducts();
             } catch (Exception ex) {
                 alert(Alert.AlertType.ERROR, "Error", ex.getMessage());
+            }
+        });
+    }
+
+    // ==================== HARD DELETE ====================
+    @FXML
+    public void handleDelete() {
+        Product sel = productTable.getSelectionModel().getSelectedItem();
+        if (sel == null) return;
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Xoá vĩnh viễn sản phẩm \"" + sel.getName() + "\"?\n\n" +
+                "⚠ Hành động này không thể hoàn tác.\n" +
+                "Yêu cầu: sản phẩm không có trong đơn hàng và không còn phiếu bảo hành.\n" +
+                "Dữ liệu tồn kho và lịch sử xuất/nhập kho sẽ bị xoá theo.",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Xác nhận xoá sản phẩm"); confirm.setHeaderText(null);
+        confirm.showAndWait().ifPresent(btn -> {
+            if (btn != ButtonType.YES) return;
+            try {
+                svcProduct.deleteProduct(sel.getProductId());
+                setStatus("Đã xoá vĩnh viễn sản phẩm [" + sel.getName() + "].");
+                loadProducts();
+            } catch (IllegalStateException ex) {
+                alert(Alert.AlertType.ERROR, "Không thể xoá", ex.getMessage());
+            } catch (Exception ex) {
+                alert(Alert.AlertType.ERROR, "Lỗi xoá", ex.getMessage());
             }
         });
     }

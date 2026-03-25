@@ -319,25 +319,26 @@ public class AdminDeliveryAddressController {
         } catch (Exception e) { alert(Alert.AlertType.ERROR, "Error", e.getMessage()); }
     }
 
-    // ==================== DEACTIVATE ====================
+    // ==================== DEACTIVATE / DELETE ====================
     @FXML public void onDelete() {
         DeliveryAddress sel = tblAddresses.getSelectionModel().getSelectedItem();
         if (sel == null) return;
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Deactivate address for " + nvl(sel.getReceiverName()) + "?\n\n"
-                + sel.getAddressLine() + ", " + sel.getCity(),
+                "Xoá địa chỉ của [" + nvl(sel.getReceiverName()) + "]?\n\n"
+                + sel.getAddressLine() + ", " + sel.getCity() + "\n\n"
+                + "• Nếu địa chỉ đang dùng trong đơn hàng → đặt INACTIVE\n"
+                + "• Nếu không có đơn hàng nào → xoá vĩnh viễn",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirm Deactivation"); confirm.setHeaderText(null);
+        confirm.setTitle("Xác nhận xoá địa chỉ"); confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
                 service.deleteAddress(sel.getAddressId());
-                setStatus("Address #" + sel.getAddressId() + " deactivated.", false);
+                setStatus("Đã xử lý địa chỉ #" + sel.getAddressId() + ".", false);
                 loadTable(); loadStats();
-            } catch (Exception e) { alert(Alert.AlertType.ERROR, "Error", e.getMessage()); }
+            } catch (Exception e) { alert(Alert.AlertType.ERROR, "Lỗi", e.getMessage()); }
         });
     }
-
     // ── Shared helpers ─────────────────────────────────────────────────────
     private List<Customer> loadCustomers() {
         try { return customerDao.findAll(); }

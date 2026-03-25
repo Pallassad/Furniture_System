@@ -89,6 +89,26 @@ public class ProductService {
             throw new SQLException("Deactivate returned 0 rows – record may not exist.");
     }
 
+    /**
+     * Hard-delete sản phẩm.
+     * Điều kiện:
+     *  - Không còn OrderLine nào tham chiếu
+     *  - Không còn WarrantyTicket nào tham chiếu
+     * Khi xoá sẽ cascade xoá: SupplierProduct, StockLog, Stock của sản phẩm.
+     */
+    public void deleteProduct(int productId) throws SQLException {
+        if (productId <= 0)
+            throw new IllegalArgumentException("Invalid product ID.");
+        if (dao.hasOrderLines(productId))
+            throw new IllegalStateException(
+                "Sản phẩm này đã xuất hiện trong đơn hàng. Không thể xoá vĩnh viễn.");
+        if (dao.hasWarrantyTickets(productId))
+            throw new IllegalStateException(
+                "Sản phẩm này còn phiếu bảo hành. Vui lòng xoá tất cả phiếu bảo hành trước.");
+        if (!dao.hardDelete(productId))
+            throw new SQLException("Xoá sản phẩm thất bại.");
+    }
+
     // ── Employee – read-only ───────────────────────────────────────────────
 
     public List<Product> getActiveProducts() throws SQLException {

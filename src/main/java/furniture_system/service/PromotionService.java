@@ -118,6 +118,27 @@ public class PromotionService {
         }
     }
 
+    // ── 3.6.6  Delete Promotion (hard-delete) ─────────────────────────────────
+
+    /**
+     * Xoá cứng Promotion.
+     * Điều kiện: không còn Order nào sử dụng promo này.
+     */
+    public void deletePromotion(int promoId) {
+        requireAdmin();
+        try {
+            if (dao.hasLinkedOrders(promoId))
+                throw new IllegalStateException(
+                    "Mã khuyến mãi này đã được sử dụng trong đơn hàng. " +
+                    "Không thể xoá vĩnh viễn.");
+            dao.hardDelete(promoId);
+        } catch (IllegalStateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Xoá khuyến mãi thất bại: " + e.getMessage(), e);
+        }
+    }
+
     // ── Employee helper: active promos for ComboBox in Order form ────────────
 
     public List<Promotion> getActivePromotions() {

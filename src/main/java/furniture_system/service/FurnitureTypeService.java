@@ -57,31 +57,30 @@ public class FurnitureTypeService {
 
     // ── Deactivate (Soft Delete) ──────────────────────────────────────────────
     /**
-     * Warns if the TypeId is referenced by active products.
+     * Soft-delete: chỉ cảnh báo nếu còn Product ACTIVE.
      * @return null on success, error message on failure
      */
     public String deactivate(int typeId) throws SQLException {
-        if (dao.hasLinkedProducts(typeId)) {
-            return "This furniture type has active products linked to it.\n"
-                 + "Please deactivate the related products before deactivating this type.";
+        if (dao.hasActiveLinkedProducts(typeId)) {
+            return "Loại nội thất này còn sản phẩm đang ACTIVE.\n" +
+                   "Vui lòng tắt hoặc xoá các sản phẩm liên quan trước khi vô hiệu hoá.";
         }
         boolean ok = dao.deactivate(typeId);
-        return ok ? null : "Failed to deactivate. Please try again.";
+        return ok ? null : "Vô hiệu hoá thất bại. Vui lòng thử lại.";
     }
 
     // ── Delete (Hard Delete) ──────────────────────────────────────────────────
     /**
-     * Permanently removes a FurnitureType record from the database.
-     * Blocked if active products are linked to this type.
+     * Hard-delete: chặn nếu còn BẤT KỲ Product nào (kể cả INACTIVE).
      * @return null on success, error message on failure
      */
     public String delete(int typeId) throws SQLException {
         if (dao.hasLinkedProducts(typeId)) {
-            return "This furniture type has active products linked to it.\n"
-                 + "Please deactivate or reassign the related products before deleting.";
+            return "Loại nội thất này còn sản phẩm liên kết (kể cả sản phẩm đã vô hiệu hoá).\n" +
+                   "Vui lòng xoá tất cả sản phẩm liên quan trước.";
         }
         boolean ok = dao.delete(typeId);
-        return ok ? null : "Failed to delete. Please try again.";
+        return ok ? null : "Xoá thất bại. Vui lòng thử lại.";
     }
 
     // ── Validation ───────────────────────────────────────────────────────────

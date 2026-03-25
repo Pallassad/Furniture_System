@@ -51,6 +51,7 @@ public class AdminOrderController {
     @FXML private Button btnUpdateStatus;
     @FXML private Button btnManageBilling;
     @FXML private Button btnCancelOrder;
+    @FXML private Button btnDeleteOrder;
     @FXML private Label  statusBarLabel;
 
     private final OrderService          orderService = new OrderService();
@@ -71,11 +72,16 @@ public class AdminOrderController {
             btnManageBilling.setDisable(!has);
             boolean canCancel = has && ("DRAFT".equals(sel.getStatus()) || "CONFIRMED".equals(sel.getStatus()));
             btnCancelOrder.setDisable(!canCancel);
+            boolean canDelete = has && ("COMPLETED".equals(sel.getStatus())
+                    || "CANCELLED".equals(sel.getStatus())
+                    || "RETURNED".equals(sel.getStatus()));
+            btnDeleteOrder.setDisable(!canDelete);
         });
         btnViewDetail.setDisable(true);
         btnUpdateStatus.setDisable(true);
         btnManageBilling.setDisable(true);
         btnCancelOrder.setDisable(true);
+        btnDeleteOrder.setDisable(true);
 
         // Double-click → view detail
         tblOrders.setRowFactory(tv -> {
@@ -332,7 +338,41 @@ public class AdminOrderController {
         Button btnSave   = primaryBtn(btnLabel);
         Button btnCancel = new Button("Cancel");
         btnCancel.setStyle("-fx-background-radius:6;-fx-padding:8 18;");
-        HBox btns = new HBox(10, btnCancel, btnSave); btns.setAlignment(Pos.CENTER_RIGHT);
+        HBox btns;
+
+        // Nút xoá hoá đơn — chỉ hiện khi đã có hoá đơn và status là UNPAID/VOID
+        if (existing[0] != null) {
+            String bs = existing[0].getBillingStatus();
+            boolean canDeleteBilling = "UNPAID".equals(bs) || "VOID".equals(bs);
+            Button btnDelBilling = new Button("🗑 Xoá hoá đơn");
+            btnDelBilling.setStyle("-fx-background-color:#c62828;-fx-text-fill:white;" +
+                "-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;");
+            btnDelBilling.setDisable(!canDeleteBilling);
+            btnDelBilling.setOnAction(ev -> {
+                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Xoá hoá đơn #" + existing[0].getInvoiceId() + "?\n" +
+                    "Bạn có thể tạo lại hoá đơn mới sau.",
+                    ButtonType.YES, ButtonType.NO);
+                confirm.setTitle("Xác nhận xoá hoá đơn");
+                confirm.setHeaderText(null);
+                confirm.showAndWait().ifPresent(b -> {
+                    if (b != ButtonType.YES) return;
+                    try {
+                        orderService.deleteBilling(existing[0].getInvoiceId());
+                        setStatus("Đã xoá hoá đơn #" + existing[0].getInvoiceId());
+                        loadAllOrders();
+                        dlg.close();
+                    } catch (Exception ex) {
+                        alert(Alert.AlertType.ERROR, "Không thể xoá", ex.getMessage());
+                    }
+                });
+            });
+            btns = new HBox(10, btnDelBilling, btnCancel, btnSave);
+        } else {
+            btns = new HBox(10, btnCancel, btnSave);
+        }
+
+        btns.setAlignment(Pos.CENTER_RIGHT);
         grid.add(btns, 0, row, 2, 1);
 
         btnSave.setOnAction(ev -> {
@@ -361,6 +401,35 @@ public class AdminOrderController {
         ScrollPane scroll = new ScrollPane(grid); scroll.setFitToWidth(true);
         dlg.setScene(new Scene(scroll, 480, 440)); dlg.showAndWait();
     }
+
+    // ==================== DELETE ORDER ====================
+    @FXML public void handleDeleteOrder() {
+        Order sel = tblOrders.getSelectionModel().getSelectedItem();
+        if (sel == null) return;
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+            "Xoá vĩnh viễn đơn hàng #" + sel.getOrderId()
+            + " [" + sel.getCustomerName() + "]?\n\n"
+            + "⚠ Hành động này không thể hoàn tác.\n"
+            + "Tất cả dòng đơn hàng, hoá đơn (nếu VOID) và\n"
+            + "phiếu bảo hành đã terminal sẽ bị xoá theo.",
+            ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Xác nhận xoá đơn hàng");
+        confirm.setHeaderText(null);
+        confirm.showAndWait().ifPresent(btn -> {
+            if (btn != ButtonType.YES) return;
+            try {
+                orderService.deleteOrder(sel.getOrderId());
+                setStatus("Đã xoá đơn hàng #" + sel.getOrderId() + ".");
+                loadAllOrders();
+            } catch (Exception ex) {
+                alert(Alert.AlertType.ERROR, "Không thể xoá", ex.getMessage());
+            }
+        });
+    }
+
+    // ==================== DELETE BILLING (trong dialog Manage Invoice) ====================
+    // Nút này được thêm động trong handleManageBilling khi hoá đơn ở trạng thái UNPAID/VOID
 
     // ==================== CANCEL ORDER ====================
     @FXML public void handleCancelOrder() {

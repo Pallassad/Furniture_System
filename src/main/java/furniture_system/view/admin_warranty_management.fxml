@@ -17,6 +17,7 @@
         <Button fx:id="btnAdd"          text="➕  Add Ticket"      onAction="#handleAdd"          styleClass="btn-primary"/>
         <Button fx:id="btnEdit"         text="✏  Edit"             onAction="#handleEdit"         styleClass="btn-warning"/>
         <Button fx:id="btnCancelTicket" text="🚫  Cancel/Reject"   onAction="#handleCancelTicket" styleClass="btn-danger"/>
+        <Button fx:id="btnDelete"       text="🗑  Delete"           onAction="#handleDelete"        styleClass="btn-danger"/>
         <Button                         text="⟳  Refresh"         onAction="#handleRefresh"      styleClass="btn-outline"/>
     </HBox>
 

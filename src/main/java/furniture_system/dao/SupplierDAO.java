@@ -94,6 +94,49 @@ public class SupplierDAO {
         }
     }
 
+    /**
+     * Hard-delete Supplier.
+     * SupplierProduct links được xoá trước (không có CASCADE trong schema).
+     * Chỉ gọi khi không còn Product nào có supplierId trỏ tới Supplier này.
+     */
+    public boolean hardDelete(int supplierId) throws SQLException {
+        try (Connection con = DatabaseConfig.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                // Xoá SupplierProduct links
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM SupplierProduct WHERE SupplierId = ?")) {
+                    ps.setInt(1, supplierId);
+                    ps.executeUpdate();
+                }
+                // Xoá Supplier
+                int rows;
+                try (PreparedStatement ps = con.prepareStatement(
+                        "DELETE FROM Supplier WHERE SupplierId = ?")) {
+                    ps.setInt(1, supplierId);
+                    rows = ps.executeUpdate();
+                }
+                con.commit();
+                return rows > 0;
+            } catch (SQLException ex) {
+                con.rollback();
+                throw ex;
+            }
+        }
+    }
+
+    /** Kiểm tra Supplier còn Product nào tham chiếu (supplierId FK trong Product). */
+    public boolean hasLinkedProducts(int supplierId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Product WHERE SupplierId = ?";
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, supplierId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
     // ══════════════════════════════════════════════════════════════════════
     //  SUPPLIER-PRODUCT LINK
     // ══════════════════════════════════════════════════════════════════════
