@@ -1,62 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="furniture_system.controller.EmployeePromotionController"
-      stylesheets="@/furniture_system/resources/css/emp.css"
       styleClass="content-root"
+      stylesheets="@../resources/css/emp.css"
       spacing="14">
     <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
 
-    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <!-- Page Header -->
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="🎫 Active Promotions" styleClass="page-title"/>
+        <Label text="🎫 Promotions" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnViewDetail" text="🔍  View Detail" onAction="#handleViewDetail" styleClass="btn-primary"/>
-        <Button                       text="⟳  Refresh"     onAction="#handleRefresh"    styleClass="btn-outline"/>
+        <Button text="⟳  Refresh"         onAction="#handleRefresh"     styleClass="btn-outline"/>
+        <Button fx:id="btnViewDetail"
+                text="🔍  View Details"
+                onAction="#handleViewDetail"
+                styleClass="btn-teal"
+                disable="true"/>
     </HBox>
-
     <Separator styleClass="separator"/>
 
-    <!-- ── Search + Lookup Bar ──────────────────────────────────────────── -->
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="txtSearch" styleClass="login-field"
-                   promptText="🔍 Search by code or name…"
-                   HBox.hgrow="ALWAYS"/>
-        <Button text="Search" onAction="#handleSearch"  styleClass="btn-primary"/>
-        <Button text="Reset"  onAction="#handleRefresh" styleClass="btn-outline"/>
-        <Separator orientation="VERTICAL" style="-fx-padding:0 4;"/>
-        <Label text="Lookup code:" style="-fx-font-weight:bold;-fx-font-size:12px;"/>
-        <TextField fx:id="tfLookupCode" styleClass="login-field"
-                   promptText="e.g. SUMMER20" prefWidth="150"/>
-        <Button text="Check" onAction="#handleLookup" styleClass="btn-success"/>
+    <!-- Lookup Bar -->
+    <HBox styleClass="search-card" spacing="10" alignment="CENTER_LEFT">
+        <Label text="🔎 Look up code:" styleClass="search-card-title"/>
+        <TextField fx:id="tfLookupCode"
+                   promptText="Enter promo code (e.g. SPRING26)"
+                   prefWidth="240"
+                   styleClass="login-field"/>
+        <Button text="Lookup" onAction="#handleLookup" styleClass="btn-success"/>
     </HBox>
 
-    <!-- ── Promotion Table ──────────────────────────────────────────────── -->
-    <TableView fx:id="promoTable" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+    <!-- Search Row -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="txtSearch"
+                   promptText="🔍  Search by code or name..."
+                   prefWidth="360"
+                   styleClass="login-field"/>
+        <Button text="Search" onAction="#handleSearch" styleClass="btn-primary"/>
+    </HBox>
+
+    <!-- Table (read-only — active promotions only) -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
+
+      <TableView fx:id="promoTable" styleClass="table-view" style="-fx-hbar-policy:never;">
         <columns>
-            <TableColumn fx:id="colCode"  text="Code"         prefWidth="130"/>
-            <TableColumn fx:id="colName"  text="Name"         prefWidth="230"/>
-            <TableColumn fx:id="colType"  text="Type"         prefWidth="90"/>
-            <TableColumn fx:id="colValue" text="Discount"     prefWidth="120"/>
-            <TableColumn fx:id="colMin"   text="Min Order"    prefWidth="130"/>
-            <TableColumn fx:id="colDates" text="Valid Period"  prefWidth="200"/>
-            <TableColumn fx:id="colUsage" text="Used / Limit" prefWidth="110"/>
+            <TableColumn fx:id="colCode"  text="Code"        prefWidth="130"/>
+            <TableColumn fx:id="colName"  text="Name"        prefWidth="200"/>
+            <TableColumn fx:id="colType"  text="Type"        prefWidth="110"/>
+            <TableColumn fx:id="colValue" text="Value"       prefWidth="90"/>
+            <TableColumn fx:id="colMin"   text="Min. Order"  prefWidth="110"/>
+            <TableColumn fx:id="colDates" text="Valid Dates" prefWidth="210"/>
+            <TableColumn fx:id="colUsage" text="Usage Left"  prefWidth="110"/>
         </columns>
         <placeholder>
-            <Label text="No active promotions available." styleClass="table-placeholder"/>
+            <Label text="No active promotions found." styleClass="table-placeholder"/>
         </placeholder>
     </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+    </ScrollPane>
+
+    <!-- Status Bar -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
         <Label text="ℹ"/>
         <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label text="💡 Double-click a row or use Lookup to view promotion details."
-               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+        <Label text="🔒 View only — active promotions shown."
+               style="-fx-font-size:11px; -fx-text-fill:#888;"/>
     </HBox>
 </VBox>

@@ -1,79 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-
-<!--
-  employee_management.fxml
-  Controller: furniture_system.controller.EmployeeController
-  Access: ADMIN only
--->
-<VBox xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx"
       fx:controller="furniture_system.controller.EmployeeController"
-      spacing="12"
-      styleClass="content-root"
-      stylesheets="@../resources/css/admin.css">
-    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+      stylesheets="@../resources/css/admin.css" spacing="0"
+      style="-fx-background-color:#eef0f5;">
 
-    <!-- ── Page Header ──────────────────────────────────────────── -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="👥 Employee Management" styleClass="page-title"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnStats" text="📊  Statistics"
-                onAction="#handleStats" styleClass="btn-purple"/>
-    </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 14 28;">
+    <Label styleClass="page-title" text="👥  Employee Management" HBox.hgrow="ALWAYS"/>
+    <Button fx:id="btnAdd"     styleClass="btn-primary" text="➕  Add"     onAction="#handleAdd"/>
+    <Button fx:id="btnEdit"    styleClass="btn-warning" text="✏  Edit"    onAction="#handleEdit"   disable="true"/>
+    <Button fx:id="btnDelete"  styleClass="btn-danger"  text="🗑  Delete"  onAction="#handleDelete" disable="true"/>
+    <Button fx:id="btnStats"   styleClass="btn-success" text="📊  Stats"   onAction="#handleStats"/>
+    <Button fx:id="btnRefresh" styleClass="btn-outline" text="⟳  Refresh" onAction="#handleRefresh"/>
+  </HBox>
+  <Separator style="-fx-background-color:#d8dce8;"/>
 
-    <Separator styleClass="separator"/>
+  <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding:10 28 8 28;">
+    <TextField fx:id="searchField" styleClass="search-field"
+               promptText="Search by name, phone, email…" prefWidth="320"/>
+    <Button styleClass="btn-primary" text="Search" onAction="#handleSearch"
+            style="-fx-padding:7 14 7 14;"/>
+  </HBox>
 
-    <!-- ── Toolbar ──────────────────────────────────────────────── -->
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="searchField"
-                   promptText="🔍  Search by name / phone / email / position / status..."
-                   prefWidth="380" styleClass="login-field"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnRefresh" text="⟳  Refresh"    onAction="#handleRefresh" styleClass="btn-outline"/>
-        <Button fx:id="btnAdd"     text="➕  Add Employee" onAction="#handleAdd"    styleClass="btn-primary"/>
-        <Button fx:id="btnEdit"    text="✏  Edit"          onAction="#handleEdit"   styleClass="btn-warning"/>
-        <Button fx:id="btnDelete"  text="🗑  Remove"       onAction="#handleDelete" styleClass="btn-danger"/>
-    </HBox>
+  <VBox VBox.vgrow="ALWAYS" style="-fx-padding:0 28 14 28;">
+    <VBox styleClass="table-card" VBox.vgrow="ALWAYS">
+      <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
 
-    <!-- ── Table ────────────────────────────────────────────────── -->
-    <TableView fx:id="employeeTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <TableView fx:id="employeeTable" styleClass="table-view" style="-fx-hbar-policy:never;">
         <columns>
-            <TableColumn fx:id="colId"       text="ID"        prefWidth="55"/>
-            <TableColumn fx:id="colFullName" text="Full Name" prefWidth="170"/>
-            <TableColumn fx:id="colPhone"    text="Phone"     prefWidth="115"/>
-            <TableColumn fx:id="colEmail"    text="Email"     prefWidth="185"/>
-            <TableColumn fx:id="colPosition" text="Position"  prefWidth="110"/>
-            <TableColumn fx:id="colStatus"   text="Status"    prefWidth="100"/>
-            <TableColumn fx:id="colDob"      text="DOB"       prefWidth="100"/>
-            <TableColumn fx:id="colAccount"  text="Account"   prefWidth="120"/>
-            <TableColumn fx:id="colHiredAt"  text="Hired At"  prefWidth="145"/>
+          <TableColumn fx:id="colId"        text="ID"          prefWidth="50"/>
+          <TableColumn fx:id="colFullName"  text="Full Name"   prefWidth="160"/>
+          <TableColumn fx:id="colPhone"     text="Phone"       prefWidth="120"/>
+          <TableColumn fx:id="colEmail"     text="Email"       prefWidth="190"/>
+          <TableColumn fx:id="colPosition"  text="Position"    prefWidth="120"/>
+          <TableColumn fx:id="colStatus"    text="Status"      prefWidth="110"/>
+          <TableColumn fx:id="colDob"       text="Date of Birth" prefWidth="110"/>
+          <TableColumn fx:id="colAccount"   text="Account"     prefWidth="120"/>
+          <TableColumn fx:id="colHiredAt"   text="Hired At"    prefWidth="155"/>
         </columns>
-        <placeholder>
-            <Label text="No employees found." styleClass="table-placeholder"/>
-        </placeholder>
-    </TableView>
+        <placeholder><Label text="No employees found." style="-fx-text-fill:#8a93b2;"/></placeholder>
+      </TableView>
 
-    <!-- ── Legend ───────────────────────────────────────────────── -->
-    <HBox spacing="18" alignment="CENTER_LEFT">
-        <padding><Insets top="4" left="4"/></padding>
-        <HBox spacing="6" alignment="CENTER_LEFT">
-            <Label styleClass="legend-swatch"
-                   style="-fx-background-color:#ffe0e0;"/>
-            <Label text="SUSPENDED" styleClass="hint-label"/>
-        </HBox>
-        <HBox spacing="6" alignment="CENTER_LEFT">
-            <Label styleClass="legend-swatch"/>
-            <Label text="INACTIVE"  styleClass="hint-label"/>
-        </HBox>
-    </HBox>
-
-    <!-- ── Status Bar ───────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
-        <Label text="ℹ"/>
-        <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
-    </HBox>
-
+      </ScrollPane>
+      <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ" style="-fx-text-fill:#4a7cff;"/>
+        <Label fx:id="statusBarLabel" styleClass="status-bar-label" text="Loading…"/>
+      </HBox>
+    </VBox>
+  </VBox>
 </VBox>

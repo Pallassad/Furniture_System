@@ -1,54 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<VBox xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx"
       fx:controller="furniture_system.controller.FurnitureTypeController"
-      stylesheets="@/furniture_system/resources/css/admin.css"
-      styleClass="content-root"
-      spacing="14">
-    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+      stylesheets="@../resources/css/admin.css" spacing="0"
+      style="-fx-background-color:#eef0f5;">
 
-    <!-- ── Page Header ──────────────────────────────────────────────────── -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="🪑 Furniture Types" styleClass="page-title"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnAdd"     text="➕  Add Type"   onAction="#handleAdd"     styleClass="btn-primary"/>
-        <Button fx:id="btnEdit"    text="✏  Edit Type"   onAction="#handleEdit"    styleClass="btn-warning"/>
-        <Button fx:id="btnDelete"  text="🗑  Delete"      onAction="#handleDelete"  styleClass="btn-danger"/>
-        <Button fx:id="btnRefresh" text="⟳  Refresh"     onAction="#handleRefresh" styleClass="btn-outline"/>
-    </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 14 28;">
+    <Label styleClass="page-title" text="🪑  Furniture Types" HBox.hgrow="ALWAYS"/>
+    <Button fx:id="btnAdd"     styleClass="btn-primary" text="➕  Add Type" onAction="#handleAdd"/>
+    <Button fx:id="btnEdit"    styleClass="btn-warning" text="✏  Edit"     onAction="#handleEdit"   disable="true"/>
+    <Button fx:id="btnDelete"  styleClass="btn-danger"  text="🗑  Delete"   onAction="#handleDelete" disable="true"/>
+    <Button fx:id="btnRefresh" styleClass="btn-outline" text="⟳  Refresh"  onAction="#handleRefresh"/>
+  </HBox>
+  <Separator style="-fx-background-color:#d8dce8;"/>
 
-    <Separator styleClass="separator"/>
+  <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding:10 28 8 28;">
+    <TextField fx:id="txtSearch" styleClass="search-field"
+               promptText="Search by name…" prefWidth="300"/>
+    <Button styleClass="btn-primary" text="Search" onAction="#handleSearch"
+            style="-fx-padding:7 14 7 14;"/>
+  </HBox>
 
-    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="txtSearch" styleClass="login-field"
-                   promptText="🔍 Search by name, ID, or status…"
-                   HBox.hgrow="ALWAYS"/>
-        <Button text="Search" onAction="#handleSearch"  styleClass="btn-primary"/>
-        <Button text="Clear"  onAction="#handleRefresh" styleClass="btn-outline"/>
-    </HBox>
+  <VBox VBox.vgrow="ALWAYS" style="-fx-padding:0 28 14 28;">
+    <VBox styleClass="table-card" VBox.vgrow="ALWAYS">
+      <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
 
-    <!-- ── Furniture Type Table ─────────────────────────────────────────── -->
-    <TableView fx:id="typeTable" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+        <TableView fx:id="typeTable" styleClass="table-view" style="-fx-hbar-policy:never;">
         <columns>
-            <TableColumn fx:id="colId"          text="ID"           prefWidth="55"/>
-            <TableColumn fx:id="colName"        text="Type Name"    prefWidth="210"/>
-            <TableColumn fx:id="colDescription" text="Description"  prefWidth="340"/>
-            <TableColumn fx:id="colStatus"      text="Status"       prefWidth="110"/>
-            <TableColumn fx:id="colCreatedAt"   text="Created Date" prefWidth="150"/>
+          <TableColumn fx:id="colId"          text="ID"          prefWidth="55"/>
+          <TableColumn fx:id="colName"        text="Type Name"   prefWidth="200"/>
+          <TableColumn fx:id="colDescription" text="Description" prefWidth="340"/>
+          <TableColumn fx:id="colStatus"      text="Status"      prefWidth="110"/>
+          <TableColumn fx:id="colCreatedAt"   text="Created At"  prefWidth="155"/>
         </columns>
-        <placeholder>
-            <Label text="No furniture types found." styleClass="table-placeholder"/>
-        </placeholder>
-    </TableView>
+        <placeholder><Label text="No types found." style="-fx-text-fill:#8a93b2;"/></placeholder>
+      </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
-        <Label text="ℹ"/>
-        <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
-    </HBox>
+      </ScrollPane>
+      <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ" style="-fx-text-fill:#4a7cff;"/>
+        <Label fx:id="statusBarLabel" styleClass="status-bar-label" text="Loading…"/>
+      </HBox>
+    </VBox>
+  </VBox>
 </VBox>

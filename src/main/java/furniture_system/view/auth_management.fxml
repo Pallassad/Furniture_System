@@ -1,48 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-
-<VBox xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx"
       fx:controller="furniture_system.controller.AuthController"
-      stylesheets="@/furniture_system/resources/css/admin.css"
-      styleClass="content-root"
-      spacing="14">
-    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+      stylesheets="@../resources/css/admin.css" spacing="0"
+      style="-fx-background-color:#eef0f5;">
 
-    <!-- ── Page header ──────────────────────────────────────────── -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="🔐 Authentication &amp; Authorization" styleClass="page-title"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnAdd"     text="➕  Add Account"  onAction="#handleAdd"    styleClass="btn-primary"/>
-        <Button fx:id="btnEdit"    text="✏  Edit Account"  onAction="#handleEdit"   styleClass="btn-warning"/>
-        <Button fx:id="btnDelete"  text="🗑  Delete"        onAction="#handleDelete" styleClass="btn-danger"/>
-        <Button fx:id="btnRefresh" text="⟳  Refresh"       onAction="#handleRefresh" styleClass="btn-outline"/>
-    </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 14 28;">
+    <Label styleClass="page-title" text="🔐  Authentication &amp; Authorization" HBox.hgrow="ALWAYS"/>
+    <Button fx:id="btnAdd"    styleClass="btn-primary" text="➕  Add Account" onAction="#handleAdd"/>
+    <Button fx:id="btnEdit"   styleClass="btn-warning" text="✏  Edit"        onAction="#handleEdit"   disable="true"/>
+    <Button fx:id="btnDelete" styleClass="btn-danger"  text="🗑  Delete"      onAction="#handleDelete" disable="true"/>
+    <Button                   styleClass="btn-outline" text="⟳  Refresh"     onAction="#handleRefresh"/>
+  </HBox>
+  <Separator style="-fx-background-color:#d8dce8;"/>
 
-    <Separator styleClass="separator"/>
-
-    <!-- ── Account Table ────────────────────────────────────────── -->
-    <TableView fx:id="accountTable" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+  <VBox VBox.vgrow="ALWAYS" style="-fx-padding:14 28 14 28;">
+    <VBox styleClass="table-card" VBox.vgrow="ALWAYS">
+      <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
+  <TableView fx:id="accountTable" styleClass="table-view" style="-fx-hbar-policy:never;">
         <columns>
-            <TableColumn fx:id="colId"        text="ID"              prefWidth="55"/>
-            <TableColumn fx:id="colUsername"  text="Username"        prefWidth="130"/>
-            <TableColumn fx:id="colEmail"     text="Email"           prefWidth="195"/>
-            <TableColumn fx:id="colRole"      text="Role"            prefWidth="100"/>
-            <TableColumn fx:id="colStatus"    text="Status"          prefWidth="110"/>
-            <TableColumn fx:id="colLastLogin" text="Last Login"      prefWidth="145"/>
-            <TableColumn fx:id="colFailed"    text="Failed Attempts" prefWidth="120"/>
+          <TableColumn fx:id="colId"        text="ID"              prefWidth="55"/>
+          <TableColumn fx:id="colUsername"  text="Username"        prefWidth="140"/>
+          <TableColumn fx:id="colEmail"     text="Email"           prefWidth="230"/>
+          <TableColumn fx:id="colRole"      text="Role"            prefWidth="110"/>
+          <TableColumn fx:id="colStatus"    text="Status"          prefWidth="110"/>
+          <TableColumn fx:id="colLastLogin" text="Last Login"      prefWidth="160"/>
+          <TableColumn fx:id="colFailed"    text="Failed Attempts" prefWidth="130"/>
         </columns>
-        <placeholder>
-            <Label text="No accounts found." styleClass="table-placeholder"/>
-        </placeholder>
-    </TableView>
-
-    <!-- ── Status Bar ───────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
-        <Label text="ℹ"/>
-        <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
-    </HBox>
+        <placeholder><Label text="No accounts found." style="-fx-text-fill:#8a93b2;"/></placeholder>
+      </TableView>
+</ScrollPane>
+      <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ" style="-fx-text-fill:#4a7cff;"/>
+        <Label fx:id="statusBarLabel" styleClass="status-bar-label" text="Loading…"/>
+      </HBox>
+    </VBox>
+  </VBox>
 </VBox>

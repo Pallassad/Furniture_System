@@ -10,33 +10,37 @@
       stylesheets="@../resources/css/emp.css">
     <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
 
-    <!-- ── Page Header ──────────────────────────────────────────── -->
+    <!-- Page Header -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label text="👤 Customer Management" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <!-- btnStats ẩn với Employee (isAdmin=false → setVisible(false) trong controller) -->
+        <!-- btnStats: Admin only — controller calls setVisible(false) for Employee role -->
         <Button fx:id="btnStats" text="📊  Statistics" onAction="#handleStats" styleClass="btn-purple"/>
     </HBox>
     <Separator styleClass="separator"/>
 
-    <!-- ── Toolbar ──────────────────────────────────────────────── -->
+    <!-- Toolbar -->
     <HBox spacing="8" alignment="CENTER_LEFT">
         <TextField fx:id="searchField"
                    promptText="🔍  Search by name / phone / email..."
                    prefWidth="380"
-                   styleClass="login-field"/>
+                   styleClass="login-field"
+                   onAction="#handleSearch"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnRefresh" text="⟳  Refresh"          onAction="#handleRefresh"  styleClass="btn-outline"/>
-        <!-- btnAdd hiển thị với cả Employee (createCustomer) -->
-        <Button fx:id="btnAdd"     text="➕  Add Customer"     onAction="#handleAdd"      styleClass="btn-primary"/>
-        <!-- btnEdit / btnDelete: controller sẽ setVisible(false) khi isAdmin=false -->
-        <Button fx:id="btnEdit"    text="✏  Edit"              onAction="#handleEdit"     styleClass="btn-warning"/>
-        <Button fx:id="btnDelete"  text="🗑  Remove"           onAction="#handleDelete"   styleClass="btn-danger"/>
-        <Button fx:id="btnHistory" text="🛒  Purchase History" onAction="#handleHistory"  styleClass="btn-teal"/>
+        <Button fx:id="btnRefresh" text="⟳  Refresh"         onAction="#handleRefresh" styleClass="btn-outline"/>
+        <Button fx:id="btnAdd"     text="➕  Add Customer"    onAction="#handleAdd"     styleClass="btn-primary"/>
+        <!-- btnEdit / btnDelete: controller calls setVisible(false) for Employee role -->
+        <Button fx:id="btnEdit"    text="✏  Edit"             onAction="#handleEdit"    styleClass="btn-warning"/>
+        <Button fx:id="btnDelete"  text="🗑  Delete"          onAction="#handleDelete"  styleClass="btn-danger"/>
+        <Button fx:id="btnHistory" text="🛒  Purchase History" onAction="#handleHistory" styleClass="btn-teal"/>
     </HBox>
 
-    <!-- ── Table ────────────────────────────────────────────────── -->
-    <TableView fx:id="customerTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+    <!-- Table -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
+
+      <TableView fx:id="customerTable" styleClass="table-view" style="-fx-hbar-policy:never;">
         <columns>
             <TableColumn fx:id="colId"        text="ID"         prefWidth="60"/>
             <TableColumn fx:id="colFullName"  text="Full Name"  prefWidth="190"/>
@@ -51,12 +55,14 @@
         </placeholder>
     </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────── -->
+    </ScrollPane>
+
+    <!-- Status Bar -->
     <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
         <Label text="ℹ"/>
         <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Label text="💡 Double-click a row to view purchase history."
-               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+               style="-fx-font-size:11px; -fx-text-fill:#888;"/>
     </HBox>
 </VBox>

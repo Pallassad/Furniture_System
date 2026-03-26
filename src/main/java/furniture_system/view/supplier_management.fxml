@@ -1,56 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<VBox xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx"
       fx:controller="furniture_system.controller.SupplierController"
-      stylesheets="@/furniture_system/resources/css/admin.css"
-      styleClass="content-root"
-      spacing="14">
-    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+      stylesheets="@../resources/css/admin.css" spacing="0"
+      style="-fx-background-color:#eef0f5;">
 
-    <!-- ── Page Header ──────────────────────────────────────────────────── -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="🏭 Supplier Management" styleClass="page-title"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnAdd"         text="➕  Add Supplier"      onAction="#handleAdd"         styleClass="btn-primary"/>
-        <Button fx:id="btnEdit"        text="✏  Edit"               onAction="#handleEdit"        styleClass="btn-warning"/>
-        <Button fx:id="btnDelete"      text="🗑  Delete"      onAction="#handleDelete"       styleClass="btn-danger"/>
-        <Button fx:id="btnManageLinks" text="🔗  Manage Products"    onAction="#handleManageLinks" styleClass="btn-outline"/>
-        <Button                        text="⟳  Refresh"            onAction="#handleRefresh"     styleClass="btn-outline"/>
-    </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 0 28;">
+    <Label styleClass="page-title" text="🏭  Supplier Management" HBox.hgrow="ALWAYS"/>
+    <Button styleClass="btn-primary" text="➕  Add"      onAction="#handleAdd"          fx:id="btnAdd"/>
+    <Button styleClass="btn-warning" text="✏  Edit"     onAction="#handleEdit"         fx:id="btnEdit"        disable="true"/>
+    <Button styleClass="btn-danger"  text="🗑  Delete"   onAction="#handleDelete"       fx:id="btnDelete"      disable="true"/>
+    <Button styleClass="btn-info"    text="🔗  Products" onAction="#handleManageLinks"  fx:id="btnManageLinks" disable="true"/>
+    <Button styleClass="btn-outline" text="⟳  Refresh"  onAction="#handleRefresh"/>
+  </HBox>
+  <Separator style="-fx-padding:0 28 16 28; -fx-background-color:#d8dce8;"/>
 
-    <Separator styleClass="separator"/>
+  <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding:4 28 8 28;">
+    <TextField fx:id="txtSearch" styleClass="search-field"
+               promptText="Search by name, phone, email…" prefWidth="300"/>
+    <Button styleClass="btn-primary" text="Search" onAction="#handleSearch"
+            style="-fx-padding:7 14 7 14;"/>
+  </HBox>
 
-    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="txtSearch" styleClass="login-field"
-                   promptText="🔍 Search by name, phone, email, status…"
-                   HBox.hgrow="ALWAYS"/>
-        <Button text="Search" onAction="#handleSearch"  styleClass="btn-primary"/>
-        <Button text="Clear"  onAction="#handleRefresh" styleClass="btn-outline"/>
-    </HBox>
+  <VBox VBox.vgrow="ALWAYS" style="-fx-padding:0 28 14 28;">
+    <VBox styleClass="table-card" VBox.vgrow="ALWAYS">
+      <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
 
-    <!-- ── Supplier Table ───────────────────────────────────────────────── -->
-    <TableView fx:id="tblSuppliers" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+        <TableView fx:id="tblSuppliers" styleClass="table-view" style="-fx-hbar-policy:never;">
         <columns>
-            <TableColumn fx:id="colSuppId"      text="ID"      prefWidth="55"/>
-            <TableColumn fx:id="colSuppName"    text="Name"    prefWidth="200"/>
-            <TableColumn fx:id="colSuppPhone"   text="Phone"   prefWidth="130"/>
-            <TableColumn fx:id="colSuppEmail"   text="Email"   prefWidth="210"/>
-            <TableColumn fx:id="colSuppAddress" text="Address" prefWidth="230"/>
-            <TableColumn fx:id="colSuppStatus"  text="Status"  prefWidth="100"/>
+          <TableColumn fx:id="colSuppId"      text="ID"            prefWidth="55"/>
+          <TableColumn fx:id="colSuppName"    text="Supplier Name" prefWidth="200"/>
+          <TableColumn fx:id="colSuppPhone"   text="Phone"         prefWidth="130"/>
+          <TableColumn fx:id="colSuppEmail"   text="Email"         prefWidth="200"/>
+          <TableColumn fx:id="colSuppAddress" text="Address"       prefWidth="220"/>
+          <TableColumn fx:id="colSuppStatus"  text="Status"        prefWidth="110"/>
         </columns>
-        <placeholder>
-            <Label text="No suppliers found." styleClass="table-placeholder"/>
-        </placeholder>
-    </TableView>
+        <placeholder><Label text="No suppliers found." style="-fx-text-fill:#8a93b2;"/></placeholder>
+      </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
-        <Label text="ℹ"/>
-        <Label fx:id="lblStatus" text="Ready." styleClass="status-label"/>
-    </HBox>
+      </ScrollPane>
+      <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ" style="-fx-text-fill:#4a7cff;-fx-font-size:14px;"/>
+        <Label fx:id="lblStatus" styleClass="status-bar-label" text="Loading…"/>
+      </HBox>
+    </VBox>
+  </VBox>
 </VBox>

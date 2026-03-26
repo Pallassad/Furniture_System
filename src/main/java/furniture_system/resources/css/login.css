@@ -1,0 +1,294 @@
+/* ================================================================
+   login.css  —  Fair Deal Furniture · Login Screen (JavaFX)
+   Place in: src/main/resources/furniture_system/css/login.css
+   ================================================================ */
+
+/* ── Root ──────────────────────────────────────────────────────── */
+.root {
+    -fx-font-family: "System";
+    -fx-font-size: 13px;
+    -fx-background-color: #1e2a5e;
+}
+
+/* ── Outer HBox ─────────────────────────────────────────────────── */
+.login-root {
+    -fx-background-color: #1e2a5e;
+    -fx-pref-width: 860;
+    -fx-pref-height: 560;
+}
+
+/* ================================================================
+   LEFT PANEL
+   ================================================================ */
+.panel-left {
+    -fx-background-color: linear-gradient(to bottom right, #1e2a5e, #2a3f8f);
+    -fx-pref-width: 320;
+    -fx-min-width: 320;
+    -fx-max-width: 320;
+    -fx-padding: 44 36 36 36;
+}
+
+.brand-block { -fx-padding: 0 0 0 0; }
+
+.brand-icon {
+    -fx-font-size: 32px;
+    -fx-padding: 10 10 10 10;
+    -fx-background-color: rgba(255,255,255,0.12);
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+}
+.brand-name {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-line-spacing: 2;
+}
+.brand-tagline {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: rgba(255,255,255,0.5);
+    -fx-line-spacing: 3;
+    -fx-wrap-text: true;
+}
+
+.feature-list { -fx-padding: 0 0 0 0; }
+.feature-dot {
+    -fx-background-color: #7ca6ff;
+    -fx-background-radius: 4;
+    -fx-min-width: 6;
+    -fx-max-width: 6;
+    -fx-pref-width: 6;
+    -fx-min-height: 6;
+    -fx-max-height: 6;
+    -fx-pref-height: 6;
+}
+.feature-item {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: rgba(255,255,255,0.65);
+}
+
+.panel-footer {
+    -fx-font-size: 11px;
+    -fx-text-fill: rgba(255,255,255,0.28);
+    -fx-line-spacing: 3;
+    -fx-wrap-text: true;
+}
+
+/* ================================================================
+   RIGHT PANEL
+   ================================================================ */
+.panel-right {
+    -fx-background-color: white;
+    -fx-padding: 44 44 44 44;
+}
+
+/* ── Form panes ──────────────────────────────────────────────────── */
+.form-pane {
+    -fx-alignment: TOP_LEFT;
+    -fx-fill-width: true;
+}
+
+/* ── Step indicator ──────────────────────────────────────────────── */
+.step-indicator { -fx-padding: 0 0 0 0; }
+.step-dot {
+    -fx-background-color: #dde1ee;
+    -fx-background-radius: 4;
+    -fx-pref-width: 8;
+    -fx-min-width: 8;
+    -fx-max-width: 8;
+    -fx-pref-height: 8;
+    -fx-min-height: 8;
+    -fx-max-height: 8;
+}
+.step-active {
+    -fx-background-color: #4a7cff;
+    -fx-background-radius: 4;
+    -fx-pref-width: 22;
+    -fx-min-width: 22;
+    -fx-max-width: 22;
+}
+.step-done {
+    -fx-background-color: #2d8a50;
+    -fx-background-radius: 4;
+}
+.step-label {
+    -fx-font-size: 10.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8a93b2;
+    -fx-padding: 0 0 0 4;
+}
+
+/* ── Text labels ─────────────────────────────────────────────────── */
+.pane-title {
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e2a5e;
+    -fx-padding: 0 0 4 0;
+}
+.pane-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7a85aa;
+    -fx-wrap-text: true;
+    -fx-line-spacing: 2;
+    -fx-padding: 0 0 0 0;
+}
+.field-label {
+    -fx-font-size: 12.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3a4266;
+    -fx-padding: 0 0 5 0;
+}
+
+/* ── Form fields ─────────────────────────────────────────────────── */
+.form-field {
+    -fx-background-color: white;
+    -fx-border-color: #dde1ee;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 14 10 14;
+    -fx-font-size: 13.5px;
+    -fx-pref-height: 42;
+    -fx-max-width: Infinity;
+}
+.form-field:focused {
+    -fx-border-color: #4a7cff;
+    -fx-effect: dropshadow(gaussian, rgba(74,124,255,0.12), 8, 0, 0, 0);
+}
+.otp-field {
+    -fx-font-size: 16px;
+    -fx-letter-spacing: 3px;
+}
+
+/* ── Error label ─────────────────────────────────────────────────── */
+.error-label {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: #d94f3a;
+    -fx-background-color: #fff3f2;
+    -fx-border-color: #ffcccc;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-border-width: 1;
+    -fx-padding: 9 12 9 12;
+    -fx-wrap-text: true;
+    -fx-max-width: Infinity;
+}
+
+/* ── Info label (step2) ──────────────────────────────────────────── */
+.info-label {
+    -fx-text-fill: #0066aa;
+    -fx-background-color: #e8f4fd;
+    -fx-border-color: #b3d4ee;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-border-width: 1;
+    -fx-padding: 8 12 8 12;
+}
+
+/* ── Password match label ────────────────────────────────────────── */
+.match-label {
+    -fx-font-size: 11.5px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 2;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────── */
+.form-divider {
+    -fx-background-color: #dde1ee;
+    -fx-max-height: 1;
+    -fx-pref-height: 1;
+    -fx-padding: 0;
+    -fx-max-width: Infinity;
+}
+.form-divider .line {
+    -fx-border-color: #dde1ee;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+.btn-main {
+    -fx-background-color: #1e2a5e;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 12 0 12 0;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-pref-height: 44;
+}
+.btn-main:hover   { -fx-background-color: #253580; }
+.btn-main:pressed { -fx-scale-x: 0.98; -fx-scale-y: 0.98; }
+.btn-main:disabled { -fx-opacity: 0.5; }
+
+.btn-accent {
+    -fx-background-color: #4a7cff;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 12 0 12 0;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-pref-height: 44;
+}
+.btn-accent:hover   { -fx-background-color: #3a6ce8; }
+.btn-accent:pressed { -fx-scale-x: 0.98; -fx-scale-y: 0.98; }
+.btn-accent:disabled { -fx-opacity: 0.5; }
+
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #4a7cff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 4 0 4 0;
+}
+.btn-ghost:hover { -fx-underline: true; }
+
+.btn-exit {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #8a93b2;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 4 0 4 0;
+}
+.btn-exit:hover { -fx-text-fill: #d94f3a; }
+
+/* ================================================================
+   SUCCESS PANE
+   ================================================================ */
+.success-icon {
+    -fx-font-size: 28px;
+    -fx-text-fill: #2d8a50;
+    -fx-background-color: #e6f9ef;
+    -fx-background-radius: 50;
+    -fx-padding: 14 18 14 18;
+    -fx-font-weight: bold;
+}
+.success-title { -fx-text-fill: #2d8a50; }
+
+.success-detail {
+    -fx-background-color: #f4f6fb;
+    -fx-background-radius: 8;
+    -fx-border-color: #dde1ee;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 12 16 12 16;
+    -fx-max-width: Infinity;
+    -fx-hgap: 12;
+    -fx-vgap: 8;
+}
+.summary-key {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4a5278;
+    -fx-min-width: 80;
+}
+.summary-val {
+    -fx-font-size: 12px;
+    -fx-text-fill: #1a2340;
+}

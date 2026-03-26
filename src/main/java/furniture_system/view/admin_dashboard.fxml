@@ -1,140 +1,165 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.Insets?>
-
-<BorderPane xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.geometry.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
             fx:controller="furniture_system.controller.AdminDashboardController"
-            prefWidth="1100" prefHeight="680"
-            style="-fx-background-color:#f5f6fa;">
+            stylesheets="@../resources/css/admin.css"
+            prefWidth="1280" prefHeight="760">
 
-    <!-- TOP NAV -->
+    <!-- TOPBAR -->
     <top>
-        <HBox style="-fx-background-color:#1a237e; -fx-padding:12 20;"
-              spacing="16" alignment="CENTER_LEFT">
-            <Label text="🪑 Fair Deal – Admin Dashboard"
-                   style="-fx-text-fill:white; -fx-font-size:18px; -fx-font-weight:bold;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblUsername"
-                   text="Welcome, Admin"
-                   style="-fx-text-fill:#c5cae9; -fx-font-size:13px;"/>
-            <Button text="Logout"
-                    onAction="#handleLogout"
-                    style="-fx-background-color:#ef5350; -fx-text-fill:white;
-                           -fx-background-radius:6; -fx-cursor:hand;"/>
+        <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16" prefHeight="58">
+        
+            <!-- Bên trái: Logo + Title -->
+            <Region styleClass="topbar-logo" prefWidth="22" prefHeight="22"/>
+            <Label styleClass="topbar-title" text="Fair Deal – Admin Dashboard" HBox.hgrow="ALWAYS"/>
+
+            <!-- Bên phải: Role + Welcome + Logout (sát phải) -->
+            <HBox alignment="CENTER_RIGHT" spacing="14" HBox.hgrow="NEVER">
+                <Label styleClass="topbar-role" text="ADMIN"/>
+                <Label fx:id="lblUsername" styleClass="topbar-welcome" text="Welcome, admin"/>
+                <Button styleClass="btn-logout" text="Logout" onAction="#handleLogout"/>
+            </HBox>
+        
         </HBox>
     </top>
 
-    <!-- SIDEBAR -->
-    <left>
-        <VBox style="-fx-background-color:#283593; -fx-pref-width:210px;"
-              spacing="2">
-            <padding><Insets top="16" right="8" bottom="16" left="8"/></padding>
-            <Label text="MENU" style="-fx-text-fill:#9fa8da; -fx-font-size:11px;
-                                      -fx-padding:0 0 8 8;"/>
-
-            <Button fx:id="btnReports" text="📊  Summary Reports"
-                    onAction="#showReports"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Separator style="-fx-border-color:#3949ab; -fx-padding:2 0;"/>
-
-            <Button fx:id="btnAuth" text="🔐  Auth &amp; Authorization"
-                    onAction="#showAuthManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:#3949ab; -fx-text-fill:white;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;
-                           -fx-font-weight:bold;"/>
-
-            <Button fx:id="btnEmployee" text="👥  Employee Management"
-                    onAction="#showEmployeeManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Button fx:id="btnCustomer" text="👤  Customer Management"
-                    onAction="#showCustomerManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Button fx:id="btnProduct" text="📦  Furniture Management"
-                    onAction="#showProductManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Button fx:id="btnFurnitureType" text="🏷️  Furniture Types"
-                    onAction="#showFurnitureTypeManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Button fx:id="btnOrders" text="🛒  Orders"
-                    onAction="#showOrders"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <!-- ★ MỚI -->
-            <Button fx:id="btnPromotion" text="🎫  Promotion Management"
-                    onAction="#showPromotionManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Button fx:id="btnSupplier" text="🏭  Supplier Management"
-                    onAction="#showSupplierManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Button fx:id="btnStock" text="📋  Stock and Inventory"
-                    onAction="#showStockManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Button fx:id="btnSalary" text="💰  Salary Management"
-                    onAction="#showSalaryManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Button fx:id="btnWarranty" text="🔧  Warranty &amp; Repair"
-                    onAction="#showWarrantyManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-            <Button fx:id="btnDeliveryAddress" text="📍  Delivery Addresses"
-                    onAction="#showDeliveryAddressManagement"
-                    maxWidth="Infinity"
-                    style="-fx-background-color:transparent; -fx-text-fill:#c5cae9;
-                           -fx-background-radius:6; -fx-cursor:hand;
-                           -fx-alignment:CENTER_LEFT; -fx-padding:10 12;"/>
-
-        </VBox>
-    </left>
-
-    <!-- MAIN CONTENT AREA -->
+    <!-- BODY -->
     <center>
-        <StackPane fx:id="contentArea"/>
-    </center>
+        <HBox>
+            <!-- SIDEBAR -->
+            <VBox styleClass="sidebar" spacing="0">
+                <Label styleClass="menu-label" text="MENU"/>
+                <Region styleClass="sidebar-separator" maxHeight="1" VBox.vgrow="NEVER"/>
+                <Button fx:id="btnReports"         styleClass="nav-btn" text="📊  Summary Reports"      onAction="#showReports"                   maxWidth="Infinity"/>
+                <Region styleClass="sidebar-separator" maxHeight="1" VBox.vgrow="NEVER"/>
+                <Button fx:id="btnAuth"            styleClass="nav-btn" text="🔐  Auth &amp; Authorization"   onAction="#showAuthManagement"            maxWidth="Infinity"/>
+                <Button fx:id="btnEmployee"        styleClass="nav-btn" text="👥  Employee Management"   onAction="#showEmployeeManagement"        maxWidth="Infinity"/>
+                <Button fx:id="btnCustomer"        styleClass="nav-btn" text="🙍  Customer Management"   onAction="#showCustomerManagement"        maxWidth="Infinity"/>
+                <Button fx:id="btnProduct"         styleClass="nav-btn" text="🛋  Furniture Management"  onAction="#showProductManagement"         maxWidth="Infinity"/>
+                <Button fx:id="btnFurnitureType"   styleClass="nav-btn" text="🪑  Furniture Types"        onAction="#showFurnitureTypeManagement"   maxWidth="Infinity"/>
+                <Button fx:id="btnOrders"          styleClass="nav-btn" text="📦  Orders"                 onAction="#showOrders"                    maxWidth="Infinity"/>
+                <Button fx:id="btnPromotion"       styleClass="nav-btn" text="🏷  Promotion Management"  onAction="#showPromotionManagement"       maxWidth="Infinity"/>
+                <Button fx:id="btnSupplier"        styleClass="nav-btn" text="🏭  Supplier Management"   onAction="#showSupplierManagement"        maxWidth="Infinity"/>
+                <Button fx:id="btnStock"           styleClass="nav-btn" text="📈  Stock &amp; Inventory"      onAction="#showStockManagement"           maxWidth="Infinity"/>
+                <Button fx:id="btnSalary"          styleClass="nav-btn" text="💰  Salary Management"     onAction="#showSalaryManagement"          maxWidth="Infinity"/>
+                <Button fx:id="btnWarranty"        styleClass="nav-btn" text="🔧  Warranty &amp; Repair"      onAction="#showWarrantyManagement"        maxWidth="Infinity"/>
+                <Button fx:id="btnDeliveryAddress" styleClass="nav-btn" text="📍  Delivery Addresses"    onAction="#showDeliveryAddressManagement" maxWidth="Infinity"/>
+            </VBox>
 
+            <!-- CONTENT AREA -->
+            <StackPane fx:id="contentArea" HBox.hgrow="ALWAYS"
+                       style="-fx-background-color:#eef0f5;">
+
+                <!-- Default: welcome card + tile grid -->
+                <ScrollPane fitToWidth="true"
+                            style="-fx-background-color:#eef0f5; -fx-background:#eef0f5; -fx-border-color:transparent;">
+                    <VBox spacing="20" style="-fx-padding:24 28 24 28; -fx-background-color:#eef0f5;">
+
+                        <!-- Welcome Card -->
+                        <HBox styleClass="welcome-card" alignment="CENTER_LEFT" spacing="20">
+                            <Label styleClass="welcome-avatar" text="👤"
+                                   prefWidth="52" prefHeight="52" alignment="CENTER"/>
+                            <VBox spacing="4">
+                                <Label styleClass="welcome-title"    text="Welcome back, Admin"/>
+                                <Label styleClass="welcome-subtitle" text="Fair Deal Furniture Management System  ·  Thursday, 26 March 2026"/>
+                            </VBox>
+                        </HBox>
+
+                        <!-- Tile Grid -->
+                        <GridPane hgap="14" vgap="14">
+
+                            <!-- Row 0 -->
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showReports"
+                                  GridPane.columnIndex="0" GridPane.rowIndex="0" prefWidth="185">
+                                <Label styleClass="tile-icon" text="📊"/>
+                                <Label styleClass="tile-label" text="Summary Reports"/>
+                                <Label styleClass="tile-desc" text="KPI overview: orders, revenue, customers, payroll" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showAuthManagement"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="185">
+                                <Label styleClass="tile-icon" text="🔐"/>
+                                <Label styleClass="tile-label" text="Auth &amp; Authorization"/>
+                                <Label styleClass="tile-desc" text="Manage user accounts, roles and login status" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showEmployeeManagement"
+                                  GridPane.columnIndex="2" GridPane.rowIndex="0" prefWidth="185">
+                                <Label styleClass="tile-icon" text="👥"/>
+                                <Label styleClass="tile-label" text="Employee Management"/>
+                                <Label styleClass="tile-desc" text="Add, edit, deactivate staff records" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showCustomerManagement"
+                                  GridPane.columnIndex="3" GridPane.rowIndex="0" prefWidth="185">
+                                <Label styleClass="tile-icon" text="🙍"/>
+                                <Label styleClass="tile-label" text="Customer Management"/>
+                                <Label styleClass="tile-desc" text="View and manage registered customers" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showProductManagement"
+                                  GridPane.columnIndex="4" GridPane.rowIndex="0" prefWidth="185">
+                                <Label styleClass="tile-icon" text="🛋"/>
+                                <Label styleClass="tile-label" text="Furniture Management"/>
+                                <Label styleClass="tile-desc" text="Product catalog, pricing, warranty periods" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showFurnitureTypeManagement"
+                                  GridPane.columnIndex="5" GridPane.rowIndex="0" prefWidth="185">
+                                <Label styleClass="tile-icon" text="🪑"/>
+                                <Label styleClass="tile-label" text="Furniture Types"/>
+                                <Label styleClass="tile-desc" text="Product category definitions" wrapText="true"/>
+                            </VBox>
+
+                            <!-- Row 1 -->
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showOrders"
+                                  GridPane.columnIndex="0" GridPane.rowIndex="1" prefWidth="185">
+                                <Label styleClass="tile-icon" text="📦"/>
+                                <Label styleClass="tile-label" text="Orders"/>
+                                <Label styleClass="tile-desc" text="Track and update all customer orders" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showPromotionManagement"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="185">
+                                <Label styleClass="tile-icon" text="🏷"/>
+                                <Label styleClass="tile-label" text="Promotion Management"/>
+                                <Label styleClass="tile-desc" text="Discount codes, validity and usage limits" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showSupplierManagement"
+                                  GridPane.columnIndex="2" GridPane.rowIndex="1" prefWidth="185">
+                                <Label styleClass="tile-icon" text="🏭"/>
+                                <Label styleClass="tile-label" text="Supplier Management"/>
+                                <Label styleClass="tile-desc" text="Supplier contacts and product links" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showStockManagement"
+                                  GridPane.columnIndex="3" GridPane.rowIndex="1" prefWidth="185">
+                                <Label styleClass="tile-icon" text="📈"/>
+                                <Label styleClass="tile-label" text="Stock &amp; Inventory"/>
+                                <Label styleClass="tile-desc" text="Stock levels, reorder alerts, movement log" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showSalaryManagement"
+                                  GridPane.columnIndex="4" GridPane.rowIndex="1" prefWidth="185">
+                                <Label styleClass="tile-icon" text="💰"/>
+                                <Label styleClass="tile-label" text="Salary Management"/>
+                                <Label styleClass="tile-desc" text="Payroll records, bonuses and deductions" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showWarrantyManagement"
+                                  GridPane.columnIndex="5" GridPane.rowIndex="1" prefWidth="185">
+                                <Label styleClass="tile-icon" text="🔧"/>
+                                <Label styleClass="tile-label" text="Warranty &amp; Repair"/>
+                                <Label styleClass="tile-desc" text="Warranty tickets, repair status and costs" wrapText="true"/>
+                            </VBox>
+
+                            <!-- Row 2 -->
+                            <VBox styleClass="tile" spacing="8" onMouseClicked="#showDeliveryAddressManagement"
+                                  GridPane.columnIndex="0" GridPane.rowIndex="2" prefWidth="185">
+                                <Label styleClass="tile-icon" text="📍"/>
+                                <Label styleClass="tile-label" text="Delivery Addresses"/>
+                                <Label styleClass="tile-desc" text="Manage customer delivery addresses" wrapText="true"/>
+                            </VBox>
+
+                        </GridPane>
+                    </VBox>
+                </ScrollPane>
+
+            </StackPane>
+        </HBox>
+    </center>
 </BorderPane>

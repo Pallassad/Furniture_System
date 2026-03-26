@@ -1,62 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<VBox xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx"
       fx:controller="furniture_system.controller.AdminSalaryManagementController"
-      stylesheets="@/furniture_system/resources/css/admin.css"
-      styleClass="content-root"
-      spacing="14">
-    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+      stylesheets="@../resources/css/admin.css" spacing="0"
+      style="-fx-background-color:#eef0f5;">
 
-    <!-- ── Page Header ──────────────────────────────────────────────────── -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="💰 Salary Management" styleClass="page-title"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnAdd"    text="➕  Add New"    onAction="#handleAdd"     styleClass="btn-primary"/>
-        <Button fx:id="btnEdit"   text="✏  Edit"     onAction="#handleEdit"    styleClass="btn-warning"/>
-        <Button fx:id="btnDelete" text="🗑  Delete Draft"   onAction="#handleDelete"  styleClass="btn-danger"/>
-        <Button                   text="⟳  Refresh"     onAction="#handleRefresh" styleClass="btn-outline"/>
-    </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 0 28;">
+    <Label styleClass="page-title" text="💰  Salary Management" HBox.hgrow="ALWAYS"/>
+    <Button styleClass="btn-primary" text="➕  Add Record" onAction="#handleAdd"    fx:id="btnAdd"/>
+    <Button styleClass="btn-warning" text="✏  Edit"       onAction="#handleEdit"   fx:id="btnEdit"   disable="true"/>
+    <Button styleClass="btn-danger"  text="🗑  Delete"     onAction="#handleDelete" fx:id="btnDelete" disable="true"/>
+    <Button styleClass="btn-outline" text="⟳  Refresh"    onAction="#handleRefresh"/>
+  </HBox>
+  <Separator style="-fx-padding:0 28 16 28; -fx-background-color:#d8dce8;"/>
 
-    <Separator styleClass="separator"/>
+  <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding:4 28 8 28;">
+    <TextField fx:id="txtSearch" styleClass="search-field"
+               promptText="Search by employee name…" prefWidth="280"/>
+    <Button styleClass="btn-primary" text="Search" onAction="#handleSearch"
+            style="-fx-padding:7 14 7 14;"/>
+  </HBox>
 
-    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="txtSearch" styleClass="login-field"
-                   promptText="🔍 Search by employee, month (YYYY-MM), status…"
-                   HBox.hgrow="ALWAYS"/>
-        <Button text="Search" onAction="#handleSearch"  styleClass="btn-primary"/>
-        <Button text="Clear"      onAction="#handleRefresh" styleClass="btn-outline"/>
-    </HBox>
+  <VBox VBox.vgrow="ALWAYS" style="-fx-padding:0 28 14 28;">
+    <VBox styleClass="table-card" VBox.vgrow="ALWAYS">
+      <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
 
-    <!-- ── Salary Table ─────────────────────────────────────────────────── -->
-    <TableView fx:id="tableSalary" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+        <TableView fx:id="tableSalary" styleClass="table-view" style="-fx-hbar-policy:never;">
         <columns>
-            <TableColumn fx:id="colSalaryId"     text="#"             prefWidth="55"/>
-            <TableColumn fx:id="colEmployee"     text="Employee"     prefWidth="170"/>
-            <TableColumn fx:id="colMonth"        text="Month"         prefWidth="85"/>
-            <TableColumn fx:id="colBase"         text="Base Salary"  prefWidth="130"/>
-            <TableColumn fx:id="colAllowance"    text="Allowance"       prefWidth="110"/>
-            <TableColumn fx:id="colBonus"        text="Bonus (+)"    prefWidth="115"/>
-            <TableColumn fx:id="colDeduction"    text="Penalty (−)"      prefWidth="110"/>
-            <TableColumn fx:id="colFinal"        text="Net Pay ₫"  prefWidth="135"/>
-            <TableColumn fx:id="colSalaryStatus" text="Status"    prefWidth="100"/>
-            <TableColumn fx:id="colPaidDate"     text="Paid Date"      prefWidth="100"/>
+          <TableColumn fx:id="colSalaryId"     text="ID"             prefWidth="50"/>
+          <TableColumn fx:id="colEmployee"     text="Employee"       prefWidth="160"/>
+          <TableColumn fx:id="colMonth"        text="Month"          prefWidth="90"/>
+          <TableColumn fx:id="colBase"         text="Base (VND)"     prefWidth="120"/>
+          <TableColumn fx:id="colAllowance"    text="Allowance"      prefWidth="120"/>
+          <TableColumn fx:id="colBonus"        text="Bonus"          prefWidth="100"/>
+          <TableColumn fx:id="colDeduction"    text="Deduction"      prefWidth="110"/>
+          <TableColumn fx:id="colFinal"        text="Final (VND)"    prefWidth="125"/>
+          <TableColumn fx:id="colSalaryStatus" text="Status"         prefWidth="110"/>
+          <TableColumn fx:id="colPaidDate"     text="Paid Date"      prefWidth="120"/>
         </columns>
-        <placeholder>
-            <Label text="No salary records found." styleClass="table-placeholder"/>
-        </placeholder>
-    </TableView>
+        <placeholder><Label text="No salary records found." style="-fx-text-fill:#8a93b2;"/></placeholder>
+      </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
-        <Label text="ℹ"/>
-        <Label fx:id="lblSalaryStatus" text="Ready." styleClass="status-label"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label text="💡 PAID records are read-only. Only DRAFT records can be deleted."
-               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
-    </HBox>
+      </ScrollPane>
+      <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ" style="-fx-text-fill:#4a7cff;-fx-font-size:14px;"/>
+        <Label fx:id="lblSalaryStatus" styleClass="status-bar-label" text="Loading…"/>
+      </HBox>
+    </VBox>
+  </VBox>
 </VBox>

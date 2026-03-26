@@ -1,69 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<VBox xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx"
       fx:controller="furniture_system.controller.AdminDeliveryAddressController"
-      stylesheets="@/furniture_system/resources/css/admin.css"
-      styleClass="content-root"
-      spacing="14">
-    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+      stylesheets="@../resources/css/admin.css" spacing="0"
+      style="-fx-background-color:#eef0f5;">
 
-    <!-- ── Page Header ──────────────────────────────────────────────────── -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="📍 Delivery Address Management" styleClass="page-title"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnAdd"        text="➕  Add Address"  onAction="#onAdd"        styleClass="btn-primary"/>
-        <Button fx:id="btnEdit"       text="✏  Edit"          onAction="#onEdit"       styleClass="btn-warning"/>
-        <Button fx:id="btnSetDefault" text="⭐  Set Default"  onAction="#onSetDefault" styleClass="btn-outline"/>
-        <Button fx:id="btnDelete"     text="🗑  Delete"        onAction="#onDelete"     styleClass="btn-danger"/>
-        <Button                       text="⟳  Refresh"      onAction="#handleRefresh" styleClass="btn-outline"/>
-    </HBox>
+  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 0 28;">
+    <Label styleClass="page-title" text="📍  Delivery Addresses" HBox.hgrow="ALWAYS"/>
+    <Button styleClass="btn-primary" text="➕  Add"          onAction="#onAdd"        fx:id="btnAdd"/>
+    <Button styleClass="btn-warning" text="✏  Edit"         onAction="#onEdit"       fx:id="btnEdit"       disable="true"/>
+    <Button styleClass="btn-info"    text="⭐  Set Default"  onAction="#onSetDefault" fx:id="btnSetDefault" disable="true"/>
+    <Button styleClass="btn-danger"  text="🗑  Delete"       onAction="#onDelete"     fx:id="btnDelete"     disable="true"/>
+    <Button styleClass="btn-outline" text="⟳  Refresh"      onAction="#handleRefresh"/>
+  </HBox>
+  <Separator style="-fx-padding:0 28 16 28; -fx-background-color:#d8dce8;"/>
 
-    <!-- ── Stats Bar ────────────────────────────────────────────────────── -->
-    <HBox spacing="24" alignment="CENTER_LEFT"
-          style="-fx-background-color:#e8eaf6;-fx-background-radius:6;-fx-padding:8 14;">
-        <Label fx:id="lblTopCity"     text="Top City: —"             style="-fx-font-size:12px;-fx-text-fill:#3949ab;-fx-font-weight:bold;"/>
-        <Label fx:id="lblDefaultRate" text="Default address used: —" style="-fx-font-size:12px;-fx-text-fill:#3949ab;-fx-font-weight:bold;"/>
-    </HBox>
+  <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding:4 28 8 28;">
+    <TextField fx:id="txtSearch" styleClass="search-field"
+               promptText="Search by customer, receiver, city…" prefWidth="320"/>
+    <Button styleClass="btn-primary" text="Search" onAction="#onSearch"
+            style="-fx-padding:7 14 7 14;"/>
+  </HBox>
 
-    <Separator styleClass="separator"/>
+  <VBox VBox.vgrow="ALWAYS" style="-fx-padding:0 28 14 28;">
+    <VBox styleClass="table-card" VBox.vgrow="ALWAYS">
+      <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
 
-    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="txtSearch" styleClass="login-field"
-                   promptText="🔍 Search by name, city, district, status…"
-                   HBox.hgrow="ALWAYS"/>
-        <Button text="Search" onAction="#onSearch"      styleClass="btn-primary"/>
-        <Button text="Clear"  onAction="#handleRefresh" styleClass="btn-outline"/>
-    </HBox>
-
-    <!-- ── Address Table ────────────────────────────────────────────────── -->
-    <TableView fx:id="tblAddresses" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+        <TableView fx:id="tblAddresses" styleClass="table-view">
         <columns>
-            <TableColumn fx:id="colId"       text="ID"       prefWidth="55"/>
-            <TableColumn fx:id="colCustomer" text="Customer" prefWidth="150"/>
-            <TableColumn fx:id="colReceiver" text="Receiver" prefWidth="150"/>
-            <TableColumn fx:id="colPhone"    text="Phone"    prefWidth="120"/>
-            <TableColumn fx:id="colAddress"  text="Address"  prefWidth="200"/>
-            <TableColumn fx:id="colDistrict" text="District" prefWidth="120"/>
-            <TableColumn fx:id="colCity"     text="City"     prefWidth="130"/>
-            <TableColumn fx:id="colDefault"  text="Default"  prefWidth="70"/>
-            <TableColumn fx:id="colStatus"   text="Status"   prefWidth="90"/>
+          <TableColumn fx:id="colId"       text="ID"            prefWidth="55"/>
+          <TableColumn fx:id="colCustomer" text="Customer"      prefWidth="160"/>
+          <TableColumn fx:id="colReceiver" text="Receiver Name" prefWidth="160"/>
+          <TableColumn fx:id="colPhone"    text="Phone"         prefWidth="120"/>
+          <TableColumn fx:id="colAddress"  text="Address Line"  prefWidth="200"/>
+          <TableColumn fx:id="colDistrict" text="District"      prefWidth="110"/>
+          <TableColumn fx:id="colCity"     text="City"          prefWidth="110"/>
+          <TableColumn fx:id="colDefault"  text="Default"       prefWidth="80"/>
+          <TableColumn fx:id="colStatus"   text="Status"        prefWidth="110"/>
         </columns>
-        <placeholder>
-            <Label text="No addresses found." styleClass="table-placeholder"/>
-        </placeholder>
-    </TableView>
+        <placeholder><Label text="No addresses found." style="-fx-text-fill:#8a93b2;"/></placeholder>
+      </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
-        <Label text="ℹ"/>
-        <Label fx:id="lblStatus" text="Ready." styleClass="status-label"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label text="💡 Green rows = default address  |  Grey rows = inactive"
-               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+      </ScrollPane>
+      <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ" style="-fx-text-fill:#4a7cff;-fx-font-size:14px;"/>
+        <Label fx:id="lblStatus" styleClass="status-bar-label" text="Loading…"/>
+      </HBox>
+    </VBox>
+    <!-- Stats row below table -->
+    <HBox spacing="24" style="-fx-padding:8 0 0 4;">
+      <Label fx:id="lblTopCity"      styleClass="status-bar-label" text="Top City: —"/>
+      <Label fx:id="lblDefaultRate"  styleClass="status-bar-label" text="Default address used: —"/>
     </HBox>
+  </VBox>
 </VBox>

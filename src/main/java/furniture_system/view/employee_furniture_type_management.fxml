@@ -1,57 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="furniture_system.controller.EmployeeFurnitureTypeController"
-      stylesheets="@/furniture_system/resources/css/emp.css"
       styleClass="content-root"
+      stylesheets="@../resources/css/emp.css"
       spacing="14">
     <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
 
-    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <!-- Page Header -->
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="🪑 Furniture Categories" styleClass="page-title"/>
+        <Label text="🪑 Furniture Types" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnViewDetail" text="🔍  View Details" onAction="#handleViewDetail" styleClass="btn-primary"/>
         <Button fx:id="btnRefresh"    text="⟳  Refresh"      onAction="#handleRefresh"    styleClass="btn-outline"/>
+        <Button fx:id="btnViewDetail" text="🔍  View Details" onAction="#handleViewDetail" styleClass="btn-teal" disable="true"/>
     </HBox>
-
     <Separator styleClass="separator"/>
 
-    <!-- ── Filter & Search Bar ──────────────────────────────────────────── -->
+    <!-- Type Filter + Search Row -->
     <HBox spacing="8" alignment="CENTER_LEFT">
-        <Label text="Category:" style="-fx-font-weight:bold;-fx-font-size:12px;"/>
-        <ComboBox fx:id="cmbTypeFilter" prefWidth="200" styleClass="combo-box"/>
-        <TextField fx:id="txtProductSearch" styleClass="login-field"
-                   promptText="🔍 Search by product name…"
-                   HBox.hgrow="ALWAYS"/>
-        <Button text="Search"  onAction="#handleSearch"  styleClass="btn-primary"/>
-        <Button text="Reset"   onAction="#handleRefresh" styleClass="btn-outline"/>
+        <Label text="Filter by type:" style="-fx-font-size:12px; -fx-font-weight:bold; -fx-text-fill:#555;"/>
+        <ComboBox fx:id="cmbTypeFilter"
+                  promptText="All Types"
+                  prefWidth="200"
+                  onAction="#handleSearch"
+                  styleClass="combo-box"/>
+        <TextField fx:id="txtProductSearch"
+                   promptText="🔍  Search product name..."
+                   prefWidth="260"
+                   styleClass="login-field"/>
+        <Button text="Search" onAction="#handleSearch" styleClass="btn-primary"/>
     </HBox>
 
-    <!-- ── Product Table ────────────────────────────────────────────────── -->
-    <TableView fx:id="productTable" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+    <!-- Table (read-only) -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
+
+      <TableView fx:id="productTable" styleClass="table-view">
         <columns>
             <TableColumn fx:id="colProductId"     text="ID"           prefWidth="55"/>
-            <TableColumn fx:id="colProductName"   text="Product Name" prefWidth="280"/>
-            <TableColumn fx:id="colProductType"   text="Category"     prefWidth="180"/>
-            <TableColumn fx:id="colProductPrice"  text="Price"        prefWidth="150"/>
+            <TableColumn fx:id="colProductName"   text="Product Name" prefWidth="250"/>
+            <TableColumn fx:id="colProductType"   text="Type"         prefWidth="160"/>
+            <TableColumn fx:id="colProductPrice"  text="Price (VND)"  prefWidth="140"/>
             <TableColumn fx:id="colProductStatus" text="Status"       prefWidth="100"/>
         </columns>
         <placeholder>
-            <Label text="No active products found." styleClass="table-placeholder"/>
+            <Label text="No products found for this type." styleClass="table-placeholder"/>
         </placeholder>
     </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+    </ScrollPane>
+
+    <!-- Status Bar -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
         <Label text="ℹ"/>
         <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label text="💡 Double-click a row to view product details."
-               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+        <Label text="🔒 View only — browse products by furniture category."
+               style="-fx-font-size:11px; -fx-text-fill:#888;"/>
     </HBox>
 </VBox>

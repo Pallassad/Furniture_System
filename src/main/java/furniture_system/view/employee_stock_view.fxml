@@ -1,59 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="furniture_system.controller.EmployeeStockController"
-      stylesheets="@/furniture_system/resources/css/emp.css"
       styleClass="content-root"
+      stylesheets="@../resources/css/emp.css"
       spacing="14">
     <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
 
-    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <!-- Page Header -->
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="📦 Inventory Check" styleClass="page-title"/>
+        <Label text="📈 Inventory Check" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnCheckAvail" text="🔍  Check Availability" onAction="#handleCheckAvailability" styleClass="btn-primary"/>
-        <Button                       text="⟳  Refresh"            onAction="#handleRefresh"           styleClass="btn-outline"/>
+        <Button text="⟳  Refresh"         onAction="#handleRefresh"         styleClass="btn-outline"/>
+        <Button fx:id="btnCheckAvail"
+                text="✅  Check Availability"
+                onAction="#handleCheckAvailability"
+                styleClass="btn-teal"
+                disable="true"/>
     </HBox>
-
     <Separator styleClass="separator"/>
 
-    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
+    <!-- Search Row -->
     <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="txtSearch" styleClass="login-field"
-                   promptText="🔍 Search by product name…"
-                   HBox.hgrow="ALWAYS"/>
-        <Button text="Search" onAction="#handleSearch"  styleClass="btn-primary"/>
-        <Button text="Reset"  onAction="#handleRefresh" styleClass="btn-outline"/>
+        <TextField fx:id="txtSearch"
+                   promptText="🔍  Search by product name..."
+                   prefWidth="360"
+                   styleClass="login-field"/>
+        <Button text="Search" onAction="#handleSearch" styleClass="btn-primary"/>
     </HBox>
 
-    <!-- ── Stock hint ───────────────────────────────────────────────────── -->
-    <Label text="⚠ Rows highlighted in orange are below reorder level — notify admin."
-           style="-fx-font-size:11px;-fx-text-fill:#e65100;"/>
+    <!-- Table (read-only) -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
 
-    <!-- ── Stock Table ──────────────────────────────────────────────────── -->
-    <TableView fx:id="tblStock" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+      <TableView fx:id="tblStock" styleClass="table-view">
         <columns>
-            <TableColumn fx:id="colProduct" text="Product"       prefWidth="320"/>
-            <TableColumn fx:id="colQty"     text="In Stock"      prefWidth="110"/>
-            <TableColumn fx:id="colReorder" text="Reorder Level" prefWidth="130"/>
-            <TableColumn fx:id="colUpdated" text="Last Updated"  prefWidth="180"/>
-            <TableColumn fx:id="colAlert"   text="Availability"  prefWidth="130"/>
+            <TableColumn fx:id="colProduct"  text="Product"       prefWidth="280"/>
+            <TableColumn fx:id="colQty"      text="In Stock"      prefWidth="100"/>
+            <TableColumn fx:id="colReorder"  text="Reorder Point" prefWidth="120"/>
+            <TableColumn fx:id="colUpdated"  text="Last Updated"  prefWidth="160"/>
+            <TableColumn fx:id="colAlert"    text="Alert"         prefWidth="130"/>
         </columns>
         <placeholder>
-            <Label text="No stock data available." styleClass="table-placeholder"/>
+            <Label text="No stock data found." styleClass="table-placeholder"/>
         </placeholder>
     </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+    </ScrollPane>
+
+    <!-- Status Bar -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
         <Label text="ℹ"/>
         <Label fx:id="lblStatus" text="Ready." styleClass="status-label"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label text="💡 Select a row then click Check Availability to check stock for an order."
-               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
+        <Label text="🔒 View only — select a row to check availability."
+               style="-fx-font-size:11px; -fx-text-fill:#888;"/>
     </HBox>
 </VBox>

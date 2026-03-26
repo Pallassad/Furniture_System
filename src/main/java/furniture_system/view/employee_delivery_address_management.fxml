@@ -1,49 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="furniture_system.controller.EmployeeDeliveryAddressController"
-      stylesheets="@/furniture_system/resources/css/emp.css"
       styleClass="content-root"
+      stylesheets="@../resources/css/emp.css"
       spacing="14">
     <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
 
-    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <!-- Page Header -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label text="📍 Delivery Addresses" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnAddAddress" text="➕  Add Address" onAction="#handleAddAddress" styleClass="btn-primary"/>
-        <Button                       text="⟳  Refresh"     onAction="#handleRefresh"    styleClass="btn-outline"/>
+        <Button text="⟳  Refresh"       onAction="#handleRefresh"    styleClass="btn-outline"/>
+        <Button fx:id="btnAddAddress"
+                text="➕  Add Address"
+                onAction="#handleAddAddress"
+                styleClass="btn-primary"/>
     </HBox>
-
     <Separator styleClass="separator"/>
 
-    <!-- ── Hint ─────────────────────────────────────────────────────────── -->
-    <Label text="💡 Green rows = default address."
-           style="-fx-font-size:11px;-fx-text-fill:#888;-fx-font-style:italic;"/>
+    <!-- Table -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
 
-    <!-- ── Address Table ────────────────────────────────────────────────── -->
-    <TableView fx:id="tblAddresses" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+      <TableView fx:id="tblAddresses" styleClass="table-view">
         <columns>
-            <TableColumn fx:id="colId"       text="ID"       prefWidth="55"/>
-            <TableColumn fx:id="colReceiver" text="Receiver" prefWidth="180"/>
-            <TableColumn fx:id="colPhone"    text="Phone"    prefWidth="130"/>
-            <TableColumn fx:id="colAddress"  text="Address"  prefWidth="230"/>
-            <TableColumn fx:id="colDistrict" text="District" prefWidth="140"/>
-            <TableColumn fx:id="colCity"     text="City"     prefWidth="150"/>
-            <TableColumn fx:id="colDefault"  text="Default"  prefWidth="75"/>
+            <TableColumn fx:id="colId"       text="ID"            prefWidth="55"/>
+            <TableColumn fx:id="colReceiver" text="Receiver Name" prefWidth="170"/>
+            <TableColumn fx:id="colPhone"    text="Phone"         prefWidth="130"/>
+            <TableColumn fx:id="colAddress"  text="Address Line"  prefWidth="220"/>
+            <TableColumn fx:id="colDistrict" text="District"      prefWidth="120"/>
+            <TableColumn fx:id="colCity"     text="City"          prefWidth="120"/>
+            <TableColumn fx:id="colDefault"  text="Default"       prefWidth="80"/>
         </columns>
         <placeholder>
-            <Label text="No addresses found." styleClass="table-placeholder"/>
+            <Label text="No delivery addresses found." styleClass="table-placeholder"/>
         </placeholder>
     </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+    </ScrollPane>
+
+    <!-- Status Bar -->
+    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="6">
         <Label text="ℹ"/>
         <Label fx:id="lblStatus" text="Ready." styleClass="status-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="💡 Double-click a row to select address for an order."
+               style="-fx-font-size:11px; -fx-text-fill:#888;"/>
     </HBox>
 </VBox>

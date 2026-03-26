@@ -1,20 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx"
+      fx:controller="furniture_system.controller.AdminReportsController"
+      stylesheets="@../resources/css/admin.css" spacing="0"
+      style="-fx-background-color:#eef0f5;">
 
-<ScrollPane xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="furniture_system.controller.AdminReportsController"
-            fx:id="scrollPane"
-            fitToWidth="true"
-            hbarPolicy="NEVER"
-            style="-fx-background-color:#f5f6fa; -fx-background:#f5f6fa;">
+  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 14 28;">
+    <Label styleClass="page-title" text="📊  Summary Reports" HBox.hgrow="ALWAYS"/>
+  </HBox>
+  <Separator style="-fx-background-color:#d8dce8;"/>
 
-    <VBox fx:id="rootVBox"
-          spacing="20"
-          style="-fx-background-color:#f5f6fa;">
-        <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+  <ScrollPane fx:id="scrollPane" styleClass="reports-scroll-pane" VBox.vgrow="ALWAYS"
+              fitToWidth="true">
+    <VBox fx:id="rootVBox" spacing="20"
+          style="-fx-padding:0 28 24 28; -fx-background-color:#eef0f5;">
+
+      <Label styleClass="section-title-label" text="🛒  Orders"/>
+      <HBox spacing="12">
+        <VBox styleClass="kpi-card kpi-blue"   HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="TOTAL ORDERS"/><Label fx:id="lblTotalOrders"     styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="All time"/></VBox>
+        <VBox styleClass="kpi-card kpi-green"  HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="COMPLETED"/><Label fx:id="lblCompletedOrders"   styleClass="kpi-value" text="—"/><Label fx:id="lblCompletedPct" styleClass="kpi-sub" text="—"/></VBox>
+        <VBox styleClass="kpi-card kpi-orange" HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="PENDING"/><Label fx:id="lblPendingOrders"       styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="Awaiting action"/></VBox>
+        <VBox styleClass="kpi-card kpi-red"    HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="CANCELLED"/><Label fx:id="lblCancelledOrders"   styleClass="kpi-value" text="—"/><Label fx:id="lblCancelledPct" styleClass="kpi-sub" text="—"/></VBox>
+        <VBox styleClass="kpi-card kpi-green"  HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="TOTAL REVENUE"/><Label fx:id="lblRevenue"       styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="VND — completed"/></VBox>
+      </HBox>
+
+      <Label styleClass="section-title-label" text="🙍  Customers"/>
+      <HBox spacing="12">
+        <VBox styleClass="kpi-card kpi-blue"   HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="TOTAL CUSTOMERS"/><Label fx:id="lblTotalCustomers"  styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="Registered"/></VBox>
+        <VBox styleClass="kpi-card kpi-green"  HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="ACTIVE"/><Label fx:id="lblActiveCustomers"          styleClass="kpi-value" text="—"/><Label fx:id="lblActivePct" styleClass="kpi-sub" text="—"/></VBox>
+        <VBox styleClass="kpi-card kpi-red"    HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="INACTIVE"/><Label fx:id="lblInactiveCustomers"       styleClass="kpi-value" text="—"/><Label fx:id="lblInactivePct" styleClass="kpi-sub" text="—"/></VBox>
+        <VBox styleClass="kpi-card kpi-orange" HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="NEW THIS MONTH"/><Label fx:id="lblNewCustomers"     styleClass="kpi-value" text="—"/><Label fx:id="lblNewMonth" styleClass="kpi-sub" text="—"/></VBox>
+      </HBox>
+
+      <Label styleClass="section-title-label" text="🛋  Products &amp; Stock"/>
+      <HBox spacing="12">
+        <VBox styleClass="kpi-card kpi-blue"   HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="TOTAL PRODUCTS"/><Label fx:id="lblTotalProducts"    styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="Active SKUs"/></VBox>
+        <VBox styleClass="kpi-card kpi-orange" HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="LOW STOCK ALERTS"/><Label fx:id="lblLowStock"        styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="Below reorder point"/></VBox>
+        <VBox styleClass="kpi-card kpi-red"    HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="OUT OF STOCK"/><Label fx:id="lblOutOfStock"          styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="Need restocking"/></VBox>
+        <VBox styleClass="kpi-card kpi-green"  HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="ACTIVE SUPPLIERS"/><Label fx:id="lblSuppliers"        styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="Contracted"/></VBox>
+      </HBox>
+
+      <Label styleClass="section-title-label" text="💰  Salary"/>
+      <HBox spacing="12">
+        <VBox styleClass="kpi-card kpi-blue"   HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="TOTAL EMPLOYEES"/><Label fx:id="lblTotalEmployees"   styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="Head count"/></VBox>
+        <VBox styleClass="kpi-card kpi-green"  HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="PAID THIS MONTH"/><Label fx:id="lblPaidSalary"        styleClass="kpi-value" text="—"/><Label fx:id="lblSalaryMonth" styleClass="kpi-sub" text="—"/></VBox>
+        <VBox styleClass="kpi-card kpi-orange" HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="PENDING PAYROLL"/><Label fx:id="lblPendingSalary"      styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="DRAFT / CONFIRMED"/></VBox>
+        <VBox styleClass="kpi-card kpi-purple" HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="MONTHLY PAYROLL"/><Label fx:id="lblMonthlyPayroll"    styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="VND"/></VBox>
+      </HBox>
+
+      <Label styleClass="section-title-label" text="🔧  Warranty &amp; Repair"/>
+      <HBox spacing="12">
+        <VBox styleClass="kpi-card kpi-blue"   HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="TOTAL TICKETS"/><Label fx:id="lblTotalTickets"       styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="All time"/></VBox>
+        <VBox styleClass="kpi-card kpi-orange" HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="IN PROGRESS"/><Label fx:id="lblInProgress"            styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="Processing / Waiting"/></VBox>
+        <VBox styleClass="kpi-card kpi-green"  HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="COMPLETED"/><Label fx:id="lblCompletedTickets"        styleClass="kpi-value" text="—"/><Label fx:id="lblCompletedTicketsPct" styleClass="kpi-sub" text="—"/></VBox>
+        <VBox styleClass="kpi-card kpi-red"    HBox.hgrow="ALWAYS" spacing="4"><Label styleClass="kpi-label" text="AVG REPAIR COST"/><Label fx:id="lblAvgCost"           styleClass="kpi-value" text="—"/><Label styleClass="kpi-sub" text="VND per ticket"/></VBox>
+      </HBox>
     </VBox>
-
-</ScrollPane>
+  </ScrollPane>
+</VBox>

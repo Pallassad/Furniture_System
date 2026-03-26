@@ -1,63 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<VBox xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx"
       fx:controller="furniture_system.controller.AdminOrderController"
-      stylesheets="@/furniture_system/resources/css/admin.css"
-      styleClass="content-root"
-      spacing="14">
-    <padding><Insets top="20" right="24" bottom="16" left="24"/></padding>
+      stylesheets="@../resources/css/admin.css" spacing="0"
+      style="-fx-background-color:#eef0f5;">
 
-    <!-- ── Page Header ──────────────────────────────────────────────────── -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="🛒 Order &amp; Invoice Management" styleClass="page-title"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnViewDetail"    text="📋  View Detail"     onAction="#handleViewDetail"    styleClass="btn-primary"/>
-        <Button fx:id="btnUpdateStatus"  text="✏  Update Status"   onAction="#handleUpdateStatus"  styleClass="btn-warning"/>
-        <Button fx:id="btnManageBilling" text="💳  Manage Invoice"  onAction="#handleManageBilling" styleClass="btn-success"/>
-        <Button fx:id="btnDeleteOrder"   text="🗑  Delete Order"    onAction="#handleDeleteOrder"   styleClass="btn-danger"/>
-        <Button                          text="⟳  Refresh"         onAction="#onRefresh"           styleClass="btn-outline"/>
-    </HBox>
+  <!-- Page Header -->
+  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 14 28;">
+    <Label styleClass="page-title" text="📦  Order Management" HBox.hgrow="ALWAYS"/>
+    <Button fx:id="btnViewDetail"    styleClass="btn-info"    text="🔍  Detail"        onAction="#handleViewDetail"    disable="true"/>
+    <Button fx:id="btnUpdateStatus"  styleClass="btn-warning" text="✏  Update Status" onAction="#handleUpdateStatus"  disable="true"/>
+    <Button fx:id="btnManageBilling" styleClass="btn-success" text="💳  Billing"        onAction="#handleManageBilling" disable="true"/>
+    <Button fx:id="btnDeleteOrder"   styleClass="btn-danger"  text="🗑  Delete"         onAction="#handleDeleteOrder"   disable="true"/>
+    <Button                          styleClass="btn-outline" text="⟳  Refresh"         onAction="#onRefresh"/>
+  </HBox>
+  <Separator style="-fx-background-color:#d8dce8;"/>
 
-    <Separator styleClass="separator"/>
+  <!-- Filter Row -->
+  <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding:10 28 8 28;">
+    <TextField fx:id="tfSearchOrderId"    styleClass="search-field" promptText="Order ID"    prefWidth="100"/>
+    <TextField fx:id="tfSearchCustomerId" styleClass="search-field" promptText="Customer ID" prefWidth="110"/>
+    <TextField fx:id="tfSearchEmployeeId" styleClass="search-field" promptText="Employee ID" prefWidth="110"/>
+    <ComboBox  fx:id="cbSearchStatus"     styleClass="filter-combo" promptText="All Status"  prefWidth="130"/>
+    <DatePicker fx:id="dpFrom" styleClass="filter-date" promptText="From" prefWidth="130"/>
+    <DatePicker fx:id="dpTo"   styleClass="filter-date" promptText="To"   prefWidth="130"/>
+    <Button styleClass="btn-primary" text="🔍 Search" onAction="#onSearch"
+            style="-fx-padding:7 14 7 14;"/>
+    <Button styleClass="btn-outline" text="✕ Reset"   onAction="#onReset"
+            style="-fx-padding:7 14 7 14;"/>
+  </HBox>
 
-    <!-- ── Search Bar ───────────────────────────────────────────────────── -->
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="tfSearchOrderId"    promptText="Order ID"    prefWidth="90"  styleClass="login-field"/>
-        <TextField fx:id="tfSearchCustomerId" promptText="Customer ID" prefWidth="108" styleClass="login-field"/>
-        <TextField fx:id="tfSearchEmployeeId" promptText="Employee ID" prefWidth="108" styleClass="login-field"/>
-        <ComboBox  fx:id="cbSearchStatus"     promptText="Status"      prefWidth="130" styleClass="combo-box"/>
-        <DatePicker fx:id="dpFrom" promptText="From" prefWidth="138" styleClass="date-picker"/>
-        <DatePicker fx:id="dpTo"   promptText="To"   prefWidth="138" styleClass="date-picker"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button text="⟳  Reset"  onAction="#onReset"  styleClass="btn-outline"/>
-        <Button text="🔍  Search" onAction="#onSearch" styleClass="btn-primary"/>
-    </HBox>
+  <!-- Table -->
+  <VBox VBox.vgrow="ALWAYS" style="-fx-padding:0 28 14 28;">
+    <VBox styleClass="table-card" VBox.vgrow="ALWAYS">
+      <ScrollPane VBox.vgrow="ALWAYS" fitToHeight="true" fitToWidth="false"
+           hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+           style="-fx-background-color:transparent; -fx-border-color:transparent; -fx-padding:0;">
 
-    <!-- ── Orders Table ─────────────────────────────────────────────────── -->
-    <TableView fx:id="tblOrders" VBox.vgrow="ALWAYS" styleClass="table-view"
-               tableMenuButtonVisible="true">
+        <TableView fx:id="tblOrders" styleClass="table-view" style="-fx-hbar-policy:never;">
         <columns>
-            <TableColumn fx:id="colOrderId"  text="#"         prefWidth="60"/>
-            <TableColumn fx:id="colCustomer" text="Customer"  prefWidth="185"/>
-            <TableColumn fx:id="colEmployee" text="Employee"  prefWidth="155"/>
-            <TableColumn fx:id="colDate"     text="Date"      prefWidth="150"/>
-            <TableColumn fx:id="colStatus"   text="Status"    prefWidth="120"/>
-            <TableColumn fx:id="colFinal"    text="Total"     prefWidth="140"/>
+          <TableColumn fx:id="colOrderId"  text="Order ID"    prefWidth="90"/>
+          <TableColumn fx:id="colCustomer" text="Customer"    prefWidth="180"/>
+          <TableColumn fx:id="colEmployee" text="Employee"    prefWidth="150"/>
+          <TableColumn fx:id="colDate"     text="Date"        prefWidth="155"/>
+          <TableColumn fx:id="colStatus"   text="Status"      prefWidth="110"/>
+          <TableColumn fx:id="colFinal"    text="Final (VND)" prefWidth="140"/>
         </columns>
-        <placeholder>
-            <Label text="No orders found." styleClass="table-placeholder"/>
-        </placeholder>
-    </TableView>
+        <placeholder><Label text="No orders found." style="-fx-text-fill:#8a93b2;"/></placeholder>
+      </TableView>
 
-    <!-- ── Status Bar ───────────────────────────────────────────────────── -->
-    <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
-        <Label text="ℹ"/>
-        <Label fx:id="statusBarLabel" text="Ready." styleClass="status-label"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label text="💡 Double-click a row to view order detail."
-               style="-fx-font-size:11px;-fx-text-fill:#888;"/>
-    </HBox>
+      </ScrollPane>
+      <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="8">
+        <Label text="ℹ" style="-fx-text-fill:#4a7cff;"/>
+        <Label fx:id="statusBarLabel" styleClass="status-bar-label" text="Loading…"/>
+      </HBox>
+    </VBox>
+  </VBox>
 </VBox>
