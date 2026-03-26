@@ -226,8 +226,12 @@ public class DeliveryAddressDAO {
     }
 
     /**
-     * Hard-delete: xoá vĩnh viễn địa chỉ.
-     * Chỉ gọi khi không còn Order nào tham chiếu (kiểm tra qua isLinkedToOrder trước).
+     * Hard-delete: permanently remove address.
+    /**
+     * Hard-delete: permanently remove an INACTIVE address.
+     * Only call this when the address has no Orders referencing it.
+     * Since orders only use ACTIVE addresses, an INACTIVE address
+     * should never be referenced by any new order.
      */
     public boolean hardDelete(int addressId) throws SQLException {
         String sql = "DELETE FROM DeliveryAddress WHERE AddressId = ?";

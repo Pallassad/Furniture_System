@@ -57,30 +57,30 @@ public class FurnitureTypeService {
 
     // ── Deactivate (Soft Delete) ──────────────────────────────────────────────
     /**
-     * Soft-delete: chỉ cảnh báo nếu còn Product ACTIVE.
+     * Soft-delete: only warn if there are still ACTIVE Products.
      * @return null on success, error message on failure
      */
     public String deactivate(int typeId) throws SQLException {
         if (dao.hasActiveLinkedProducts(typeId)) {
-            return "Loại nội thất này còn sản phẩm đang ACTIVE.\n" +
-                   "Vui lòng tắt hoặc xoá các sản phẩm liên quan trước khi vô hiệu hoá.";
+            return "This furniture type still has ACTIVE products.\n" +
+                   "Please deactivate or delete related products before deactivating.";
         }
         boolean ok = dao.deactivate(typeId);
-        return ok ? null : "Vô hiệu hoá thất bại. Vui lòng thử lại.";
+        return ok ? null : "Deactivation failed. Please try again.";
     }
 
     // ── Delete (Hard Delete) ──────────────────────────────────────────────────
     /**
-     * Hard-delete: chặn nếu còn BẤT KỲ Product nào (kể cả INACTIVE).
+     * Hard-delete: block if there are ANY Products (even INACTIVE).
      * @return null on success, error message on failure
      */
     public String delete(int typeId) throws SQLException {
         if (dao.hasLinkedProducts(typeId)) {
-            return "Loại nội thất này còn sản phẩm liên kết (kể cả sản phẩm đã vô hiệu hoá).\n" +
-                   "Vui lòng xoá tất cả sản phẩm liên quan trước.";
+            return "This furniture type still has linked products (including deactivated products).\n" +
+                   "Please delete all related products first.";
         }
         boolean ok = dao.delete(typeId);
-        return ok ? null : "Xoá thất bại. Vui lòng thử lại.";
+        return ok ? null : "Delete failed. Please try again.";
     }
 
     // ── Validation ───────────────────────────────────────────────────────────

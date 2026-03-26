@@ -80,26 +80,36 @@ public class DeliveryAddressService {
     }
 
     /**
-     * Xoá địa chỉ:
-     *  - Nếu có Order tham chiếu → soft-delete (Status = INACTIVE)
-     *  - Nếu không có Order → hard-delete
+     * Hard-delete an address permanently.
+     * Only allowed when Status = INACTIVE AND no Orders reference it.
+     * An INACTIVE address should have no active orders, but we check anyway
+     * to guard against old completed orders still holding the FK reference.
      *
+     * @throws IllegalStateException if address is still ACTIVE or linked to orders
      * @throws SQLException on DB error
      */
     public void deleteAddress(int addressId) throws SQLException {
         DeliveryAddress existing = dao.findById(addressId);
         if (existing == null)
-            throw new IllegalArgumentException("Không tìm thấy địa chỉ (AddressId=" + addressId + ").");
+            throw new IllegalArgumentException("Address not found (AddressId=" + addressId + ").");
+        if (!"INACTIVE".equals(existing.getStatus()))
+            throw new IllegalStateException(
+                "Only INACTIVE addresses can be deleted. " +
+                "Please deactivate the address first via Edit.");
+        if (dao.isLinkedToOrder(addressId))
+            throw new IllegalStateException(
+                "This address is still referenced by one or more orders. " +
+                "Delete those orders first before deleting this address.");
+        if (!dao.hardDelete(addressId))
+            throw new SQLException("Delete failed for AddressId=" + addressId);
+    }
 
-        if (dao.isLinkedToOrder(addressId)) {
-            // Soft-delete: đang được dùng bởi Order
-            if (!dao.softDelete(addressId))
-                throw new SQLException("Soft-delete thất bại cho AddressId=" + addressId);
-        } else {
-            // Hard-delete
-            if (!dao.hardDelete(addressId))
-                throw new SQLException("Xoá địa chỉ thất bại (AddressId=" + addressId + ").");
-        }
+
+    /**
+     * Check if address is referenced by any Order.
+     */
+    public boolean isLinkedToOrder(int addressId) throws SQLException {
+        return dao.isLinkedToOrder(addressId);
     }
 
     /**

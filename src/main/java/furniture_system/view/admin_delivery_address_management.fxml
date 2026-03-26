@@ -14,11 +14,11 @@
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label text="📍 Delivery Address Management" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnAdd"        text="➕  Add Address"    onAction="#onAdd"        styleClass="btn-primary"/>
-        <Button fx:id="btnEdit"       text="✏  Edit"            onAction="#onEdit"       styleClass="btn-warning"/>
-        <Button fx:id="btnSetDefault" text="⭐  Set Default"    onAction="#onSetDefault" styleClass="btn-outline"/>
-        <Button fx:id="btnDeactivate" text="🗑  Deactivate"     onAction="#onDelete"     styleClass="btn-danger"/>
-        <Button                       text="⟳  Refresh"        onAction="#handleRefresh" styleClass="btn-outline"/>
+        <Button fx:id="btnAdd"        text="➕  Add Address"  onAction="#onAdd"        styleClass="btn-primary"/>
+        <Button fx:id="btnEdit"       text="✏  Edit"          onAction="#onEdit"       styleClass="btn-warning"/>
+        <Button fx:id="btnSetDefault" text="⭐  Set Default"  onAction="#onSetDefault" styleClass="btn-outline"/>
+        <Button fx:id="btnDelete"     text="🗑  Delete"        onAction="#onDelete"     styleClass="btn-danger"/>
+        <Button                       text="⟳  Refresh"      onAction="#handleRefresh" styleClass="btn-outline"/>
     </HBox>
 
     <!-- ── Stats Bar ────────────────────────────────────────────────────── -->

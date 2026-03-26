@@ -16,8 +16,7 @@
         <Region HBox.hgrow="ALWAYS"/>
         <Button fx:id="btnAdd"         text="➕  Add Supplier"      onAction="#handleAdd"         styleClass="btn-primary"/>
         <Button fx:id="btnEdit"        text="✏  Edit"               onAction="#handleEdit"        styleClass="btn-warning"/>
-        <Button fx:id="btnDeactivate"  text="🚫  Deactivate"         onAction="#handleDeactivate"  styleClass="btn-danger"/>
-        <Button fx:id="btnDelete"      text="🗑  Delete permanently"      onAction="#handleDelete"       styleClass="btn-danger"/>
+        <Button fx:id="btnDelete"      text="🗑  Delete"      onAction="#handleDelete"       styleClass="btn-danger"/>
         <Button fx:id="btnManageLinks" text="🔗  Manage Products"    onAction="#handleManageLinks" styleClass="btn-outline"/>
         <Button                        text="⟳  Refresh"            onAction="#handleRefresh"     styleClass="btn-outline"/>
     </HBox>

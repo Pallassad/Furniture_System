@@ -35,7 +35,6 @@ public class SupplierController {
     @FXML private TextField txtSearch;
     @FXML private Button    btnAdd;
     @FXML private Button    btnEdit;
-    @FXML private Button    btnDeactivate;
     @FXML private Button    btnDelete;
     @FXML private Button    btnManageLinks;
     @FXML private Label     lblStatus;
@@ -55,12 +54,9 @@ public class SupplierController {
                     boolean has = sel != null;
                     btnEdit.setDisable(!has);
                     btnManageLinks.setDisable(!has);
-                    boolean canDeact = has && "ACTIVE".equals(sel.getStatus());
-                    btnDeactivate.setDisable(!canDeact);
                     btnDelete.setDisable(!has);
                 });
         btnEdit.setDisable(true);
-        btnDeactivate.setDisable(true);
         btnDelete.setDisable(true);
         btnManageLinks.setDisable(true);
     }
@@ -258,22 +254,22 @@ public class SupplierController {
         Supplier sel = tblSuppliers.getSelectionModel().getSelectedItem();
         if (sel == null) return;
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xoá vĩnh viễn nhà cung cấp \"" + sel.getName() + "\"?\n\n"
-                + "⚠ Hành động này không thể hoàn tác.\n"
-                + "Yêu cầu: không còn sản phẩm nào liên kết với nhà cung cấp này.\n"
-                + "Các liên kết SupplierProduct sẽ bị xoá theo.",
+                "Permanently delete supplier \"" + sel.getName() + "\"?\n\n"
+                + "⚠ This action cannot be undone.\n"
+                + "Requirement: no products remain linked to this supplier.\n"
+                + "SupplierProduct links will be deleted accordingly.",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận xoá nhà cung cấp"); confirm.setHeaderText(null);
+        confirm.setTitle("Confirm supplier deletion"); confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
                 service.deleteSupplier(sel.getSupplierId());
-                setStatus("Đã xoá vĩnh viễn nhà cung cấp [" + sel.getName() + "].", false);
+                setStatus("Permanently deleted supplier [" + sel.getName() + "].", false);
                 loadSuppliers();
             } catch (IllegalStateException ex) {
-                alert(Alert.AlertType.ERROR, "Không thể xoá", ex.getMessage());
+                alert(Alert.AlertType.ERROR, "Cannot delete", ex.getMessage());
             } catch (Exception ex) {
-                alert(Alert.AlertType.ERROR, "Lỗi xoá", ex.getMessage());
+                alert(Alert.AlertType.ERROR, "Delete error", ex.getMessage());
             }
         });
     }

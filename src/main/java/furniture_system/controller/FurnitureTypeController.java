@@ -233,8 +233,8 @@ public class FurnitureTypeController {
         if (sel == null) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xoá vĩnh viễn loại nội thất \"" + sel.getTypeName() + "\" (ID: " + sel.getTypeId() + ")?\n\n"
-                + "⚠ Yêu cầu: không còn sản phẩm nào (kể cả INACTIVE) liên kết với loại này.",
+                "Permanently delete furniture type \"" + sel.getTypeName() + "\" (ID: " + sel.getTypeId() + ")?\n\n"
+                + "⚠ Requirement: no products (including INACTIVE) remain linked to this type.",
                 ButtonType.YES, ButtonType.NO);
         confirm.setTitle("Confirm Delete"); confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {

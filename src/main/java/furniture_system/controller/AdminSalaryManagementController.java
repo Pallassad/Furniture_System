@@ -399,7 +399,7 @@ public class AdminSalaryManagementController {
             // Bonus hint
             String desc = service.describeBonusAmount(tfBonus.getText(), base);
             lblBonusHint.setText(desc);
-            lblBonusHint.setStyle(desc.contains("Penalty")
+            lblBonusHint.setStyle(desc.contains("Deduction")
                     ? "-fx-text-fill:#c62828;-fx-font-size:10px;-fx-font-style:italic;"
                     : "-fx-text-fill:#27ae60;-fx-font-size:10px;-fx-font-style:italic;");
         } catch (Exception e) {

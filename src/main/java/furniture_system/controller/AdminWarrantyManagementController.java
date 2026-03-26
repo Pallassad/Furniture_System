@@ -36,7 +36,6 @@ public class AdminWarrantyManagementController {
     @FXML private TextField txtSearch;
     @FXML private Button    btnAdd;
     @FXML private Button    btnEdit;
-    @FXML private Button    btnCancelTicket;
     @FXML private Button    btnDelete;
     @FXML private Label     lblStatus;
 
@@ -59,15 +58,11 @@ public class AdminWarrantyManagementController {
                 .addListener((obs, old, sel) -> {
                     boolean has = sel != null;
                     btnEdit.setDisable(!has);
-                    boolean canCancel = has &&
-                            !List.of("COMPLETED","CANCELLED","REJECTED").contains(sel.getStatus());
-                    btnCancelTicket.setDisable(!canCancel);
                     boolean canDelete = has &&
                             List.of("COMPLETED","CANCELLED","REJECTED").contains(sel.getStatus());
                     btnDelete.setDisable(!canDelete);
                 });
         btnEdit.setDisable(true);
-        btnCancelTicket.setDisable(true);
         btnDelete.setDisable(true);
     }
 
@@ -304,20 +299,20 @@ public class AdminWarrantyManagementController {
         if (sel == null) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-            "Xoá vĩnh viễn phiếu bảo hành #" + sel.getTicketId()
+            "Permanently delete warranty ticket #" + sel.getTicketId()
             + " [" + nvl(sel.getProductName()) + "]?\n\n"
-            + "⚠ Hành động này không thể hoàn tác.",
+            + "⚠ This action cannot be undone.",
             ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận xoá phiếu bảo hành");
+        confirm.setTitle("Confirm warranty ticket deletion");
         confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
                 warrantyService.delete(sel.getTicketId());
-                setStatus("Đã xoá phiếu bảo hành #" + sel.getTicketId() + ".", false);
+                setStatus("Deleted warranty ticket #" + sel.getTicketId() + ".", false);
                 loadAll();
             } catch (Exception ex) {
-                alert(Alert.AlertType.ERROR, "Không thể xoá", ex.getMessage());
+                alert(Alert.AlertType.ERROR, "Cannot delete", ex.getMessage());
             }
         });
     }

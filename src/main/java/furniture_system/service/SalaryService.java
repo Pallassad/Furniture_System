@@ -13,17 +13,17 @@ import java.util.List;
  * SalaryService – Business logic layer for the Salary module.
  *
  * ┌─────────────────────────────────────────────────────────────┐
- *  CÁCH NHẬP BONUS (Thưởng / Phạt):
+ *  HOW TO INPUT BONUS (Reward / Deduction):
  *
- *  Số tiền cố định:
- *    500000  hoặc  +500000  →  Thưởng +500.000 ₫
- *    -200000                →  Phạt   -200.000 ₫
+ *  Fixed amount:
+ *    500000  or  +500000  →  Reward +500.000 ₫
+ *    -200000                →  Deduction -200.000 ₫
  *
- *  Theo % lương cơ bản:
- *    10%   hoặc  +10%       →  Thưởng 10% × BaseSalary
- *    -5%                    →  Phạt    5% × BaseSalary
+ *  As % of base salary:
+ *    10%   or  +10%       →  Reward 10% × BaseSalary
+ *    -5%                  →  Deduction 5% × BaseSalary
  *
- *  Service tự tách khi lưu DB:
+ *  Service auto-splits when saving to DB:
  *    bonus > 0  →  DB.Bonus = bonus,   DB.Deduction = 0
  *    bonus < 0  →  DB.Bonus = 0,       DB.Deduction = |bonus|
  *    bonus = 0  →  DB.Bonus = 0,       DB.Deduction = 0
@@ -55,10 +55,10 @@ public class SalaryService {
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Thêm bản ghi lương mới.
+     * Add a new salary record.
      *
-     * @param allowanceInput  Phụ cấp — số ≥ 0 hoặc "X%"
-     * @param bonusInput      Thưởng/Phạt — có thể âm: "500000", "-200000", "10%", "-5%"
+     * @param allowanceInput  Allowance — number ≥ 0 or "X%"
+     * @param bonusInput      Reward/Deduction — can be negative: "500000", "-200000", "10%", "-5%"
      */
     public int addSalary(int employeeId,
                          LocalDate month,
@@ -75,8 +75,8 @@ public class SalaryService {
     }
 
     /**
-     * Cập nhật bản ghi lương.
-     * Guard: PAID records không được sửa.
+     * Update a salary record.
+     * Guard: PAID records cannot be edited.
      */
     public void updateSalary(int salaryId,
                              int employeeId,
@@ -90,47 +90,47 @@ public class SalaryService {
 
         Salary existing = dao.getById(salaryId);
         if (existing == null)
-            throw new IllegalArgumentException("Không tìm thấy bản ghi #" + salaryId);
+            throw new IllegalArgumentException("Record #" + salaryId + " not found.");
         if ("PAID".equals(existing.getStatus()))
-            throw new IllegalArgumentException("Không thể sửa bản ghi đã PAID.");
+            throw new IllegalArgumentException("Cannot edit a record that is PAID.");
 
         Salary s = buildSalary(salaryId, employeeId, month, baseSalary,
                 allowanceInput, bonusInput, status, paidDate, note);
         dao.update(s);
     }
 
-    /** Xoá — chỉ DRAFT. */
+    /** Delete — DRAFT only. */
     public void deleteSalary(int salaryId) throws SQLException {
         dao.delete(salaryId);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // PARSING  (public — Controller dùng cho live preview)
+    // PARSING  (public — Controller uses for live preview)
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Parse chuỗi nhập thành số tiền có dấu (signed BigDecimal).
+     * Parse input string into signed number (signed BigDecimal).
      *
-     * Định dạng chấp nhận:
-     *   "500000"   →  +500.000   (thưởng)
-     *   "+500000"  →  +500.000   (thưởng tường minh)
-     *   "-200000"  →  -200.000   (phạt)
+     * Accepted formats:
+     *   "500000"   →  +500.000   (reward)
+     *   "+500000"  →  +500.000   (explicit reward)
+     *   "-200000"  →  -200.000   (deduction)
      *   "10%"      →  +10% × base
      *   "+10%"     →  +10% × base
-     *   "-5%"      →  - 5% × base  (phạt)
+     *   "-5%"      →  - 5% × base  (deduction)
      *   ""  / null →  0
      *
-     * @param input         Chuỗi người dùng nhập
-     * @param baseSalary    Lương cơ bản (dùng khi tính %)
-     * @param allowNegative true  = chấp nhận âm (Bonus/Phạt)
-     *                      false = chỉ nhận ≥ 0 (Allowance)
+     * @param input         User input string
+     * @param baseSalary    Base salary (used when calculating %)
+     * @param allowNegative true  = accept negative (Bonus/Deduction)
+     *                      false = accept only ≥ 0 (Allowance)
      */
     public BigDecimal parseAmount(String input, BigDecimal baseSalary, boolean allowNegative) {
         if (input == null || input.isBlank()) return BigDecimal.ZERO;
 
         String trimmed = input.strip();
 
-        // ── Tách dấu ở đầu ───────────────────────────────────────────────────
+        // ── Extract leading sign ─────────────────────────────────────────────
         boolean negative = false;
         if (trimmed.startsWith("-")) {
             negative = true;
@@ -140,78 +140,78 @@ public class SalaryService {
         }
 
         if (trimmed.isEmpty())
-            throw new IllegalArgumentException("Giá trị trống. Nhập số tiền hoặc phần trăm.");
+            throw new IllegalArgumentException("Empty value. Enter amount or percentage.");
 
         BigDecimal absValue;
 
-        // ── Phần trăm ─────────────────────────────────────────────────────────
+        // ── Percentage ───────────────────────────────────────────────────────
         if (trimmed.endsWith("%")) {
             String pctStr = trimmed.substring(0, trimmed.length() - 1).strip();
             if (pctStr.isEmpty())
-                throw new IllegalArgumentException("Thiếu số trước dấu %. Ví dụ: 10%");
+                throw new IllegalArgumentException("Missing number before %. Example: 10%");
 
             BigDecimal pct;
             try {
                 pct = new BigDecimal(pctStr.replace(",", "."));
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(
-                        "Phần trăm không hợp lệ: \"" + pctStr + "\". Dùng số như 10 hoặc 10.5");
+                        "Invalid percentage: \"" + pctStr + "\". Use number like 10 or 10.5");
             }
             if (pct.compareTo(BigDecimal.ZERO) < 0)
                 throw new IllegalArgumentException(
-                        "Số sau % phải ≥ 0. Để phạt dùng dấu - ở trước, ví dụ: -10%");
+                        "Number after % must be ≥ 0. For deduction use minus sign before, example: -10%");
             if (pct.compareTo(new BigDecimal("100")) > 0)
-                throw new IllegalArgumentException("Phần trăm phải ≤ 100. Nhập: " + pctStr + "%");
+                throw new IllegalArgumentException("Percentage must be ≤ 100. Enter: " + pctStr + "%");
 
             BigDecimal base = (baseSalary != null) ? baseSalary : BigDecimal.ZERO;
             absValue = base.multiply(pct).divide(new BigDecimal("100"), 0, RoundingMode.FLOOR);
 
         } else {
-            // ── Số tiền cố định ───────────────────────────────────────────────
-            // Cho phép dấu chấm/phẩy ngăn cách hàng nghìn: "500.000" "500,000"
-            // Quy tắc: nếu có cả hai, loại bỏ tất cả; nếu chỉ có một thì đó là hàng nghìn
+            // ── Fixed amount ─────────────────────────────────────────────────
+            // Allow dot/comma as thousand separators: "500.000" "500,000"
+            // Rule: if both present, remove all; if only one, it's the thousand separator
             String cleaned = trimmed.replace(".", "").replace(",", "");
             try {
                 absValue = new BigDecimal(cleaned).setScale(0, RoundingMode.HALF_UP);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(
-                        "Số tiền không hợp lệ: \"" + input.strip() + "\"." +
-                        "\n• Số tiền: 500000  hoặc  +500000  hoặc  -200000" +
-                        "\n• Phần trăm: 10%  hoặc  +10%  hoặc  -5%");
+                        "Invalid amount: \"" + input.strip() + "\"." +
+                        "\n• Amount: 500000  or  +500000  or  -200000" +
+                        "\n• Percentage: 10%  or  +10%  or  -5%");
             }
         }
 
         if (absValue.compareTo(BigDecimal.ZERO) < 0)
-            throw new IllegalArgumentException("Giá trị tuyệt đối phải ≥ 0.");
+            throw new IllegalArgumentException("Absolute value must be ≥ 0.");
 
         BigDecimal result = negative ? absValue.negate() : absValue;
 
         if (!allowNegative && result.compareTo(BigDecimal.ZERO) < 0)
-            throw new IllegalArgumentException("Giá trị phụ cấp không được âm.");
+            throw new IllegalArgumentException("Allowance value cannot be negative.");
 
         return result;
     }
 
-    /** Overload — dùng cho Allowance (không cho phép âm). */
+    /** Overload — for Allowance (no negative allowed). */
     public BigDecimal parseAmount(String input, BigDecimal baseSalary) {
         return parseAmount(input, baseSalary, false);
     }
 
     /**
-     * Tạo chuỗi mô tả hiển thị hint label realtime cho field Bonus.
+     * Create description string to display realtime hint label for Bonus field.
      *
-     * Ví dụ kết quả:
-     *   "-10%"  + base 8.000.000  →  "= -800.000 ₫  ⚠ Phạt"
-     *   "+10%"  + base 8.000.000  →  "= +800.000 ₫  🎉 Thưởng"
-     *   "-200000"                 →  "= -200.000 ₫  ⚠ Phạt"
-     *   "+500000"                 →  "= +500.000 ₫  🎉 Thưởng"
-     *   "500000"                  →  ""  (plain positive: không cần hint)
+     * Example results:
+     *   "-10%"  + base 8.000.000  →  "= -800.000 ₫  ⚠ Deduction"
+     *   "+10%"  + base 8.000.000  →  "= +800.000 ₫  🎉 Reward"
+     *   "-200000"                 →  "= -200.000 ₫  ⚠ Deduction"
+     *   "+500000"                 →  "= +500.000 ₫  🎉 Reward"
+     *   "500000"                  →  ""  (plain positive: no hint needed)
      */
     public String describeBonusAmount(String input, BigDecimal baseSalary) {
         if (input == null || input.isBlank()) return "";
         String stripped = input.strip();
 
-        // Chỉ hiện hint khi: có dấu tường minh (+ / -) HOẶC là phần trăm
+        // Show hint only when: has explicit sign (+ / -) OR is percentage
         boolean hasSign   = stripped.startsWith("-") || stripped.startsWith("+");
         boolean isPercent = stripped.endsWith("%") ||
                             stripped.replace("+", "").replace("-", "").endsWith("%");
@@ -223,7 +223,7 @@ public class SalaryService {
 
             boolean isReward = amount.compareTo(BigDecimal.ZERO) > 0;
             String sign   = isReward ? "+" : "-";
-            String label  = isReward ? "🎉 Thưởng" : "⚠ Phạt";
+            String label  = isReward ? "🎉 Reward" : "⚠ Deduction";
             String fmtAmt = String.format("%,.0f ₫", amount.abs());
             return "= " + sign + fmtAmt + "   " + label;
         } catch (Exception e) {
@@ -238,7 +238,7 @@ public class SalaryService {
     /**
      * Validate + parse + build Salary object.
      *
-     * Bonus signed tự động tách:
+     * Signed bonus auto-splits:
      *   signed > 0  →  DB.Bonus = signed,   DB.Deduction = 0
      *   signed < 0  →  DB.Bonus = 0,        DB.Deduction = abs(signed)
      *   signed = 0  →  DB.Bonus = 0,        DB.Deduction = 0
@@ -254,30 +254,30 @@ public class SalaryService {
                                 String note) {
 
         if (employeeId <= 0)
-            throw new IllegalArgumentException("Employee ID phải > 0.");
+            throw new IllegalArgumentException("Employee ID must be > 0.");
         if (month == null)
-            throw new IllegalArgumentException("Tháng lương là bắt buộc.");
+            throw new IllegalArgumentException("Salary month is required.");
         if (baseSalary == null || baseSalary.compareTo(BigDecimal.ZERO) <= 0)
-            throw new IllegalArgumentException("Lương cơ bản phải > 0.");
+            throw new IllegalArgumentException("Base salary must be > 0.");
         if (status == null || status.isBlank())
-            throw new IllegalArgumentException("Trạng thái là bắt buộc.");
+            throw new IllegalArgumentException("Status is required.");
         if ("PAID".equals(status) && paidDate == null)
-            throw new IllegalArgumentException("Ngày thanh toán bắt buộc khi Status = PAID.");
+            throw new IllegalArgumentException("Payment date is required when Status = PAID.");
 
-        // Allowance luôn ≥ 0
+        // Allowance always ≥ 0
         BigDecimal allowance = parseAmount(allowanceInput, baseSalary, false);
 
-        // Bonus có thể âm
+        // Bonus can be negative
         BigDecimal bonusSigned = parseAmount(bonusInput, baseSalary, true);
 
-        // Tách vào đúng cột DB
+        // Split into correct DB columns
         BigDecimal bonus, deduction;
         if (bonusSigned.compareTo(BigDecimal.ZERO) >= 0) {
             bonus     = bonusSigned;
             deduction = BigDecimal.ZERO;
         } else {
             bonus     = BigDecimal.ZERO;
-            deduction = bonusSigned.negate();   // lưu giá trị dương vào cột Deduction
+            deduction = bonusSigned.negate();   // store as positive value in Deduction column
         }
 
         Salary s = new Salary();

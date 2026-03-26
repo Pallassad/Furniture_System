@@ -45,7 +45,7 @@ public class EmployeeController {
     @FXML private TableColumn<Employee,String>   colAccount;
     @FXML private TableColumn<Employee,String>   colHiredAt;
 
-    // ── Search bar ────────────────────────────────────────────────────────────
+    // ── Search bar ─────────────────��──────────────────────────────────────────
     @FXML private TextField searchField;
 
     // ── Toolbar buttons ───────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ public class EmployeeController {
         } catch (Exception e) { showError("Load failed", e.getMessage()); }
     }
 
-    // ── 3.3.5 Search ──────────────────────────────────────────────────────────
+    // ── 3.3.5 Search ────────────��─────────────────────────────────────────────
     @FXML public void handleSearch() {
         try {
             String kw = searchField.getText();
@@ -160,26 +160,26 @@ public class EmployeeController {
         if (sel == null) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xoá vĩnh viễn nhân viên [" + sel.getFullName() + "]?\n\n" +
-                "⚠ Yêu cầu trước khi xoá:\n" +
-                "  • Tất cả đơn hàng đã được xoá\n" +
-                "  • Không còn lương PAID/PENDING\n" +
-                "  • Không còn phiếu bảo hành đang xử lý\n" +
-                "  • Không có lịch sử xuất/nhập kho\n\n" +
-                "Lương DRAFT (nếu có) sẽ tự động bị xoá.",
+                "Permanently delete employee [" + sel.getFullName() + "]?\n\n" +
+                "⚠ Requirements before deletion:\n" +
+                "  • All orders must be deleted\n" +
+                "  • No PAID/PENDING salary records\n" +
+                "  • No warranty tickets in progress\n" +
+                "  • No stock in/out history\n\n" +
+                "DRAFT salary records (if any) will be automatically deleted.",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận xoá nhân viên");
+        confirm.setTitle("Confirm employee deletion");
         confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
                 service.removeEmployee(sel.getEmployeeId());
-                setStatus("Đã xoá nhân viên [" + sel.getFullName() + "] vĩnh viễn.");
+                setStatus("Permanently deleted employee [" + sel.getFullName() + "].");
                 loadAll();
             } catch (IllegalStateException e) {
-                showError("Không thể xoá", e.getMessage());
+                showError("Cannot delete", e.getMessage());
             } catch (Exception e) {
-                showError("Lỗi xoá", e.getMessage());
+                showError("Delete error", e.getMessage());
             }
         });
     }
@@ -246,7 +246,7 @@ public class EmployeeController {
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle(isEdit ? "Edit Employee" : "Add New Employee");
 
-        // ── Fields ────────────────────────────────────────────────────────────
+        // ── Fields ──────────────────────────────────────────────────��─────────
         TextField      tfName     = new TextField();
         TextField      tfPhone    = new TextField();
         TextField      tfEmail    = new TextField();

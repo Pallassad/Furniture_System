@@ -62,16 +62,16 @@ public class CustomerService {
 
     // ── 3.10.4  Delete / Deactivate ───────────────────────────────────────────
     /**
-     * Xoá khách hàng:
-     *  - Nếu còn Order → báo lỗi, không xoá (phải xoá Order trước)
-     *  - Nếu không còn Order → hard-delete (DeliveryAddress cascade theo FK hoặc xoá thủ công)
+     * Delete customer:
+     *  - If customer still has Orders → throw error, cannot delete (must delete Orders first)
+     *  - If no Orders remain → hard-delete (DeliveryAddress cascade via FK or delete manually)
      */
     public String removeCustomer(int customerId) {
         requireAdmin();
         if (dao.hasOrders(customerId))
             throw new IllegalStateException(
-                "Khách hàng này còn đơn hàng. Vui lòng xoá tất cả đơn hàng của khách hàng trước.");
-        // Xoá DeliveryAddress không còn liên kết Order
+                "This customer still has orders. Please delete all customer orders first.");
+        // Delete DeliveryAddresses no longer linked to Orders
         dao.deleteUnlinkedAddresses(customerId);
         dao.delete(customerId);
         return "HARD";

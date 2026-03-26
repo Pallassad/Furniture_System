@@ -177,7 +177,7 @@ public class OrderService {
         updateStatus(orderId, "CANCELLED", actorId, null);
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+    // ────────────────────────────────────────────────��────────────────────
     //  MANAGE BILLING  (3.11.5 / 4.10.3)
     // ─────────────────────────────────────────────────────────────────────
 
@@ -219,20 +219,20 @@ public class OrderService {
     // ─────────────────────────────────────────────────────────────────────
 
     /**
-     * Xoá Billing của một Order.
-     * Chỉ cho phép khi BillingStatus = UNPAID hoặc VOID.
+     * Delete Billing record of an Order.
+     * Only allowed when BillingStatus = UNPAID or VOID.
      */
     public void deleteBilling(int invoiceId) throws Exception {
         Billing billing = billingDAO.findById(invoiceId);
         if (billing == null)
-            throw new IllegalArgumentException("Invoice #" + invoiceId + " không tồn tại.");
+            throw new IllegalArgumentException("Invoice #" + invoiceId + " does not exist.");
         String status = billing.getBillingStatus();
         if (!"UNPAID".equals(status) && !"VOID".equals(status))
             throw new IllegalStateException(
-                "Chỉ có thể xoá hoá đơn ở trạng thái UNPAID hoặc VOID. " +
-                "Trạng thái hiện tại: " + status);
+                "Can only delete invoices with UNPAID or VOID status. " +
+                "Current status: " + status);
         if (!billingDAO.delete(invoiceId))
-            throw new SQLException("Xoá hoá đơn thất bại.");
+            throw new SQLException("Failed to delete invoice.");
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -240,34 +240,34 @@ public class OrderService {
     // ─────────────────────────────────────────────────────────────────────
 
     /**
-     * Xoá cứng một Order và toàn bộ OrderLine của nó.
+     * Hard delete an Order and all of its OrderLines.
      *
-     * Điều kiện:
-     *  - Status phải là COMPLETED, CANCELLED hoặc RETURNED
-     *  - Không còn Billing (đã xoá trước) hoặc Billing = VOID
-     *  - Không còn WarrantyTicket nào đang active (chưa terminal)
+     * Conditions:
+     *  - Status must be COMPLETED, CANCELLED, or RETURNED
+     *  - No remaining Billing (already deleted) or Billing = VOID
+     *  - No active WarrantyTickets (not in terminal state)
      */
     public void deleteOrder(int orderId) throws Exception {
         Order order = requireOrder(orderId);
 
-        // 1. Kiểm tra status
+        // 1. Check status
         String status = order.getStatus();
         if (!"COMPLETED".equals(status) && !"CANCELLED".equals(status) && !"RETURNED".equals(status))
             throw new IllegalStateException(
-                "Chỉ có thể xoá đơn hàng ở trạng thái COMPLETED, CANCELLED hoặc RETURNED. " +
-                "Trạng thái hiện tại: " + status);
+                "Can only delete orders with COMPLETED, CANCELLED, or RETURNED status. " +
+                "Current status: " + status);
 
-        // 2. Kiểm tra Billing
+        // 2. Check Billing
         Billing billing = billingDAO.findByOrderId(orderId);
         if (billing != null) {
             String bs = billing.getBillingStatus();
             if (!"VOID".equals(bs))
                 throw new IllegalStateException(
-                    "Đơn hàng còn hoá đơn (trạng thái: " + bs + "). " +
-                    "Vui lòng xoá hoặc đặt hoá đơn thành VOID trước.");
+                    "Order still has an invoice (status: " + bs + "). " +
+                    "Please delete or set the invoice to VOID first.");
         }
 
-        // 3. Kiểm tra WarrantyTicket active
+        // 3. Check active WarrantyTickets
         WarrantyTicketDAO warrantyDAO = new WarrantyTicketDAO();
         boolean hasActiveWarranty = warrantyDAO.getAll().stream()
             .filter(w -> w.getOrderId() == orderId)
@@ -277,20 +277,20 @@ public class OrderService {
             });
         if (hasActiveWarranty)
             throw new IllegalStateException(
-                "Đơn hàng còn phiếu bảo hành đang xử lý. " +
-                "Vui lòng hoàn tất hoặc huỷ tất cả phiếu bảo hành trước.");
+                "Order still has warranty tickets being processed. " +
+                "Please complete or cancel all warranty tickets first.");
 
-        // 4. Xoá OrderLine + Order trong transaction
+        // 4. Delete OrderLines + Order in transaction
         try (Connection conn = DatabaseConfig.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                // Xoá OrderLine
+                // Delete OrderLines
                 String delLines = "DELETE FROM OrderLine WHERE OrderId = ?";
                 try (PreparedStatement ps = conn.prepareStatement(delLines)) {
                     ps.setInt(1, orderId);
                     ps.executeUpdate();
                 }
-                // Xoá Billing nếu còn (VOID)
+                // Delete Billing if exists (VOID)
                 if (billing != null) {
                     String delBilling = "DELETE FROM Billing WHERE OrderId = ?";
                     try (PreparedStatement ps = conn.prepareStatement(delBilling)) {
@@ -298,14 +298,14 @@ public class OrderService {
                         ps.executeUpdate();
                     }
                 }
-                // Xoá WarrantyTicket terminal của Order này
+                // Delete terminal WarrantyTickets for this Order
                 String delWarranty = "DELETE FROM WarrantyTicket WHERE OrderId = ? " +
                     "AND Status IN ('COMPLETED','CANCELLED','REJECTED')";
                 try (PreparedStatement ps = conn.prepareStatement(delWarranty)) {
                     ps.setInt(1, orderId);
                     ps.executeUpdate();
                 }
-                // Xoá Order
+                // Delete Order
                 String delOrder = "DELETE FROM [Order] WHERE OrderId = ?";
                 try (PreparedStatement ps = conn.prepareStatement(delOrder)) {
                     ps.setInt(1, orderId);
@@ -411,8 +411,8 @@ public class OrderService {
             int available = stock != null ? stock.getQuantity() : 0;
             if (available < line.getQuantity())
                 throw new IllegalStateException(
-                        "Không đủ tồn kho cho sản phẩm #" + line.getProductId()
-                        + " (tồn: " + available + ", cần: " + line.getQuantity() + ").");
+                        "Insufficient stock for product #" + line.getProductId()
+                        + " (available: " + available + ", required: " + line.getQuantity() + ").");
         }
     }
 
@@ -423,7 +423,7 @@ public class OrderService {
             // Delegate to StockDAO.applyChange – handles missing Stock row gracefully
             stockDAO.applyChange(conn, line.getProductId(), -line.getQuantity());
             insertStockLogTx(conn, line.getProductId(), -line.getQuantity(),
-                    "OUT", orderId, actorId, "Xác nhận đơn #" + orderId);
+                    "OUT", orderId, actorId, "Order #" + orderId + " confirmed");
         }
     }
 
@@ -432,7 +432,7 @@ public class OrderService {
         for (OrderLine line : lines) {
             stockDAO.applyChange(conn, line.getProductId(), line.getQuantity());
             insertStockLogTx(conn, line.getProductId(), line.getQuantity(),
-                    logType, orderId, actorId, "Đơn #" + orderId + " " + logType.toLowerCase());
+                    logType, orderId, actorId, "Order #" + orderId + " " + logType.toLowerCase());
         }
     }
 

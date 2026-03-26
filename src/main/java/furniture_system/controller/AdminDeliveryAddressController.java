@@ -18,7 +18,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class AdminDeliveryAddressController {
@@ -40,7 +39,7 @@ public class AdminDeliveryAddressController {
     @FXML private Button    btnAdd;
     @FXML private Button    btnEdit;
     @FXML private Button    btnSetDefault;
-    @FXML private Button    btnDeactivate;
+    @FXML private Button    btnDelete;
     @FXML private Label     lblStatus;
 
     // ── Stats ──────────────────────────────────────────────────────────────
@@ -57,7 +56,7 @@ public class AdminDeliveryAddressController {
     public void initialize() {
         setupColumns();
         tblAddresses.setItems(data);
-        loadTable();   // ← load tất cả địa chỉ ngay khi mở
+        loadTable();
         loadStats();
 
         tblAddresses.getSelectionModel().selectedItemProperty()
@@ -65,12 +64,13 @@ public class AdminDeliveryAddressController {
                     boolean has = sel != null;
                     btnEdit.setDisable(!has);
                     btnSetDefault.setDisable(!has || sel.isDefault());
-                    boolean canDeact = has && "ACTIVE".equals(sel.getStatus());
-                    btnDeactivate.setDisable(!canDeact);
+                    // Delete only enabled when INACTIVE
+                    boolean canDelete = has && "INACTIVE".equals(sel.getStatus());
+                    btnDelete.setDisable(!canDelete);
                 });
         btnEdit.setDisable(true);
         btnSetDefault.setDisable(true);
-        btnDeactivate.setDisable(true);
+        btnDelete.setDisable(true);
     }
 
     // ── Column setup ───────────────────────────────────────────────────────
@@ -167,13 +167,13 @@ public class AdminDeliveryAddressController {
         dlg.setTitle("Add New Delivery Address");
 
         ComboBox<Customer> cmbCustomer = buildCustomerCombo(customers);
-        TextField tfReceiver   = new TextField();
-        TextField tfPhone      = new TextField();
-        TextField tfAddrLine   = new TextField();
-        TextField tfWard       = new TextField();
-        TextField tfDistrict   = new TextField();
-        TextField tfCity       = new TextField();
-        CheckBox  chkDefault   = new CheckBox("Set as Default Address");
+        TextField tfReceiver = new TextField();
+        TextField tfPhone    = new TextField();
+        TextField tfAddrLine = new TextField();
+        TextField tfWard     = new TextField();
+        TextField tfDistrict = new TextField();
+        TextField tfCity     = new TextField();
+        CheckBox  chkDefault = new CheckBox("Set as Default Address");
         ComboBox<String> cbStatus = new ComboBox<>(FXCollections.observableArrayList("ACTIVE", "INACTIVE"));
         cbStatus.setValue("ACTIVE"); cbStatus.setMaxWidth(Double.MAX_VALUE);
 
@@ -184,23 +184,23 @@ public class AdminDeliveryAddressController {
 
         GridPane grid = buildGrid();
         int row = 0;
-        grid.add(sec("-- Customer"),          0, row, 2, 1); row++;
-        grid.add(fl("Customer *"),   0, row); grid.add(cmbCustomer, 1, row++);
-        grid.add(new Separator(),             0, row, 2, 1); row++;
-        grid.add(sec("-- Receiver Info"),     0, row, 2, 1); row++;
+        grid.add(sec("-- Customer"),            0, row, 2, 1); row++;
+        grid.add(fl("Customer *"),     0, row); grid.add(cmbCustomer, 1, row++);
+        grid.add(new Separator(),               0, row, 2, 1); row++;
+        grid.add(sec("-- Receiver Info"),       0, row, 2, 1); row++;
         grid.add(fl("Receiver Name *"), 0, row); grid.add(tfReceiver, 1, row++);
-        grid.add(fl("Phone *"),      0, row); grid.add(tfPhone,    1, row++);
-        grid.add(new Label(""),       0, row); grid.add(hint("9–11 digits."), 1, row++);
-        grid.add(new Separator(),             0, row, 2, 1); row++;
-        grid.add(sec("-- Address"),           0, row, 2, 1); row++;
+        grid.add(fl("Phone *"),        0, row); grid.add(tfPhone,    1, row++);
+        grid.add(new Label(""),         0, row); grid.add(hint("9-11 digits."), 1, row++);
+        grid.add(new Separator(),               0, row, 2, 1); row++;
+        grid.add(sec("-- Address"),             0, row, 2, 1); row++;
         grid.add(fl("Address Line *"), 0, row); grid.add(tfAddrLine, 1, row++);
-        grid.add(fl("Ward *"),       0, row); grid.add(tfWard,     1, row++);
-        grid.add(fl("District *"),   0, row); grid.add(tfDistrict, 1, row++);
-        grid.add(fl("City *"),       0, row); grid.add(tfCity,     1, row++);
-        grid.add(new Label(""),       0, row); grid.add(chkDefault, 1, row++);
-        grid.add(fl("Status *"),     0, row); grid.add(cbStatus,   1, row++);
-        grid.add(new Separator(),             0, row, 2, 1); row++;
-        grid.add(lblErr,                      0, row, 2, 1); row++;
+        grid.add(fl("Ward *"),         0, row); grid.add(tfWard,     1, row++);
+        grid.add(fl("District *"),     0, row); grid.add(tfDistrict, 1, row++);
+        grid.add(fl("City *"),         0, row); grid.add(tfCity,     1, row++);
+        grid.add(new Label(""),         0, row); grid.add(chkDefault, 1, row++);
+        grid.add(fl("Status *"),       0, row); grid.add(cbStatus,   1, row++);
+        grid.add(new Separator(),               0, row, 2, 1); row++;
+        grid.add(lblErr,                        0, row, 2, 1); row++;
 
         Button btnSave   = primaryBtn("Add Address");
         Button btnCancel = new Button("Cancel");
@@ -242,13 +242,13 @@ public class AdminDeliveryAddressController {
         customers.stream().filter(c -> c.getCustomerId() == sel.getCustomerId())
                 .findFirst().ifPresent(cmbCustomer::setValue);
 
-        TextField tfReceiver  = new TextField(nvl(sel.getReceiverName()));
-        TextField tfPhone     = new TextField(nvl(sel.getPhone()));
-        TextField tfAddrLine  = new TextField(nvl(sel.getAddressLine()));
-        TextField tfWard      = new TextField(nvl(sel.getWard()));
-        TextField tfDistrict  = new TextField(nvl(sel.getDistrict()));
-        TextField tfCity      = new TextField(nvl(sel.getCity()));
-        CheckBox  chkDefault  = new CheckBox("Set as Default Address");
+        TextField tfReceiver = new TextField(nvl(sel.getReceiverName()));
+        TextField tfPhone    = new TextField(nvl(sel.getPhone()));
+        TextField tfAddrLine = new TextField(nvl(sel.getAddressLine()));
+        TextField tfWard     = new TextField(nvl(sel.getWard()));
+        TextField tfDistrict = new TextField(nvl(sel.getDistrict()));
+        TextField tfCity     = new TextField(nvl(sel.getCity()));
+        CheckBox  chkDefault = new CheckBox("Set as Default Address");
         chkDefault.setSelected(sel.isDefault());
         ComboBox<String> cbStatus = new ComboBox<>(FXCollections.observableArrayList("ACTIVE", "INACTIVE"));
         cbStatus.setValue(sel.getStatus()); cbStatus.setMaxWidth(Double.MAX_VALUE);
@@ -261,29 +261,30 @@ public class AdminDeliveryAddressController {
 
         GridPane grid = buildGrid();
         int row = 0;
-        grid.add(lblInfo,                     0, row, 2, 1); row++;
-        grid.add(new Separator(),             0, row, 2, 1); row++;
-        grid.add(sec("-- Customer"),          0, row, 2, 1); row++;
-        grid.add(fl("Customer *"),   0, row); grid.add(cmbCustomer, 1, row++);
-        grid.add(new Separator(),             0, row, 2, 1); row++;
-        grid.add(sec("-- Receiver Info"),     0, row, 2, 1); row++;
+        grid.add(lblInfo,                       0, row, 2, 1); row++;
+        grid.add(new Separator(),               0, row, 2, 1); row++;
+        grid.add(sec("-- Customer"),            0, row, 2, 1); row++;
+        grid.add(fl("Customer *"),     0, row); grid.add(cmbCustomer, 1, row++);
+        grid.add(new Separator(),               0, row, 2, 1); row++;
+        grid.add(sec("-- Receiver Info"),       0, row, 2, 1); row++;
         grid.add(fl("Receiver Name *"), 0, row); grid.add(tfReceiver, 1, row++);
-        grid.add(fl("Phone *"),      0, row); grid.add(tfPhone,    1, row++);
-        grid.add(new Separator(),             0, row, 2, 1); row++;
-        grid.add(sec("-- Address"),           0, row, 2, 1); row++;
+        grid.add(fl("Phone *"),        0, row); grid.add(tfPhone,    1, row++);
+        grid.add(new Separator(),               0, row, 2, 1); row++;
+        grid.add(sec("-- Address"),             0, row, 2, 1); row++;
         grid.add(fl("Address Line *"), 0, row); grid.add(tfAddrLine, 1, row++);
-        grid.add(fl("Ward *"),       0, row); grid.add(tfWard,     1, row++);
-        grid.add(fl("District *"),   0, row); grid.add(tfDistrict, 1, row++);
-        grid.add(fl("City *"),       0, row); grid.add(tfCity,     1, row++);
-        grid.add(new Label(""),       0, row); grid.add(chkDefault, 1, row++);
-        grid.add(fl("Status *"),     0, row); grid.add(cbStatus,   1, row++);
-        grid.add(new Separator(),             0, row, 2, 1); row++;
-        grid.add(lblErr,                      0, row, 2, 1); row++;
+        grid.add(fl("Ward *"),         0, row); grid.add(tfWard,     1, row++);
+        grid.add(fl("District *"),     0, row); grid.add(tfDistrict, 1, row++);
+        grid.add(fl("City *"),         0, row); grid.add(tfCity,     1, row++);
+        grid.add(new Label(""),         0, row); grid.add(chkDefault, 1, row++);
+        grid.add(fl("Status *"),       0, row); grid.add(cbStatus,   1, row++);
+        grid.add(new Separator(),               0, row, 2, 1); row++;
+        grid.add(lblErr,                        0, row, 2, 1); row++;
 
         Button btnSave   = primaryBtn("Save Changes");
         Button btnCancel = new Button("Cancel");
         btnCancel.setStyle("-fx-background-radius:6;-fx-padding:8 18;");
-        HBox btns = new HBox(10, btnCancel, btnSave); btns.setAlignment(Pos.CENTER_RIGHT);
+        HBox btns = new HBox(10, btnCancel, btnSave);
+        btns.setAlignment(Pos.CENTER_RIGHT);
         grid.add(btns, 0, row, 2, 1);
 
         btnSave.setOnAction(ev -> {
@@ -319,26 +320,32 @@ public class AdminDeliveryAddressController {
         } catch (Exception e) { alert(Alert.AlertType.ERROR, "Error", e.getMessage()); }
     }
 
-    // ==================== DEACTIVATE / DELETE ====================
+    // ==================== DELETE ====================
     @FXML public void onDelete() {
         DeliveryAddress sel = tblAddresses.getSelectionModel().getSelectedItem();
         if (sel == null) return;
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xoá địa chỉ của [" + nvl(sel.getReceiverName()) + "]?\n\n"
+                "Permanently delete address for [" + nvl(sel.getReceiverName()) + "]?\n"
                 + sel.getAddressLine() + ", " + sel.getCity() + "\n\n"
-                + "• Nếu địa chỉ đang dùng trong đơn hàng → đặt INACTIVE\n"
-                + "• Nếu không có đơn hàng nào → xoá vĩnh viễn",
+                + "This action cannot be undone.",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận xoá địa chỉ"); confirm.setHeaderText(null);
+        confirm.setTitle("Confirm Delete Address");
+        confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
                 service.deleteAddress(sel.getAddressId());
-                setStatus("Đã xử lý địa chỉ #" + sel.getAddressId() + ".", false);
+                setStatus("Address #" + sel.getAddressId() + " permanently deleted.", false);
                 loadTable(); loadStats();
-            } catch (Exception e) { alert(Alert.AlertType.ERROR, "Lỗi", e.getMessage()); }
+            } catch (IllegalStateException ex) {
+                alert(Alert.AlertType.ERROR, "Cannot Delete", ex.getMessage());
+            } catch (Exception ex) {
+                alert(Alert.AlertType.ERROR, "Error", ex.getMessage());
+            }
         });
     }
+
     // ── Shared helpers ─────────────────────────────────────────────────────
     private List<Customer> loadCustomers() {
         try { return customerDao.findAll(); }
@@ -353,7 +360,7 @@ public class AdminDeliveryAddressController {
         cb.setMaxWidth(Double.MAX_VALUE);
         cb.setConverter(new javafx.util.StringConverter<>() {
             @Override public String toString(Customer c) {
-                return c == null ? "" : c.getCustomerId() + " – " + c.getFullName(); }
+                return c == null ? "" : c.getCustomerId() + " - " + c.getFullName(); }
             @Override public Customer fromString(String s) { return null; }
         });
         return cb;
@@ -410,5 +417,5 @@ public class AdminDeliveryAddressController {
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }
-    private static String nvl(String s) { return s != null ? s : "—"; }
+    private static String nvl(String s) { return s != null ? s : "-"; }
 }

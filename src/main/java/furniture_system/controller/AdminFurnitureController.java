@@ -40,7 +40,6 @@ public class AdminFurnitureController {
     // ── Toolbar Buttons ────────────────────────────────────────────────────
     @FXML private Button btnAdd;
     @FXML private Button btnEdit;
-    @FXML private Button btnDeactivate;
     @FXML private Button btnDelete;
     @FXML private Button btnRefresh;
 
@@ -61,11 +60,9 @@ public class AdminFurnitureController {
                 .addListener((obs, old, sel) -> {
                     boolean has = sel != null;
                     btnEdit.setDisable(!has);
-                    btnDeactivate.setDisable(!has);
                     btnDelete.setDisable(!has);
                 });
         btnEdit.setDisable(true);
-        btnDeactivate.setDisable(true);
         btnDelete.setDisable(true);
     }
 
@@ -300,50 +297,28 @@ public class AdminFurnitureController {
         dlg.setScene(new Scene(scroll, 500, 680)); dlg.showAndWait();
     }
 
-    // ==================== DEACTIVATE ====================
-    @FXML
-    public void handleDeactivate() {
-        Product sel = productTable.getSelectionModel().getSelectedItem();
-        if (sel == null) return;
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Set \"" + sel.getName() + "\" (ID: " + sel.getProductId() + ") to INACTIVE?\n\n" +
-                "The product will no longer be visible to customers.",
-                ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirm Deactivation"); confirm.setHeaderText(null);
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn != ButtonType.YES) return;
-            try {
-                svcProduct.deactivateProduct(sel.getProductId());
-                setStatus("Product [" + sel.getName() + "] deactivated.");
-                loadProducts();
-            } catch (Exception ex) {
-                alert(Alert.AlertType.ERROR, "Error", ex.getMessage());
-            }
-        });
-    }
-
     // ==================== HARD DELETE ====================
     @FXML
     public void handleDelete() {
         Product sel = productTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xoá vĩnh viễn sản phẩm \"" + sel.getName() + "\"?\n\n" +
-                "⚠ Hành động này không thể hoàn tác.\n" +
-                "Yêu cầu: sản phẩm không có trong đơn hàng và không còn phiếu bảo hành.\n" +
-                "Dữ liệu tồn kho và lịch sử xuất/nhập kho sẽ bị xoá theo.",
+                "Permanently delete product \"" + sel.getName() + "\"?\n\n" +
+                "⚠ This action cannot be undone.\n" +
+                "Requirement: product must not be in any order and have no warranty tickets.\n" +
+                "Stock data and stock history will be deleted accordingly.",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận xoá sản phẩm"); confirm.setHeaderText(null);
+        confirm.setTitle("Confirm product deletion"); confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
                 svcProduct.deleteProduct(sel.getProductId());
-                setStatus("Đã xoá vĩnh viễn sản phẩm [" + sel.getName() + "].");
+                setStatus("Permanently deleted product [" + sel.getName() + "].");
                 loadProducts();
             } catch (IllegalStateException ex) {
-                alert(Alert.AlertType.ERROR, "Không thể xoá", ex.getMessage());
+                alert(Alert.AlertType.ERROR, "Cannot delete", ex.getMessage());
             } catch (Exception ex) {
-                alert(Alert.AlertType.ERROR, "Lỗi xoá", ex.getMessage());
+                alert(Alert.AlertType.ERROR, "Delete error", ex.getMessage());
             }
         });
     }

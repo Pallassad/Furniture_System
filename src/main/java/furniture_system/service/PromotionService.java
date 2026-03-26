@@ -121,21 +121,21 @@ public class PromotionService {
     // ── 3.6.6  Delete Promotion (hard-delete) ─────────────────────────────────
 
     /**
-     * Xoá cứng Promotion.
-     * Điều kiện: không còn Order nào sử dụng promo này.
+     * Hard-delete Promotion.
+     * Condition: no remaining Orders using this promotion.
      */
     public void deletePromotion(int promoId) {
         requireAdmin();
         try {
             if (dao.hasLinkedOrders(promoId))
                 throw new IllegalStateException(
-                    "Mã khuyến mãi này đã được sử dụng trong đơn hàng. " +
-                    "Không thể xoá vĩnh viễn.");
+                    "This promotion code has been used in orders. " +
+                    "Cannot permanently delete.");
             dao.hardDelete(promoId);
         } catch (IllegalStateException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Xoá khuyến mãi thất bại: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to delete promotion: " + e.getMessage(), e);
         }
     }
 

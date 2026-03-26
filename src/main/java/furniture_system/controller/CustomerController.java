@@ -25,19 +25,19 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * CustomerController — dùng chung cho Admin và Employee.
+ * CustomerController — shared for Admin and Employee.
  *
- * Phân quyền theo isAdmin:
+ * Role-based access control per isAdmin:
  *   Admin    → Search, Add, Edit, Delete, History, Stats
  *   Employee → Search, Add (createCustomer, Status=ACTIVE), History
- *              Edit / Delete / Stats bị ẩn
+ *              Edit / Delete / Stats are hidden
  *
- * Employee tạo customer:
+ * Employee creating customer:
  *   - FullName (min 2 chars, required)
  *   - Phone (9–11 digits, unique, required)
  *   - Email (optional, unique)
  *   - Gender (optional)
- *   - Status luôn = ACTIVE, không cho chỉnh
+ *   - Status always = ACTIVE, not editable
  */
 public class CustomerController {
 
@@ -75,25 +75,25 @@ public class CustomerController {
     public void initialize() {
         setupColumns();
         loadAll();
-        applyRolePermissions();  // ← phân quyền hiển thị nút
+        applyRolePermissions();  // ← apply role-based button visibility
 
         customerTable.getSelectionModel().selectedItemProperty().addListener((o, old, sel) -> {
             boolean has = sel != null;
-            // Edit/Delete chỉ enable khi isAdmin
+            // Edit/Delete only enable when isAdmin
             if (btnEdit   != null) btnEdit.setDisable(!has || !isAdmin);
             if (btnDelete != null) btnDelete.setDisable(!has || !isAdmin);
-            // History: cả Admin và Employee đều dùng được
+            // History: both Admin and Employee can use
             if (btnHistory != null) btnHistory.setDisable(!has);
         });
 
-        // Default disable trước khi chọn row
+        // Default disable before row selection
         if (btnEdit    != null) btnEdit.setDisable(true);
         if (btnDelete  != null) btnDelete.setDisable(true);
         if (btnHistory != null) btnHistory.setDisable(true);
 
         searchField.textProperty().addListener((o, old, v) -> handleSearch());
 
-        // Double-click → view history (cả 2 role)
+        // Double-click → view history (both roles)
         customerTable.setRowFactory(tv -> {
             TableRow<Customer> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -105,22 +105,22 @@ public class CustomerController {
         });
     }
 
-    // ── Phân quyền hiển thị nút ───────────────────────────────────────────────
+    // ── Role-based button visibility ──────────────────────────────────────────
     /**
-     * Admin   : tất cả nút hiển thị bình thường
-     * Employee: ẩn Edit, Delete, Stats
-     *           Add  : hiện (createCustomer)
-     *           History: hiện
+     * Admin   : all buttons visible normally
+     * Employee: hide Edit, Delete, Stats
+     *           Add  : visible (createCustomer)
+     *           History: visible
      */
     private void applyRolePermissions() {
         if (btnEdit   != null) btnEdit.setVisible(isAdmin);
         if (btnDelete != null) btnDelete.setVisible(isAdmin);
         if (btnStats  != null) btnStats.setVisible(isAdmin);
-        // btnAdd luôn hiện (cả Admin và Employee đều được tạo customer)
+        // btnAdd always visible (both Admin and Employee can create customer)
         if (btnAdd    != null) btnAdd.setVisible(true);
     }
 
-    // ── Columns ───────────────────────────────────────────────────────────────
+    // ── Columns ───────────────────────────────────────────────��───────────────
     private void setupColumns() {
         colId.setCellValueFactory(c ->
                 new SimpleIntegerProperty(c.getValue().getCustomerId()).asObject());
@@ -175,51 +175,51 @@ public class CustomerController {
     @FXML public void handleRefresh() { searchField.clear(); loadAll(); }
 
     // ── Add ───────────────────────────────────────────────────────────────────
-    /** Cả Admin và Employee đều vào đây, form tự điều chỉnh theo role. */
+    /** Both Admin and Employee enter here; form adjusts based on role. */
     @FXML public void handleAdd() { openForm(null); }
 
-    // ── Edit (Admin only) ─────────────────────────────────────────────────────
+    // ── Edit (Admin only) ─��───────────────────────────────────────────────────
     @FXML public void handleEdit() {
-        if (!isAdmin) return;   // guard thêm, nút đã bị ẩn
+        if (!isAdmin) return;   // extra guard, button already hidden
         Customer sel = customerTable.getSelectionModel().getSelectedItem();
         if (sel != null) openForm(sel);
     }
 
     // ── Delete / Deactivate (Admin only) ─────────────────────────────────────
     @FXML public void handleDelete() {
-        if (!isAdmin) return;   // guard thêm, nút đã bị ẩn
+        if (!isAdmin) return;   // extra guard, button already hidden
         Customer sel = customerTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xoá vĩnh viễn khách hàng [" + sel.getFullName() + "]?\n\n" +
-                "⚠ Yêu cầu: tất cả đơn hàng của khách hàng phải được xoá trước.\n" +
-                "Các địa chỉ giao hàng không còn liên kết Order sẽ bị xoá theo.",
+                "Permanently delete customer [" + sel.getFullName() + "]?\n\n" +
+                "⚠ Requirement: all orders of this customer must be deleted first.\n" +
+                "Delivery addresses no longer linked to orders will be deleted accordingly.",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận xoá khách hàng");
+        confirm.setTitle("Confirm customer deletion");
         confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
                 service.removeCustomer(sel.getCustomerId());
-                setStatus("Đã xoá vĩnh viễn khách hàng [" + sel.getFullName() + "].");
+                setStatus("Permanently deleted customer [" + sel.getFullName() + "].");
                 loadAll();
             } catch (IllegalStateException e) {
-                showError("Không thể xoá", e.getMessage());
+                showError("Cannot delete", e.getMessage());
             } catch (Exception e) {
-                showError("Lỗi xoá", e.getMessage());
+                showError("Delete error", e.getMessage());
             }
         });
     }
 
     // ── Purchase History ──────────────────────────────────────────────────────
-    /** Nút toolbar */
+    /** Toolbar button */
     @FXML public void handleHistory() {
         Customer sel = customerTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
         openHistoryForRow(sel);
     }
 
-    /** Double-click từ table row */
+    /** Double-click from table row */
     private void openHistoryForRow(Customer customer) {
         try {
             List<OrderSummary> orders = service.getPurchaseHistory(customer.getCustomerId());
@@ -231,7 +231,7 @@ public class CustomerController {
 
     // ── Statistics (Admin only) ───────────────────────────────────────────────
     @FXML public void handleStats() {
-        if (!isAdmin) return;   // guard thêm, nút đã bị ẩn
+        if (!isAdmin) return;   // extra guard, button already hidden
         Stage dlg = new Stage();
         dlg.setTitle("Customer Statistics");
         dlg.initModality(Modality.APPLICATION_MODAL);
@@ -251,7 +251,7 @@ public class CustomerController {
         Stage dlg = new Stage();
         dlg.initModality(Modality.APPLICATION_MODAL);
 
-        // Tiêu đề khác nhau theo role + mode
+        // Different title based on role + mode
         if (isEdit) {
             dlg.setTitle("Edit Customer");
         } else {
@@ -270,12 +270,12 @@ public class CustomerController {
         lblErr.setStyle("-fx-text-fill:#c62828; -fx-font-size:12px;");
         lblErr.setWrapText(true);
 
-        // Prompt text cho Employee
+        // Prompt text for Employee
         tfName.setPromptText("Min 2 characters, required");
         tfPhone.setPromptText("9–11 digits, unique, required");
         tfEmail.setPromptText("Optional, unique");
 
-        // Pre-fill khi Edit
+        // Pre-fill when Edit
         if (isEdit) {
             tfName.setText(existing.getFullName());
             tfPhone.setText(existing.getPhone());
@@ -287,7 +287,7 @@ public class CustomerController {
             cbStatus.setValue(Status.ACTIVE);
         }
 
-        // Employee: Status luôn ACTIVE, không cho chỉnh; cbStatus ẩn luôn
+        // Employee: Status always ACTIVE, not editable; cbStatus always hidden
         boolean showStatus = isAdmin;
         cbStatus.setDisable(!isAdmin);
         if (!isAdmin) cbStatus.setValue(Status.ACTIVE);
@@ -300,7 +300,7 @@ public class CustomerController {
 
         int row = 0;
 
-        // Hiển thị nhãn role nếu Employee để rõ ràng
+        // Show role note if Employee to make it clear
         if (!isAdmin && !isEdit) {
             Label lblNote = new Label("ℹ New customer will be set to ACTIVE automatically.");
             lblNote.setStyle("-fx-font-size:11px;-fx-text-fill:#3949ab;");
@@ -314,7 +314,7 @@ public class CustomerController {
         grid.add(lbl("Email"),       0, row); grid.add(tfEmail,  1, row++);
         grid.add(lbl("Gender"),      0, row); grid.add(cbGender, 1, row++);
 
-        // Status chỉ hiện với Admin
+        // Status only shown for Admin
         if (showStatus) {
             grid.add(lbl("Status *"), 0, row); grid.add(cbStatus, 1, row++);
         }
@@ -346,24 +346,24 @@ public class CustomerController {
                 c.setGender(("—".equals(gv) || gv == null) ? null : Gender.valueOf(gv));
 
                 if (isAdmin) {
-                    // Admin có thể set bất kỳ Status
+                    // Admin can set any Status
                     c.setStatus(cbStatus.getValue());
                 } else {
-                    // Employee: luôn ACTIVE
+                    // Employee: always ACTIVE
                     c.setStatus(Status.ACTIVE);
                 }
 
                 if (isEdit) {
-                    // Edit chỉ Admin mới vào được
+                    // Edit only Admin can enter
                     service.updateCustomer(c);
                     setStatus("Customer [" + c.getFullName() + "] updated.");
                 } else {
                     if (isAdmin) {
-                        // Admin dùng addCustomer (có thể set status tuỳ ý)
+                        // Admin uses addCustomer (can set status freely)
                         int id = service.addCustomer(c);
                         setStatus("Customer added with ID " + id + ".");
                     } else {
-                        // Employee dùng createCustomer (luôn ACTIVE)
+                        // Employee uses createCustomer (always ACTIVE)
                         int id = service.createCustomer(c);
                         setStatus("Customer registered with ID " + id + ".");
                     }

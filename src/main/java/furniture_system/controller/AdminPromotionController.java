@@ -27,7 +27,7 @@ public class AdminPromotionController {
 
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // ── Table ──────────────────────────────────────────────────────────────
+    // ── Table ───���──────────────────────────────────────────────────────────
     @FXML private TableView<Promotion>            promoTable;
     @FXML private TableColumn<Promotion, Integer> colId;
     @FXML private TableColumn<Promotion, String>  colCode;
@@ -47,7 +47,6 @@ public class AdminPromotionController {
     // ── Toolbar ────────────────────────────────────────────────────────────
     @FXML private Button btnAdd;
     @FXML private Button btnEdit;
-    @FXML private Button btnDisable;
     @FXML private Button btnDelete;
     @FXML private Label  statusBarLabel;
 
@@ -65,12 +64,9 @@ public class AdminPromotionController {
         promoTable.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
             boolean has = sel != null;
             btnEdit.setDisable(!has);
-            boolean canDisable = has && !"DISABLED".equals(sel.getStatus());
-            btnDisable.setDisable(!canDisable);
             btnDelete.setDisable(!has);
         });
         btnEdit.setDisable(true);
-        btnDisable.setDisable(true);
         btnDelete.setDisable(true);
     }
 
@@ -343,21 +339,21 @@ public class AdminPromotionController {
         Promotion sel = promoTable.getSelectionModel().getSelectedItem();
         if (sel == null) return;
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Xoá vĩnh viễn mã khuyến mãi \"" + sel.getCode() + "\"?\n\n"
-                + "⚠ Hành động này không thể hoàn tác.\n"
-                + "Yêu cầu: mã này chưa được dùng trong bất kỳ đơn hàng nào.",
+                "Permanently delete promotion code \"" + sel.getCode() + "\"?\n\n"
+                + "⚠ This action cannot be undone.\n"
+                + "Requirement: this code must not have been used in any order.",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận xoá khuyến mãi"); confirm.setHeaderText(null);
+        confirm.setTitle("Confirm promotion deletion"); confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
             try {
                 svc.deletePromotion(sel.getPromoId());
-                setStatus("Đã xoá vĩnh viễn mã [" + sel.getCode() + "].");
+                setStatus("Permanently deleted promotion [" + sel.getCode() + "].");
                 loadData();
             } catch (IllegalStateException ex) {
-                alert(Alert.AlertType.ERROR, "Không thể xoá", ex.getMessage());
+                alert(Alert.AlertType.ERROR, "Cannot delete", ex.getMessage());
             } catch (Exception ex) {
-                alert(Alert.AlertType.ERROR, "Lỗi xoá", ex.getMessage());
+                alert(Alert.AlertType.ERROR, "Delete error", ex.getMessage());
             }
         });
     }

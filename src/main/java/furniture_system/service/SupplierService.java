@@ -74,18 +74,18 @@ public class SupplierService {
 
     /**
      * Hard-delete Supplier.
-     * Điều kiện: không còn Product nào có supplierId trỏ tới Supplier này.
-     * SupplierProduct links sẽ bị xoá cascade trong transaction.
+     * Condition: no remaining Products with supplierId pointing to this Supplier.
+     * SupplierProduct links will be cascade deleted in transaction.
      */
     public void deleteSupplier(int supplierId) {
         if (supplierId <= 0) throw new IllegalArgumentException("Invalid Supplier ID.");
         try {
             if (dao.hasLinkedProducts(supplierId))
                 throw new IllegalStateException(
-                    "Nhà cung cấp này còn sản phẩm liên kết. " +
-                    "Vui lòng xoá hoặc chuyển nhà cung cấp cho tất cả sản phẩm trước.");
+                    "This supplier still has linked products. " +
+                    "Please delete or reassign the supplier for all products first.");
             if (!dao.hardDelete(supplierId))
-                throw new RuntimeException("Xoá nhà cung cấp thất bại.");
+                throw new RuntimeException("Failed to delete supplier.");
         } catch (IllegalStateException e) {
             throw e;
         } catch (SQLException e) {

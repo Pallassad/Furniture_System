@@ -49,36 +49,36 @@ public class EmployeeService {
 
     // ── 3.3.4 Delete / Deactivate ─────────────────────────────────────────────
     /**
-     * Xoá nhân viên:
-     *  - Nếu còn Order/Salary PAID/WarrantyTicket active/StockLog → báo lỗi chi tiết
-     *  - Nếu chỉ còn Salary DRAFT → tự động xoá Salary DRAFT rồi xoá Employee
-     *  - Nếu không còn dữ liệu → hard-delete
+     * Delete employee:
+     *  - If employee still has Orders/PAID Salary/active WarrantyTickets/StockLogs → throw detailed error
+     *  - If only DRAFT Salary remains → auto-delete DRAFT Salary then delete Employee
+     *  - If no data remains → hard-delete
      */
     public String removeEmployee(int employeeId) {
         requireAdmin();
 
-        // 1. Kiểm tra Order
+        // 1. Check Orders
         if (dao.hasOrders(employeeId))
             throw new IllegalStateException(
-                "Nhân viên này còn đơn hàng. Vui lòng xoá tất cả đơn hàng trước.");
+                "This employee still has orders. Please delete all orders first.");
 
-        // 2. Kiểm tra Salary PAID / PENDING
+        // 2. Check Salary PAID / PENDING
         if (dao.hasNonDraftSalary(employeeId))
             throw new IllegalStateException(
-                "Nhân viên này còn bản ghi lương đã PAID hoặc PENDING. Không thể xoá.");
+                "This employee still has PAID or PENDING salary records. Cannot delete.");
 
-        // 3. Kiểm tra WarrantyTicket đang active
+        // 3. Check active WarrantyTickets
         if (dao.hasActiveWarrantyTickets(employeeId))
             throw new IllegalStateException(
-                "Nhân viên này còn phiếu bảo hành đang xử lý. " +
-                "Vui lòng hoàn tất hoặc giao lại phiếu bảo hành trước.");
+                "This employee still has warranty tickets being processed. " +
+                "Please complete or reassign all warranty tickets first.");
 
-        // 4. Kiểm tra StockLog
+        // 4. Check StockLogs
         if (dao.hasStockLogs(employeeId))
             throw new IllegalStateException(
-                "Nhân viên này có lịch sử xuất/nhập kho. Không thể xoá vì ảnh hưởng kiểm toán.");
+                "This employee has stock history. Cannot delete due to audit trail requirements.");
 
-        // 5. Xoá Salary DRAFT còn lại (nếu có)
+        // 5. Delete remaining DRAFT Salaries (if any)
         dao.deleteDraftSalaries(employeeId);
 
         // 6. Hard-delete
