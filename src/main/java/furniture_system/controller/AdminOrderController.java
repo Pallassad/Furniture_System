@@ -479,12 +479,13 @@ public class AdminOrderController {
     }
 
     private int getActorId() {
-        SessionManager session = SessionManager.getInstance();
-        Employee emp = session.getCurrentEmployee();
+        // StockLog.ActorId là FK → Employee.EmployeeId, KHÔNG dùng AccountId làm fallback.
+        // Admin phải có Employee row được liên kết; nếu không sẽ ném lỗi rõ ràng.
+        Employee emp = SessionManager.getInstance().getCurrentEmployee();
         if (emp != null) return emp.getEmployeeId();
-        Account account = session.getCurrentAccount();
-        if (account != null) return account.getAccountId();
-        throw new IllegalStateException("Invalid session.");
+        throw new IllegalStateException(
+            "No Employee record linked to this admin account.\n" +
+            "Please ask the system admin to create an Employee row and link it to this account.");
     }
 
     private Integer parseIntOrNull(String s) {

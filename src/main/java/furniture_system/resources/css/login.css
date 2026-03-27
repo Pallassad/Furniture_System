@@ -13,8 +13,12 @@
 /* ── Outer HBox ─────────────────────────────────────────────────── */
 .login-root {
     -fx-background-color: #1e2a5e;
-    -fx-pref-width: 860;
+    -fx-pref-width: 780;
+    -fx-min-width: 780;
+    -fx-max-width: 780;
     -fx-pref-height: 560;
+    -fx-min-height: 560;
+    -fx-max-height: 560;
 }
 
 /* ================================================================

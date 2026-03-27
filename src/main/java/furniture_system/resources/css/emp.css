@@ -57,6 +57,7 @@
     -fx-font-size: 17px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
+    -fx-max-width: Infinity;
 }
 .topbar-role {
     -fx-font-size: 11px;

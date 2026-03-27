@@ -165,21 +165,21 @@ public class LoginController {
     private void showError(String msg)           { showLabel(errorLabel, msg); }
 
     /**
-     * Sau khi xác thực thành công:
-     *  1. Lưu Account + Employee vào SessionManager   ← FIX CHÍNH
+     * After successful verification:
+     *  1. Save Account + Employee to SessionManager ← MAIN FIX
      *  2. Navigate sang dashboard tương ứng
      */
     private void onLoginSuccess(Account account) {
         try {
-            // ── FIX: Lưu session TRƯỚC khi mở dashboard ─────────────────────
+            // ── FIX: Save the session BEFORE opening the dashboard. ─────────────────────
             SessionManager session = SessionManager.getInstance();
 
             if (!account.isAdmin()) {
-                // Tài khoản Employee → load Employee từ DB rồi lưu cả hai vào session
+                // Employee account → load Employee from DB and save both to session.
                 Employee emp = employeeDAO.findByAccountId(account.getAccountId());
-                session.login(account, emp);   // lưu cả account lẫn employee
+                session.login(account, emp);   // Save both account and employee
             } else {
-                // Tài khoản Admin → chỉ cần account
+                // Admin account → only account needed
                 session.login(account);
             }
             // ─────────────────────────────────────────────────────────────────
@@ -204,13 +204,13 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(resource);
             Parent root = loader.load();
             Stage stage = (Stage) loginButton.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.setResizable(true);
+            // Create Scene with size control panel → do not display Background Stage
+            stage.setScene(new Scene(root, 1100, 680));
             String title = (account.isAdmin())  ? "Furniture System - Admin"
                          : isManager             ? "Furniture System - Manager"
                          :                         "Furniture System - Employee";
             stage.setTitle(title);
-            stage.setWidth(1100);
-            stage.setHeight(680);
             stage.centerOnScreen();
 
         } catch (IOException e) {

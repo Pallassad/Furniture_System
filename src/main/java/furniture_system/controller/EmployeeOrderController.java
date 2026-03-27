@@ -343,7 +343,7 @@ public class EmployeeOrderController {
 
         // Guard: terminal statuses cannot be updated
         String cur = sel.getStatus() != null ? sel.getStatus() : "";
-        if (cur.equals("COMPLETED") || cur.equals("CANCELLED")) {
+        if (cur.equals("COMPLETED") || cur.equals("CANCELLED") || cur.equals("RETURNED")) {
             alert(Alert.AlertType.WARNING, "Cannot Update",
                     "Order #" + sel.getOrderId() + " is already " + cur + " and cannot be changed.");
             return;
@@ -353,14 +353,25 @@ public class EmployeeOrderController {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Update Status – Order #" + sel.getOrderId());
 
-        // Build allowed next-status list based on current status
+        // FIX: Đồng bộ chính xác với OrderService.validateTransition():
+        //   DRAFT      → CONFIRMED | CANCELLED
+        //   CONFIRMED  → PAID      | CANCELLED
+        //   PAID       → DELIVERING
+        //   DELIVERING → COMPLETED | RETURNED
+        //   (không có PENDING, không có transition sai)
         List<String> allowed = switch (cur) {
-            case "PENDING"    -> List.of("CONFIRMED", "CANCELLED");
-            case "CONFIRMED"  -> List.of("PAID", "DELIVERING", "CANCELLED");
-            case "PAID"       -> List.of("DELIVERING", "COMPLETED");
-            case "DELIVERING" -> List.of("COMPLETED", "CANCELLED");
-            default           -> List.of("CONFIRMED", "PAID", "DELIVERING", "COMPLETED", "CANCELLED");
+            case "DRAFT"      -> List.of("CONFIRMED", "CANCELLED");
+            case "CONFIRMED"  -> List.of("PAID", "CANCELLED");
+            case "PAID"       -> List.of("DELIVERING");
+            case "DELIVERING" -> List.of("COMPLETED", "RETURNED");
+            default           -> List.of(); // trạng thái không xác định → không cho update
         };
+
+        if (allowed.isEmpty()) {
+            alert(Alert.AlertType.WARNING, "Cannot Update",
+                "Order #" + sel.getOrderId() + " has an unrecognised status: '" + cur + "'.");
+            return;
+        }
 
         ComboBox<String> cbStatus = new ComboBox<>(FXCollections.observableArrayList(allowed));
         cbStatus.setMaxWidth(Double.MAX_VALUE);

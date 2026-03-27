@@ -7,7 +7,9 @@
            xmlns="http://javafx.com/javafx"
            fx:controller="furniture_system.controller.LoginController"
            stylesheets="@../resources/css/login.css"
-           prefWidth="860" prefHeight="560">
+           prefWidth="780" prefHeight="560"
+           minWidth="780" maxWidth="780"
+           minHeight="560" maxHeight="560">
 
   <!-- ── Background gradient panel ─────────────────────────── -->
   <HBox styleClass="login-root" alignment="CENTER">

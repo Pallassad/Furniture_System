@@ -76,9 +76,8 @@ public class OrderService {
                     insertLineTx(conn, line);
                 }
 
-                // Increment promo usage
-                if (order.getPromoId() != null)
-                    incrementPromoTx(conn, order.getPromoId());
+                // NOTE: Promotion UsedCount is NOT incremented here (order is still DRAFT).
+                // It will be incremented atomically when the order transitions to CONFIRMED.
 
                 conn.commit();
                 return orderId;
@@ -138,20 +137,28 @@ public class OrderService {
         try (Connection conn = DatabaseConfig.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                // ── CONFIRMED: deduct stock ──────────────────────────────
+                // ── CONFIRMED: deduct stock + increment promo usage ──────
                 if ("CONFIRMED".equals(newStatus)) {
                     List<OrderLine> lines = lineDAO.findByOrderId(orderId);
                     checkStock(lines);          // throws if insufficient
                     deductStock(conn, lines, orderId, actorId);
+                    // Increment promotion UsedCount only when order is confirmed
+                    if (order.getPromoId() != null)
+                        incrementPromoTx(conn, order.getPromoId());
                 }
 
-                // ── CANCELLED / RETURNED: restore stock ─────────────────
+                // ── CANCELLED / RETURNED: restore stock + refund promo ──
                 if ("CANCELLED".equals(newStatus) || "RETURNED".equals(newStatus)) {
                     // Only restore if stock was previously deducted (CONFIRMED or later)
                     if (wasStockDeducted(current)) {
                         List<OrderLine> lines = lineDAO.findByOrderId(orderId);
                         restoreStock(conn, lines, orderId, actorId,
                                 "CANCELLED".equals(newStatus) ? "CANCEL" : "RETURN");
+                    }
+                    // Decrement promotion UsedCount if it was incremented at CONFIRMED
+                    // (i.e. stock had been deducted means promo was also counted)
+                    if (order.getPromoId() != null && wasStockDeducted(current)) {
+                        decrementPromoTx(conn, order.getPromoId());
                     }
                 }
 
@@ -488,6 +495,16 @@ public class OrderService {
 
     private void incrementPromoTx(Connection conn, int promoId) throws SQLException {
         String sql = "UPDATE Promotion SET UsedCount=UsedCount+1 WHERE PromoId=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, promoId);
+            ps.executeUpdate();
+        }
+    }
+
+    /** Decrement UsedCount khi order bị CANCELLED hoặc RETURNED sau khi đã CONFIRMED. */
+    private void decrementPromoTx(Connection conn, int promoId) throws SQLException {
+        // Đảm bảo không xuống dưới 0
+        String sql = "UPDATE Promotion SET UsedCount = CASE WHEN UsedCount > 0 THEN UsedCount-1 ELSE 0 END WHERE PromoId=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, promoId);
             ps.executeUpdate();

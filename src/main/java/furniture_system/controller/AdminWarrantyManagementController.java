@@ -1,6 +1,5 @@
 package furniture_system.controller;
 
-import furniture_system.dao.WarrantyTicketDAO;
 import furniture_system.service.WarrantyTicketService;
 import furniture_system.model.WarrantyTicket;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,7 +17,15 @@ import javafx.stage.Stage;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
+/**
+ * FIX: Bỏ hoàn toàn WarrantyTicketDAO trực tiếp.
+ * Tất cả operations đều đi qua WarrantyTicketService để enforce:
+ *   - Status transition hợp lệ
+ *   - Terminal state guard
+ *   - Business validation (issueDesc, cost)
+ */
 public class AdminWarrantyManagementController {
 
     // ── Table ──────────────────────────────────────────────────────────────
@@ -43,7 +50,10 @@ public class AdminWarrantyManagementController {
             "CREATED", "RECEIVED", "PROCESSING", "WAITING_PART",
             "COMPLETED", "REJECTED", "CANCELLED");
 
-    private final WarrantyTicketDAO          dao              = new WarrantyTicketDAO();
+    private static final Set<String> TERMINAL_STATUSES =
+            Set.of("COMPLETED", "CANCELLED", "REJECTED");
+
+    // FIX: Chỉ dùng Service, không inject DAO trực tiếp
     private final WarrantyTicketService      warrantyService  = new WarrantyTicketService();
     private final ObservableList<WarrantyTicket> data = FXCollections.observableArrayList();
 
@@ -120,7 +130,7 @@ public class AdminWarrantyManagementController {
     // ── Load & Search ──────────────────────────────────────────────────────
     private void loadAll() {
         try {
-            data.setAll(dao.getAll());
+            data.setAll(warrantyService.getAll());
             setStatus("Loaded " + data.size() + " ticket(s).", false);
         } catch (SQLException e) { alert(Alert.AlertType.ERROR, "Error", e.getMessage()); }
     }
@@ -130,9 +140,8 @@ public class AdminWarrantyManagementController {
     @FXML public void handleSearch() {
         String kw = txtSearch.getText().trim();
         try {
-            List<WarrantyTicket> result = kw.isEmpty() ? dao.getAll() : dao.search(kw);
-            data.setAll(result);
-            setStatus(result.size() + " result(s).", false);
+            data.setAll(warrantyService.search(kw));
+            setStatus(data.size() + " result(s).", false);
         } catch (SQLException e) { alert(Alert.AlertType.ERROR, "Search Error", e.getMessage()); }
     }
 
@@ -193,9 +202,13 @@ public class AdminWarrantyManagementController {
                     tfHandlerId, taIssue, taNote, cbStatus, tfCost, lblErr);
             if (t == null) return;
             try {
-                int id = dao.insert(t);
+                // FIX: Dùng service.create() để enforce validation
+                // (status bị force CREATED, order phải COMPLETED, v.v.)
+                int id = warrantyService.create(t);
                 setStatus("Ticket #" + id + " created successfully.", false);
                 loadAll(); dlg.close();
+            } catch (IllegalArgumentException ex) {
+                lblErr.setText(ex.getMessage());
             } catch (SQLException ex) { lblErr.setText("DB Error: " + ex.getMessage()); }
         });
         btnCancel.setOnAction(ev -> dlg.close());
@@ -264,9 +277,15 @@ public class AdminWarrantyManagementController {
                     tfCustomerId, tfHandlerId, taIssue, taNote, cbStatus, tfCost, lblErr);
             if (t == null) return;
             try {
-                dao.update(t);
+                // FIX: Dùng service.update() để enforce:
+                //   - terminal state guard
+                //   - status transition hợp lệ
+                //   - validation issueDesc, cost
+                warrantyService.update(t);
                 setStatus("Ticket #" + sel.getTicketId() + " updated.", false);
                 loadAll(); dlg.close();
+            } catch (IllegalArgumentException | IllegalStateException ex) {
+                lblErr.setText(ex.getMessage());
             } catch (SQLException ex) { lblErr.setText("DB Error: " + ex.getMessage()); }
         });
         btnCancel.setOnAction(ev -> dlg.close());
@@ -279,6 +298,11 @@ public class AdminWarrantyManagementController {
     @FXML public void handleCancelTicket() {
         WarrantyTicket sel = tableWarranty.getSelectionModel().getSelectedItem();
         if (sel == null) return;
+        if (TERMINAL_STATUSES.contains(sel.getStatus())) {
+            alert(Alert.AlertType.WARNING, "Cannot Cancel",
+                "Ticket #" + sel.getTicketId() + " is already " + sel.getStatus() + ".");
+            return;
+        }
 
         ChoiceDialog<String> dlg = new ChoiceDialog<>("CANCELLED", "CANCELLED", "REJECTED");
         dlg.setTitle("Cancel / Reject Ticket");
@@ -286,9 +310,13 @@ public class AdminWarrantyManagementController {
         dlg.setContentText("Set status to:");
         dlg.showAndWait().ifPresent(choice -> {
             try {
-                dao.cancel(sel.getTicketId(), choice);
+                // FIX: Dùng service để enforce terminal state guard
+                if ("CANCELLED".equals(choice)) warrantyService.cancel(sel.getTicketId());
+                else                            warrantyService.reject(sel.getTicketId());
                 setStatus("Ticket #" + sel.getTicketId() + " → " + choice, false);
                 loadAll();
+            } catch (IllegalStateException ex) {
+                alert(Alert.AlertType.WARNING, "Cannot Update", ex.getMessage());
             } catch (Exception ex) { alert(Alert.AlertType.ERROR, "Error", ex.getMessage()); }
         });
     }

@@ -1,7 +1,7 @@
 package furniture_system.controller;
 
-import furniture_system.dao.WarrantyTicketDAO;
 import furniture_system.model.WarrantyTicket;
+import furniture_system.service.WarrantyTicketService;
 import furniture_system.utils.SessionManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -18,12 +18,17 @@ import javafx.stage.Stage;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Employee – Warranty / Repair Management.
  * Hiển thị TẤT CẢ ticket (chung với Admin).
  * Employee chỉ có thể tạo ticket mới và update status/cost/note.
  * setCurrentEmployeeId() được gọi từ EmployeeDashboardController sau khi load FXML.
+ *
+ * FIX: Dùng WarrantyTicketService (không gọi DAO trực tiếp) để đảm bảo
+ *      business rules (status transition, terminal state guard, handler check).
+ * FIX: Double-click row cũng kiểm tra terminal state trước khi mở dialog.
  */
 public class EmployeeWarrantyController {
 
@@ -42,17 +47,21 @@ public class EmployeeWarrantyController {
     @FXML private Button btnUpdate;
     @FXML private Label  lblEmpStatus;
 
+    private static final Set<String> TERMINAL_STATUSES =
+            Set.of("COMPLETED", "CANCELLED", "REJECTED");
+
     private static final List<String> UPDATE_STATUSES = List.of(
             "RECEIVED", "PROCESSING", "WAITING_PART", "COMPLETED", "REJECTED", "CANCELLED");
 
-    private final WarrantyTicketDAO          dao  = new WarrantyTicketDAO();
+    // FIX: Dùng Service thay vì DAO trực tiếp để enforce business rules
+    private final WarrantyTicketService service = new WarrantyTicketService();
     private final ObservableList<WarrantyTicket> data = FXCollections.observableArrayList();
     private int currentEmployeeId = -1;
 
     // ── Dependency injection từ EmployeeDashboardController ───────────────
     public void setCurrentEmployeeId(int id) {
         this.currentEmployeeId = id;
-        loadAll(); // load sau khi có employeeId
+        loadAll();
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -63,33 +72,40 @@ public class EmployeeWarrantyController {
 
         tableWarranty.getSelectionModel().selectedItemProperty()
                 .addListener((obs, old, sel) -> {
-                    boolean canUpdate = sel != null &&
-                            !List.of("COMPLETED","CANCELLED","REJECTED").contains(sel.getStatus());
+                    boolean canUpdate = sel != null && !isTerminal(sel.getStatus());
                     btnUpdate.setDisable(!canUpdate);
                 });
         btnUpdate.setDisable(true);
 
-        // Double-click → open update dialog
+        // FIX: Double-click cũng phải kiểm tra terminal state trước khi mở dialog
         tableWarranty.setRowFactory(tv -> {
             TableRow<WarrantyTicket> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
-                if (e.getClickCount() == 2 && !row.isEmpty()) openUpdateDialog(row.getItem());
+                if (e.getClickCount() == 2 && !row.isEmpty()) {
+                    WarrantyTicket item = row.getItem();
+                    if (isTerminal(item.getStatus())) {
+                        alert(Alert.AlertType.WARNING, "Cannot Update",
+                            "Ticket #" + item.getTicketId() + " is already " + item.getStatus()
+                            + " and cannot be modified.");
+                        return;
+                    }
+                    openUpdateDialog(item);
+                }
             });
             return row;
         });
 
-        // Fallback: nếu setCurrentEmployeeId() chưa được gọi thì tự lấy từ SessionManager
+        // Fallback: lấy từ SessionManager nếu chưa được inject
         if (currentEmployeeId <= 0) {
             var emp = SessionManager.getInstance().getCurrentEmployee();
-            if (emp != null) {
-                currentEmployeeId = emp.getEmployeeId();
-            }
+            if (emp != null) currentEmployeeId = emp.getEmployeeId();
         }
 
-        // Load tất cả ticket ngay khi initialize (nếu đã có employeeId)
-        if (currentEmployeeId > 0) {
-            loadAll();
-        }
+        if (currentEmployeeId > 0) loadAll();
+    }
+
+    private boolean isTerminal(String status) {
+        return status != null && TERMINAL_STATUSES.contains(status);
     }
 
     // ── Table setup ────────────────────────────────────────────────────────
@@ -108,7 +124,6 @@ public class EmployeeWarrantyController {
             return new SimpleStringProperty(dt != null ? dt.toLocalDate().toString() : "—");
         });
 
-        // Status color
         colStatus.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String s, boolean empty) {
                 super.updateItem(s, empty);
@@ -125,27 +140,15 @@ public class EmployeeWarrantyController {
             }
         });
 
-        // Row highlight
-        tableWarranty.setRowFactory(tv -> new TableRow<>() {
-            @Override protected void updateItem(WarrantyTicket item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) { setStyle(""); return; }
-                if ("CANCELLED".equals(item.getStatus()) || "REJECTED".equals(item.getStatus()))
-                    setStyle("-fx-background-color:#e8e8e8;");
-                else if ("COMPLETED".equals(item.getStatus()))
-                    setStyle("-fx-background-color:#e8f5e9;");
-                else setStyle("");
-            }
-        });
-
+        // Row highlight (phải set rowFactory một lần duy nhất — initialize() dùng cách khác)
         tableWarranty.setItems(data);
         tableWarranty.setPlaceholder(new Label("No warranty tickets found."));
     }
 
-    // ── Load TẤT CẢ ticket (hiển thị chung với Admin) ─────────────────────
+    // ── Load all tickets ───────────────────────────────────────────────────
     private void loadAll() {
         try {
-            data.setAll(dao.getAll());
+            data.setAll(service.getAll());
             setStatus(data.size() + " ticket(s).", false);
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "Error", e.getMessage());
@@ -156,12 +159,10 @@ public class EmployeeWarrantyController {
 
     // ==================== CREATE TICKET DIALOG ====================
     @FXML public void handleCreate() {
-        // Fallback: lấy lại từ SessionManager nếu chưa có
         if (currentEmployeeId <= 0) {
             var emp = SessionManager.getInstance().getCurrentEmployee();
             if (emp != null) currentEmployeeId = emp.getEmployeeId();
         }
-
         if (currentEmployeeId <= 0) {
             alert(Alert.AlertType.ERROR, "Error",
                   "Cannot determine current employee. Please re-login.");
@@ -223,16 +224,18 @@ public class EmployeeWarrantyController {
                 t.setCustomerId(customerId);
                 t.setHandlerEmployeeId(currentEmployeeId);
                 t.setIssueDesc(issueDesc);
-                t.setStatus("CREATED");
                 t.setCost(BigDecimal.ZERO);
                 t.setNote(note.isEmpty() ? null : note);
 
-                int id = dao.insert(t);
+                // FIX: Gọi qua Service để enforce validation (status = CREATED, order must be COMPLETED)
+                int id = service.create(t);
                 setStatus("Ticket #" + id + " created.", false);
                 loadAll();
                 dlg.close();
             } catch (NumberFormatException ex) {
                 lblErr.setText("Please enter valid numeric IDs.");
+            } catch (IllegalArgumentException ex) {
+                lblErr.setText(ex.getMessage());
             } catch (SQLException ex) {
                 lblErr.setText("DB Error: " + ex.getMessage());
             }
@@ -247,7 +250,14 @@ public class EmployeeWarrantyController {
     // ==================== UPDATE DIALOG ====================
     @FXML public void handleUpdate() {
         WarrantyTicket sel = tableWarranty.getSelectionModel().getSelectedItem();
-        if (sel != null) openUpdateDialog(sel);
+        if (sel == null) return;
+        // Guard: button đã disabled cho terminal, nhưng thêm lớp check phòng thủ
+        if (isTerminal(sel.getStatus())) {
+            alert(Alert.AlertType.WARNING, "Cannot Update",
+                "Ticket #" + sel.getTicketId() + " is already " + sel.getStatus() + " and cannot be modified.");
+            return;
+        }
+        openUpdateDialog(sel);
     }
 
     private void openUpdateDialog(WarrantyTicket sel) {
@@ -294,18 +304,31 @@ public class EmployeeWarrantyController {
 
         btnSave.setOnAction(ev -> {
             lblErr.setText("");
-            String status = cbStatus.getValue();
-            if (status == null) { lblErr.setText("Status is required."); return; }
+            String newStatus = cbStatus.getValue();
+            if (newStatus == null) { lblErr.setText("Status is required."); return; }
             try {
                 BigDecimal cost = new BigDecimal(tfCost.getText().trim().isEmpty() ? "0" : tfCost.getText().trim());
                 if (cost.compareTo(BigDecimal.ZERO) < 0) { lblErr.setText("Cost must be ≥ 0."); return; }
                 String note = taNote.getText().trim();
-                dao.updateStatusCostNote(sel.getTicketId(), status, cost, note.isEmpty() ? null : note);
-                setStatus("Ticket #" + sel.getTicketId() + " → " + status, false);
+
+                // FIX: Gọi qua Service để enforce:
+                //   - status transition hợp lệ
+                //   - employee phải là handler được assign
+                //   - terminal state không update được
+                service.updateStatusCostNote(
+                        sel.getTicketId(),
+                        currentEmployeeId,
+                        newStatus,
+                        cost,
+                        note.isEmpty() ? null : note);
+
+                setStatus("Ticket #" + sel.getTicketId() + " → " + newStatus, false);
                 loadAll();
                 dlg.close();
             } catch (NumberFormatException ex) {
                 lblErr.setText("Cost must be a valid number.");
+            } catch (IllegalArgumentException | IllegalStateException ex) {
+                lblErr.setText(ex.getMessage());
             } catch (SQLException ex) {
                 lblErr.setText("DB Error: " + ex.getMessage());
             }

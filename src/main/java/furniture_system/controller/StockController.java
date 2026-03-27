@@ -85,13 +85,20 @@ public class StockController {
     }
 
     // ── Resolve actorId ────────────────────────────────────────────────────
-    // Priority 1: Employee.EmployeeId (for employee login)
-    // Priority 2: Account.AccountId   (fallback for admin with no Employee row)
+    // actorId PHẢI là Employee.EmployeeId (FK constraint trong bảng StockLog).
+    // Nếu không tìm thấy Employee row → actorId = -1 → disable Stock In/Adjust.
     private void resolveActorId() {
+        // Ưu tiên 1: lấy từ SessionManager (LoginController đã set sau đăng nhập)
+        var emp = SessionManager.getInstance().getCurrentEmployee();
+        if (emp != null) {
+            actorId = emp.getEmployeeId();
+            return;
+        }
+
+        // Ưu tiên 2: tra DB theo AccountId (trường hợp SessionManager chưa set Employee)
         var account = SessionManager.getInstance().getCurrentAccount();
         if (account == null) return;
 
-        // Try to find linked Employee row first
         try (Connection con = DatabaseConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(
                      "SELECT EmployeeId FROM Employee WHERE AccountId = ?")) {
@@ -99,15 +106,11 @@ public class StockController {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     actorId = rs.getInt("EmployeeId");
-                    return; // found — done
                 }
+                // Nếu không có Employee row (kể cả Admin) → actorId giữ -1.
+                // KHÔNG fallback dùng AccountId vì đó là FK violation.
             }
         } catch (Exception ignored) {}
-
-        // Fallback: Admin account with no Employee row → use AccountId
-        if ("ADMIN".equalsIgnoreCase(account.getRole().name())) {
-            actorId = account.getAccountId();
-        }
     }
 
     // ── Table setup ────────────────────────────────────────────────────────

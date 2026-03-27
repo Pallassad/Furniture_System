@@ -156,7 +156,9 @@ public class AdminDashboardController {
                 getClass().getResource("/furniture_system/view/login.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) lblUsername.getScene().getWindow();
+            stage.setResizable(false);
             stage.setScene(new Scene(root, 780, 560));
+            stage.sizeToScene();
             stage.setTitle("Fair Deal Furniture – Login");
             stage.centerOnScreen();
         } catch (IOException e) {
