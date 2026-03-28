@@ -5,6 +5,8 @@ import furniture_system.model.Supplier;
 import furniture_system.model.SupplierProduct;
 import furniture_system.service.ProductService;
 import furniture_system.service.SupplierService;
+import furniture_system.utils.NotificationUtil;
+import furniture_system.utils.SearchableComboBox;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -160,6 +162,7 @@ public class SupplierController {
                 s.setStatus(cbStatus.getValue());
                 service.addSupplier(s);
                 setStatus("Supplier [" + s.getName() + "] added.", false);
+                NotificationUtil.success(tblSuppliers, "Supplier added: " + s.getName());
                 loadSuppliers(); dlg.close();
             } catch (IllegalArgumentException ex) { lblErr.setText(ex.getMessage()); }
               catch (Exception ex) { lblErr.setText("Error: " + ex.getMessage()); }
@@ -220,6 +223,7 @@ public class SupplierController {
                 sel.setStatus(cbStatus.getValue());
                 service.updateSupplier(sel);
                 setStatus("Supplier [" + sel.getName() + "] updated.", false);
+                NotificationUtil.success(tblSuppliers, "Supplier updated.");
                 loadSuppliers(); dlg.close();
             } catch (IllegalArgumentException ex) { lblErr.setText(ex.getMessage()); }
               catch (Exception ex) { lblErr.setText("Error: " + ex.getMessage()); }
@@ -326,14 +330,17 @@ public class SupplierController {
         ComboBox<Product> cbProduct      = new ComboBox<>();
         TextField         tfImportPrice  = new TextField();
         TextField         tfLeadDays     = new TextField();
-        cbProduct.setMaxWidth(Double.MAX_VALUE);
         tfImportPrice.setPromptText("e.g. 250000");
         tfLeadDays.setPromptText("0");
 
+        List<Product> allProducts;
         try {
-            ProductService ps = new ProductService();
-            cbProduct.setItems(FXCollections.observableArrayList(ps.getAllProducts()));
-        } catch (Exception ignored) {}
+            allProducts = new ProductService().getAllProducts();
+        } catch (Exception e) { allProducts = List.of(); }
+
+        VBox vProduct = SearchableComboBox.wrap(cbProduct, allProducts,
+                p -> p.getProductId() + ". " + p.getName()
+                     + "  [" + String.format("%,.0f ₫", p.getPrice()) + "]");
 
         Label lblErr = new Label();
         lblErr.setStyle("-fx-text-fill:#c62828;-fx-font-size:12px;"); lblErr.setWrapText(true);
@@ -349,7 +356,7 @@ public class SupplierController {
         grid.add(tblLinks,                          0, row, 2, 1); row++;
         grid.add(new Separator(),                   0, row, 2, 1); row++;
         grid.add(sec("-- Link New Product"),        0, row, 2, 1); row++;
-        grid.add(fl("Product *"),        0, row); grid.add(cbProduct,     1, row++);
+        grid.add(fl("Product *"),        0, row); grid.add(vProduct,      1, row++);
         grid.add(fl("Import Price *"),   0, row); grid.add(tfImportPrice, 1, row++);
         grid.add(fl("Lead Days"),        0, row); grid.add(tfLeadDays,    1, row++);
         grid.add(new Label(""),          0, row); grid.add(hint("Days from order to delivery. Default 0."), 1, row++);
@@ -407,7 +414,12 @@ public class SupplierController {
         if (lblStatus == null) return;
         lblStatus.setText(msg);
         lblStatus.setStyle(isError ? "-fx-text-fill:#c62828;-fx-font-size:12px;"
-                                   : "-fx-text-fill:#2e7d32;-fx-font-size:12px;");
+                                   : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("Adjusted") || msg.contains("linked")
+                || msg.contains("success") || msg.contains("Ticket") && msg.contains("→")
+                ? "-fx-text-fill:#1e7e4a;-fx-font-weight:bold;-fx-font-size:12px;"
+                : "-fx-text-fill:#37474f;-fx-font-size:12px;"));
     }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();

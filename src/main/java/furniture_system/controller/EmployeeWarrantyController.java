@@ -2,6 +2,7 @@ package furniture_system.controller;
 
 import furniture_system.model.WarrantyTicket;
 import furniture_system.service.WarrantyTicketService;
+import furniture_system.utils.NotificationUtil;
 import furniture_system.utils.SessionManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -22,13 +23,13 @@ import java.util.Set;
 
 /**
  * Employee – Warranty / Repair Management.
- * Hiển thị TẤT CẢ ticket (chung với Admin).
- * Employee chỉ có thể tạo ticket mới và update status/cost/note.
- * setCurrentEmployeeId() được gọi từ EmployeeDashboardController sau khi load FXML.
+ * Displays ALL tickets (shared view with Admin).
+ * Employees can only create new tickets and update status/cost/note.
+ * setCurrentEmployeeId() is called by EmployeeDashboardController after the FXML is loaded.
  *
- * FIX: Dùng WarrantyTicketService (không gọi DAO trực tiếp) để đảm bảo
- *      business rules (status transition, terminal state guard, handler check).
- * FIX: Double-click row cũng kiểm tra terminal state trước khi mở dialog.
+ * Uses WarrantyTicketService (not the DAO directly) to enforce
+ * business rules (status transitions, terminal state guard, handler check).
+ * Double-clicking a row also checks terminal state before opening the update dialog.
  */
 public class EmployeeWarrantyController {
 
@@ -45,6 +46,7 @@ public class EmployeeWarrantyController {
     // ── Toolbar ────────────────────────────────────────────────────────────
     @FXML private Button btnCreate;
     @FXML private Button btnUpdate;
+    @FXML private TextField txtSearch;
     @FXML private Label  lblEmpStatus;
 
     private static final Set<String> TERMINAL_STATUSES =
@@ -53,12 +55,12 @@ public class EmployeeWarrantyController {
     private static final List<String> UPDATE_STATUSES = List.of(
             "RECEIVED", "PROCESSING", "WAITING_PART", "COMPLETED", "REJECTED", "CANCELLED");
 
-    // FIX: Dùng Service thay vì DAO trực tiếp để enforce business rules
+    // Uses Service instead of DAO directly to enforce business rules
     private final WarrantyTicketService service = new WarrantyTicketService();
     private final ObservableList<WarrantyTicket> data = FXCollections.observableArrayList();
     private int currentEmployeeId = -1;
 
-    // ── Dependency injection từ EmployeeDashboardController ───────────────
+    // ── Dependency injection from EmployeeDashboardController ──────────────
     public void setCurrentEmployeeId(int id) {
         this.currentEmployeeId = id;
         loadAll();
@@ -77,7 +79,7 @@ public class EmployeeWarrantyController {
                 });
         btnUpdate.setDisable(true);
 
-        // FIX: Double-click cũng phải kiểm tra terminal state trước khi mở dialog
+        // Double-click also checks terminal state before opening the update dialog
         tableWarranty.setRowFactory(tv -> {
             TableRow<WarrantyTicket> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -95,7 +97,7 @@ public class EmployeeWarrantyController {
             return row;
         });
 
-        // Fallback: lấy từ SessionManager nếu chưa được inject
+        // Fallback: read from SessionManager if not yet injected
         if (currentEmployeeId <= 0) {
             var emp = SessionManager.getInstance().getCurrentEmployee();
             if (emp != null) currentEmployeeId = emp.getEmployeeId();
@@ -140,7 +142,7 @@ public class EmployeeWarrantyController {
             }
         });
 
-        // Row highlight (phải set rowFactory một lần duy nhất — initialize() dùng cách khác)
+        // Row highlight is set once only — the rowFactory in initialize() handles this
         tableWarranty.setItems(data);
         tableWarranty.setPlaceholder(new Label("No warranty tickets found."));
     }
@@ -155,7 +157,22 @@ public class EmployeeWarrantyController {
         }
     }
 
-    @FXML public void handleRefresh() { loadAll(); }
+    @FXML public void handleRefresh() { if (txtSearch != null) txtSearch.clear(); loadAll(); }
+
+    @FXML public void handleSearch() {
+        String kw = txtSearch == null ? "" : txtSearch.getText().trim().toLowerCase();
+        if (kw.isBlank()) { loadAll(); return; }
+        ObservableList<WarrantyTicket> filtered = FXCollections.observableArrayList(
+            data.filtered(t ->
+                (t.getProductName()  != null && t.getProductName().toLowerCase().contains(kw))  ||
+                (t.getCustomerName() != null && t.getCustomerName().toLowerCase().contains(kw)) ||
+                (t.getStatus()       != null && t.getStatus().toLowerCase().contains(kw))       ||
+                String.valueOf(t.getTicketId()).contains(kw) ||
+                String.valueOf(t.getOrderId()).contains(kw)
+            ));
+        tableWarranty.setItems(filtered);
+        setStatus("Found " + filtered.size() + " ticket(s).", false);
+    }
 
     // ==================== CREATE TICKET DIALOG ====================
     @FXML public void handleCreate() {
@@ -227,9 +244,10 @@ public class EmployeeWarrantyController {
                 t.setCost(BigDecimal.ZERO);
                 t.setNote(note.isEmpty() ? null : note);
 
-                // FIX: Gọi qua Service để enforce validation (status = CREATED, order must be COMPLETED)
+                // Call through Service to enforce validation (status=CREATED, order must be COMPLETED)
                 int id = service.create(t);
                 setStatus("Ticket #" + id + " created.", false);
+                NotificationUtil.success(tableWarranty, "Warranty ticket created.");
                 loadAll();
                 dlg.close();
             } catch (NumberFormatException ex) {
@@ -251,7 +269,7 @@ public class EmployeeWarrantyController {
     @FXML public void handleUpdate() {
         WarrantyTicket sel = tableWarranty.getSelectionModel().getSelectedItem();
         if (sel == null) return;
-        // Guard: button đã disabled cho terminal, nhưng thêm lớp check phòng thủ
+        // Guard: button is already disabled for terminal status, but add a defensive check
         if (isTerminal(sel.getStatus())) {
             alert(Alert.AlertType.WARNING, "Cannot Update",
                 "Ticket #" + sel.getTicketId() + " is already " + sel.getStatus() + " and cannot be modified.");
@@ -311,10 +329,10 @@ public class EmployeeWarrantyController {
                 if (cost.compareTo(BigDecimal.ZERO) < 0) { lblErr.setText("Cost must be ≥ 0."); return; }
                 String note = taNote.getText().trim();
 
-                // FIX: Gọi qua Service để enforce:
-                //   - status transition hợp lệ
-                //   - employee phải là handler được assign
-                //   - terminal state không update được
+                // Call through Service to enforce:
+                //   - valid status transitions
+                //   - employee must be the assigned handler
+                //   - terminal states cannot be updated
                 service.updateStatusCostNote(
                         sel.getTicketId(),
                         currentEmployeeId,
@@ -323,6 +341,7 @@ public class EmployeeWarrantyController {
                         note.isEmpty() ? null : note);
 
                 setStatus("Ticket #" + sel.getTicketId() + " → " + newStatus, false);
+                NotificationUtil.success(tableWarranty, "Ticket updated → " + newStatus);
                 loadAll();
                 dlg.close();
             } catch (NumberFormatException ex) {
@@ -359,7 +378,12 @@ public class EmployeeWarrantyController {
         if (lblEmpStatus == null) return;
         lblEmpStatus.setText(msg);
         lblEmpStatus.setStyle(isError ? "-fx-text-fill:#c62828;-fx-font-size:12px;"
-                                      : "-fx-text-fill:#37474f;-fx-font-size:12px;");
+                                      : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("Adjusted") || msg.contains("linked")
+                || msg.contains("success") || msg.contains("Ticket") && msg.contains("→")
+                ? "-fx-text-fill:#1e7e4a;-fx-font-weight:bold;-fx-font-size:12px;"
+                : "-fx-text-fill:#37474f;-fx-font-size:12px;"));
     }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();

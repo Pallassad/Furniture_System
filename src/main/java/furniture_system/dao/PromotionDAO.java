@@ -140,7 +140,7 @@ public class PromotionDAO {
     }
 
     /**
-     * Kiểm tra Promotion còn được sử dụng bởi Order nào không.
+     * Returns true if the promotion is referenced by any Order.
      */
     public boolean hasLinkedOrders(int promoId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM [Order] WHERE PromoId = ?";
@@ -155,7 +155,7 @@ public class PromotionDAO {
 
     /**
      * Hard-delete Promotion.
-     * Chỉ gọi khi không còn Order nào tham chiếu.
+     * Only call when no Orders reference this promotion.
      */
     public void hardDelete(int promoId) throws SQLException {
         String sql = "DELETE FROM Promotion WHERE PromoId = ?";

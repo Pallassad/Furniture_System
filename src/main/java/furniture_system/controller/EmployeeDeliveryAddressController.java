@@ -4,6 +4,8 @@ import furniture_system.dao.CustomerDAO;
 import furniture_system.model.Customer;
 import furniture_system.model.DeliveryAddress;
 import furniture_system.service.DeliveryAddressService;
+import furniture_system.utils.NotificationUtil;
+import furniture_system.utils.SearchableComboBox;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -24,13 +26,14 @@ import java.util.function.Consumer;
 
 /**
  * Employee – Delivery Address Management.
- * Dùng standalone (sidebar) VÀ nhúng trong order creation.
+ * Used both as a standalone sidebar view AND embedded inside the order creation flow.
  *
- * Standalone mode : currentCustomerId <= 0 → hiện TẤT CẢ địa chỉ,
- *                   Add Address mở dialog có ComboBox chọn customer.
- * Embedded mode   : currentCustomerId > 0  → lọc theo customer đó,
- *                   Add Address mở dialog không cần chọn customer.
- *                   Double-click hàng → fire onAddressSelected callback về order form.
+ * Standalone mode : currentCustomerId <= 0 -> shows ALL addresses;
+ *                   Add Address opens a dialog with a customer ComboBox.
+ * Embedded mode   : currentCustomerId > 0  -> filters by that customer;
+ *                   Add Address opens a dialog without a customer ComboBox.
+ *                   Double-clicking a row fires the onAddressSelected callback
+ *                   back to the order form.
  */
 public class EmployeeDeliveryAddressController {
 
@@ -46,6 +49,7 @@ public class EmployeeDeliveryAddressController {
 
     // ── Toolbar ────────────────────────────────────────────────────────────
     @FXML private Button btnAddAddress;
+    @FXML private TextField txtSearch;
     @FXML private Label  lblStatus;
 
     private final DeliveryAddressService          service     = new DeliveryAddressService();
@@ -53,7 +57,7 @@ public class EmployeeDeliveryAddressController {
     private final ObservableList<DeliveryAddress> data        = FXCollections.observableArrayList();
 
     private int                       currentCustomerId = -1;
-    private Consumer<DeliveryAddress> onAddressSelected; // callback → EmployeeOrderController
+    private Consumer<DeliveryAddress> onAddressSelected; // callback -> EmployeeOrderController
 
     // ══════════════════════════════════════════════════════════════════════
 
@@ -63,7 +67,7 @@ public class EmployeeDeliveryAddressController {
         tblAddresses.setItems(data);
         loadAllAddresses();
 
-        // Double-click → fire callback (chỉ có tác dụng trong embedded mode)
+        // Double-click -> fire callback (only active in embedded mode)
         tblAddresses.setRowFactory(tv -> {
             TableRow<DeliveryAddress> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -74,7 +78,7 @@ public class EmployeeDeliveryAddressController {
         });
     }
 
-    // ── Public API (dùng khi nhúng vào EmployeeOrderController) ───────────
+    // ── Public API (used when embedded inside EmployeeOrderController) ──────
     public void loadForCustomer(int customerId) {
         this.currentCustomerId = customerId;
         refreshTable();
@@ -140,9 +144,24 @@ public class EmployeeDeliveryAddressController {
         }
     }
 
-    @FXML public void handleRefresh() { refreshTable(); }
+    @FXML public void handleRefresh() { if (txtSearch != null) txtSearch.clear(); refreshTable(); }
 
-    // ── Fire callback (chỉ dùng trong embedded mode) ──────────────────────
+    @FXML public void handleSearch() {
+        String kw = txtSearch == null ? "" : txtSearch.getText().trim().toLowerCase();
+        if (kw.isBlank()) { refreshTable(); return; }
+        ObservableList<DeliveryAddress> filtered = FXCollections.observableArrayList(
+            data.filtered(a ->
+                (a.getReceiverName() != null && a.getReceiverName().toLowerCase().contains(kw)) ||
+                (a.getPhone()        != null && a.getPhone().toLowerCase().contains(kw))        ||
+                (a.getAddressLine()  != null && a.getAddressLine().toLowerCase().contains(kw))  ||
+                (a.getDistrict()     != null && a.getDistrict().toLowerCase().contains(kw))     ||
+                (a.getCity()         != null && a.getCity().toLowerCase().contains(kw))
+            ));
+        tblAddresses.setItems(filtered);
+        setStatus("Found " + filtered.size() + " address(es).", false);
+    }
+
+    // ── Fire callback (only used in embedded mode) ──────────────────────────
     private void fireSelect(DeliveryAddress addr) {
         if (onAddressSelected != null) onAddressSelected.accept(addr);
     }
@@ -156,7 +175,7 @@ public class EmployeeDeliveryAddressController {
         }
     }
 
-    // ── Dialog standalone: có ComboBox chọn customer ──────────────────────
+    // ── Standalone dialog: includes a customer ComboBox ────────────────────
     private void openAddDialogWithCustomerPicker() {
         List<Customer> customers;
         try {
@@ -171,16 +190,10 @@ public class EmployeeDeliveryAddressController {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Add New Delivery Address");
 
-        ComboBox<Customer> cmbCustomer = new ComboBox<>(
-                FXCollections.observableArrayList(customers));
-        cmbCustomer.setMaxWidth(Double.MAX_VALUE);
-        cmbCustomer.setConverter(new javafx.util.StringConverter<>() {
-            @Override public String toString(Customer c) {
-                return c == null ? "" : c.getCustomerId() + " – " + c.getFullName();
-            }
-            @Override public Customer fromString(String s) { return null; }
-        });
-        cmbCustomer.setPromptText("Select customer...");
+        ComboBox<Customer> cmbCustomer = new ComboBox<>();
+        VBox vCustomer = SearchableComboBox.wrap(cmbCustomer, customers,
+                c -> c.getCustomerId() + " – " + c.getFullName()
+                     + " (" + c.getPhone() + ")");
 
         TextField tfReceiver = new TextField();
         TextField tfPhone    = new TextField();
@@ -199,7 +212,7 @@ public class EmployeeDeliveryAddressController {
         GridPane grid = buildGrid();
         int row = 0;
         grid.add(sec("-- Customer"),            0, row, 2, 1); row++;
-        grid.add(fl("Customer *"),     0, row); grid.add(cmbCustomer, 1, row++);
+        grid.add(fl("Customer *"),     0, row); grid.add(vCustomer,   1, row++);
         grid.add(new Separator(),               0, row, 2, 1); row++;
         grid.add(sec("-- Receiver Info"),       0, row, 2, 1); row++;
         grid.add(fl("Receiver Name *"), 0, row); grid.add(tfReceiver, 1, row++);
@@ -232,6 +245,7 @@ public class EmployeeDeliveryAddressController {
                         tfCity, chkDefault);
                 service.addAddress(addr);
                 setStatus("Address added for " + sel.getFullName() + ".", false);
+                NotificationUtil.success(tblAddresses, "Address added.");
                 refreshTable();
                 dlg.close();
             } catch (IllegalArgumentException ex) {
@@ -248,7 +262,7 @@ public class EmployeeDeliveryAddressController {
         dlg.showAndWait();
     }
 
-    // ── Dialog embedded: customer đã biết ────────────────────────────────
+    // ── Embedded dialog: customer is already known ─────────────────────────
     private void openAddDialogForCustomer(int customerId) {
         Stage dlg = new Stage();
         dlg.initModality(Modality.APPLICATION_MODAL);
@@ -305,6 +319,7 @@ public class EmployeeDeliveryAddressController {
                         tfCity, chkDefault);
                 service.addAddress(addr);
                 setStatus("Address added for customer #" + customerId + ".", false);
+                NotificationUtil.success(tblAddresses, "Address added.");
                 refreshTable();
                 dlg.close();
             } catch (IllegalArgumentException ex) {
@@ -383,7 +398,12 @@ public class EmployeeDeliveryAddressController {
         lblStatus.setText(msg);
         lblStatus.setStyle(isError
                 ? "-fx-text-fill:#c62828;-fx-font-size:12px;"
-                : "-fx-text-fill:#37474f;-fx-font-size:12px;");
+                : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("Adjusted") || msg.contains("linked")
+                || msg.contains("success") || msg.contains("Ticket") && msg.contains("→")
+                ? "-fx-text-fill:#1e7e4a;-fx-font-weight:bold;-fx-font-size:12px;"
+                : "-fx-text-fill:#37474f;-fx-font-size:12px;"));
     }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t);

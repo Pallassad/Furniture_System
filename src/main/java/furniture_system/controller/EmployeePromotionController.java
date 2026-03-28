@@ -39,7 +39,6 @@ public class EmployeePromotionController {
 
     // ── Search & Toolbar ───────────────────────────────────────────────────
     @FXML private TextField txtSearch;
-    @FXML private TextField tfLookupCode;
     @FXML private Button    btnViewDetail;
     @FXML private Label     statusBarLabel;
 
@@ -107,7 +106,7 @@ public class EmployeePromotionController {
     }
 
     @FXML public void handleRefresh() {
-        txtSearch.clear(); tfLookupCode.clear();
+        txtSearch.clear();
         loadActivePromotions();
     }
 
@@ -122,31 +121,6 @@ public class EmployeePromotionController {
         setStatus("Found " + filtered.size() + " promotion(s).");
     }
 
-    // ==================== LOOKUP CODE ====================
-    @FXML public void handleLookup() {
-        String code = tfLookupCode.getText().trim();
-        if (code.isBlank()) {
-            alert(Alert.AlertType.WARNING, "Lookup", "Please enter a promotion code.");
-            return;
-        }
-
-        Promotion match = data.stream()
-                .filter(p -> p.getCode().equalsIgnoreCase(code))
-                .findFirst().orElse(null);
-
-        if (match == null) {
-            alert(Alert.AlertType.WARNING, "Code Not Found",
-                    "Code \"" + code + "\" is not active or does not exist.");
-            return;
-        }
-
-        // Highlight row
-        promoTable.getSelectionModel().select(match);
-        promoTable.scrollTo(match);
-
-        // Open detail dialog
-        openDetailDialog(match);
-    }
 
     // ==================== VIEW DETAIL DIALOG ====================
     @FXML public void handleViewDetail() {
@@ -237,7 +211,20 @@ public class EmployeePromotionController {
         b.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;");
         return b;
     }
-    private void setStatus(String msg) { if (statusBarLabel != null) statusBarLabel.setText(msg); }
+    private void setStatus(String msg) { setStatus(msg, false); }
+    private void setStatus(String msg, boolean isError) {
+        if (statusBarLabel == null) return;
+        statusBarLabel.setText(msg);
+        if (isError) {
+            statusBarLabel.setStyle("-fx-text-fill:#c0392b;-fx-font-weight:bold;");
+        } else if (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("linked") || msg.contains("success")) {
+            statusBarLabel.setStyle("-fx-text-fill:#1e7e4a;-fx-font-weight:bold;");
+        } else {
+            statusBarLabel.setStyle("-fx-text-fill:#6878aa;-fx-font-weight:normal;");
+        }
+    }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }

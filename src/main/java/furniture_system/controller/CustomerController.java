@@ -6,6 +6,7 @@ import furniture_system.model.Customer.Status;
 import furniture_system.model.OrderSummary;
 import furniture_system.model.OrderSummary.OrderLineItem;
 import furniture_system.service.CustomerService;
+import furniture_system.utils.NotificationUtil;
 import furniture_system.utils.SessionManager;
 import javafx.beans.property.*;
 import javafx.collections.*;
@@ -202,6 +203,7 @@ public class CustomerController {
             try {
                 service.removeCustomer(sel.getCustomerId());
                 setStatus("Permanently deleted customer [" + sel.getFullName() + "].");
+                NotificationUtil.warning(customerTable, "Customer deleted.");
                 loadAll();
             } catch (IllegalStateException e) {
                 showError("Cannot delete", e.getMessage());
@@ -357,15 +359,18 @@ public class CustomerController {
                     // Edit only Admin can enter
                     service.updateCustomer(c);
                     setStatus("Customer [" + c.getFullName() + "] updated.");
+                    NotificationUtil.success(customerTable, "Customer updated.");
                 } else {
                     if (isAdmin) {
                         // Admin uses addCustomer (can set status freely)
                         int id = service.addCustomer(c);
                         setStatus("Customer added with ID " + id + ".");
+                    NotificationUtil.success(customerTable, "Customer added.");
                     } else {
                         // Employee uses createCustomer (always ACTIVE)
                         int id = service.createCustomer(c);
                         setStatus("Customer registered with ID " + id + ".");
+                    NotificationUtil.success(customerTable, "Customer registered.");
                     }
                 }
                 loadAll();

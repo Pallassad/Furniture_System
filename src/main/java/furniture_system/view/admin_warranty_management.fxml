@@ -7,16 +7,17 @@
       stylesheets="@../resources/css/admin.css" spacing="0"
       style="-fx-background-color:#eef0f5;">
 
-  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 0 28;">
-    <Label styleClass="page-title" text="🔧  Warranty &amp; Repair" HBox.hgrow="ALWAYS"/>
+  <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 14 28;">
+    <Label styleClass="page-title" text="🔧  Warranty &amp; Repair"/>
+    <Region HBox.hgrow="ALWAYS"/>
     <Button styleClass="btn-primary" text="➕  Add Ticket" onAction="#handleAdd"    fx:id="btnAdd"/>
     <Button styleClass="btn-warning" text="✏  Edit"        onAction="#handleEdit"   fx:id="btnEdit"   disable="true"/>
     <Button styleClass="btn-danger"  text="🗑  Delete"      onAction="#handleDelete" fx:id="btnDelete" disable="true"/>
     <Button styleClass="btn-outline" text="⟳  Refresh"     onAction="#handleRefresh"/>
   </HBox>
-  <Separator style="-fx-padding:0 28 16 28; -fx-background-color:#d8dce8;"/>
+  <Separator style="-fx-background-color:#d8dce8;"/>
 
-  <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding:4 28 8 28;">
+  <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding:10 28 8 28;">
     <TextField fx:id="txtSearch" styleClass="search-field"
                promptText="Search by product, customer, handler…" prefWidth="320"/>
     <Button styleClass="btn-primary" text="Search" onAction="#handleSearch"

@@ -5,6 +5,8 @@ import furniture_system.model.Product;
 import furniture_system.model.Supplier;
 import furniture_system.service.FurnitureTypeService;
 import furniture_system.service.ProductService;
+import furniture_system.utils.NotificationUtil;
+import furniture_system.utils.SearchableComboBox;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -162,16 +164,23 @@ public class AdminFurnitureController {
         ComboBox<FurnitureType> cbType     = new ComboBox<>();
         ComboBox<Supplier>     cbSupplier  = new ComboBox<>();
         ComboBox<Product.Status> cbStatus  = new ComboBox<>(FXCollections.observableArrayList(Product.Status.values()));
-
         spnWarranty.setEditable(true);
         spnWarranty.setMaxWidth(Double.MAX_VALUE);
-        cbType.setMaxWidth(Double.MAX_VALUE);
-        cbSupplier.setMaxWidth(Double.MAX_VALUE);
         cbStatus.setMaxWidth(Double.MAX_VALUE);
         cbStatus.getSelectionModel().select(Product.Status.ACTIVE);
         taDesc.setPrefRowCount(4); taDesc.setWrapText(true);
 
-        loadCombos(cbType, cbSupplier);
+        // Load data and wrap with search
+        List<FurnitureType> allTypes;
+        List<Supplier>      allSuppliers;
+        try {
+            allTypes     = svcType.getActive();
+            allSuppliers = svcProduct.getActiveSuppliers();
+        } catch (SQLException e) {
+            alert(Alert.AlertType.ERROR, "Error", "Could not load data: " + e.getMessage()); return;
+        }
+        VBox vType     = wrapTypeCombo(cbType, allTypes);
+        VBox vSupplier = wrapSupplierCombo(cbSupplier, allSuppliers);
 
         Label lblErr = new Label();
         lblErr.setStyle("-fx-text-fill:#c62828;-fx-font-size:12px;"); lblErr.setWrapText(true);
@@ -182,8 +191,8 @@ public class AdminFurnitureController {
         grid.add(new Label(""),             0, row); grid.add(hint("Required. 2–150 characters."), 1, row++);
         grid.add(new Separator(),           0, row, 2, 1); row++;
         grid.add(sec("-- Category & Supplier"), 0, row, 2, 1); row++;
-        grid.add(fl("Furniture Type *"),    0, row); grid.add(cbType,      1, row++);
-        grid.add(fl("Supplier *"),          0, row); grid.add(cbSupplier,  1, row++);
+        grid.add(fl("Furniture Type *"),    0, row); grid.add(vType,      1, row++);
+        grid.add(fl("Supplier *"),          0, row); grid.add(vSupplier,  1, row++);
         grid.add(new Separator(),           0, row, 2, 1); row++;
         grid.add(sec("-- Pricing & Warranty"), 0, row, 2, 1); row++;
         grid.add(fl("Price (VND) *"),       0, row); grid.add(tfPrice,     1, row++);
@@ -210,6 +219,7 @@ public class AdminFurnitureController {
                 if (p == null) return;
                 svcProduct.addProduct(p);
                 setStatus("Product [" + p.getName() + "] added.");
+                NotificationUtil.success(productTable, "Product added: " + p.getName());
                 loadProducts();
                 dlg.close();
             } catch (Exception ex) { lblErr.setText(ex.getMessage()); }
@@ -239,14 +249,17 @@ public class AdminFurnitureController {
         ComboBox<Product.Status> cbStatus   = new ComboBox<>(FXCollections.observableArrayList(Product.Status.values()));
 
         spnWarranty.setEditable(true); spnWarranty.setMaxWidth(Double.MAX_VALUE);
-        cbType.setMaxWidth(Double.MAX_VALUE); cbSupplier.setMaxWidth(Double.MAX_VALUE);
         cbStatus.setMaxWidth(Double.MAX_VALUE); cbStatus.setValue(sel.getStatus());
         taDesc.setPrefRowCount(4); taDesc.setWrapText(true);
 
         loadCombosForEdit(cbType, cbSupplier, sel);
-        // Pre-select current values (loadCombosForEdit ensures the current type/supplier is in the list)
+        // Pre-select current values
         cbType.getItems().stream().filter(t -> t.getTypeId() == sel.getTypeId()).findFirst().ifPresent(cbType::setValue);
         cbSupplier.getItems().stream().filter(s -> s.getSupplierId() == sel.getSupplierId()).findFirst().ifPresent(cbSupplier::setValue);
+
+        // Wrap with search (items already loaded by loadCombosForEdit)
+        VBox vType     = wrapTypeCombo(cbType, cbType.getItems());
+        VBox vSupplier = wrapSupplierCombo(cbSupplier, cbSupplier.getItems());
 
         Label lblInfo = new Label("Product ID: " + sel.getProductId());
         lblInfo.setStyle("-fx-text-fill:#555;-fx-font-size:12px;");
@@ -260,8 +273,8 @@ public class AdminFurnitureController {
         grid.add(fl("Product Name *"),      0, row); grid.add(tfName,      1, row++);
         grid.add(new Separator(),           0, row, 2, 1); row++;
         grid.add(sec("-- Category & Supplier"), 0, row, 2, 1); row++;
-        grid.add(fl("Furniture Type *"),    0, row); grid.add(cbType,      1, row++);
-        grid.add(fl("Supplier *"),          0, row); grid.add(cbSupplier,  1, row++);
+        grid.add(fl("Furniture Type *"),    0, row); grid.add(vType,      1, row++);
+        grid.add(fl("Supplier *"),          0, row); grid.add(vSupplier,  1, row++);
         grid.add(new Separator(),           0, row, 2, 1); row++;
         grid.add(sec("-- Pricing & Warranty"), 0, row, 2, 1); row++;
         grid.add(fl("Price (VND) *"),       0, row); grid.add(tfPrice,     1, row++);
@@ -287,6 +300,7 @@ public class AdminFurnitureController {
                 p.setProductId(sel.getProductId());
                 svcProduct.updateProduct(p);
                 setStatus("Product [" + p.getName() + "] updated.");
+                NotificationUtil.success(productTable, "Product updated: " + p.getName());
                 loadProducts();
                 dlg.close();
             } catch (Exception ex) { lblErr.setText(ex.getMessage()); }
@@ -314,6 +328,7 @@ public class AdminFurnitureController {
             try {
                 svcProduct.deleteProduct(sel.getProductId());
                 setStatus("Permanently deleted product [" + sel.getName() + "].");
+            NotificationUtil.warning(productTable, "Deleted: " + sel.getName());
                 loadProducts();
             } catch (IllegalStateException ex) {
                 alert(Alert.AlertType.ERROR, "Cannot delete", ex.getMessage());
@@ -360,11 +375,26 @@ public class AdminFurnitureController {
     /** For ADD dialog — only ACTIVE types and active suppliers. */
     private void loadCombos(ComboBox<FurnitureType> cbType, ComboBox<Supplier> cbSupplier) {
         try {
-            cbType.setItems(FXCollections.observableArrayList(svcType.getActive()));
-            cbSupplier.setItems(FXCollections.observableArrayList(svcProduct.getActiveSuppliers()));
+            List<FurnitureType> types     = svcType.getActive();
+            List<Supplier>      suppliers = svcProduct.getActiveSuppliers();
+            cbType.setItems(FXCollections.observableArrayList(types));
+            cbSupplier.setItems(FXCollections.observableArrayList(suppliers));
         } catch (SQLException e) {
             alert(Alert.AlertType.ERROR, "Error", "Could not load combo data: " + e.getMessage());
         }
+    }
+
+    /** Wraps the FurnitureType ComboBox with a search field. */
+    private VBox wrapTypeCombo(ComboBox<FurnitureType> cb, List<FurnitureType> list) {
+        return SearchableComboBox.wrap(cb, list,
+                t -> t.getTypeId() + ". " + t.getTypeName());
+    }
+
+    /** Wraps the Supplier ComboBox with a search field. */
+    private VBox wrapSupplierCombo(ComboBox<Supplier> cb, List<Supplier> list) {
+        return SearchableComboBox.wrap(cb, list,
+                s -> s.getSupplierId() + ". " + s.getName()
+                     + (s.getPhone() != null ? "  (" + s.getPhone() + ")" : ""));
     }
 
     /**
@@ -425,7 +455,20 @@ public class AdminFurnitureController {
         b.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;");
         return b;
     }
-    private void setStatus(String msg) { if (statusBarLabel != null) statusBarLabel.setText(msg); }
+    private void setStatus(String msg) { setStatus(msg, false); }
+    private void setStatus(String msg, boolean isError) {
+        if (statusBarLabel == null) return;
+        statusBarLabel.setText(msg);
+        if (isError) {
+            statusBarLabel.setStyle("-fx-text-fill:#c0392b;-fx-font-weight:bold;");
+        } else if (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("linked") || msg.contains("success")) {
+            statusBarLabel.setStyle("-fx-text-fill:#1e7e4a;-fx-font-weight:bold;");
+        } else {
+            statusBarLabel.setStyle("-fx-text-fill:#6878aa;-fx-font-weight:normal;");
+        }
+    }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }

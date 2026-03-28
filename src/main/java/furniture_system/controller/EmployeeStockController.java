@@ -89,6 +89,24 @@ public class EmployeeStockController {
     private void loadStock() {
         try {
             List<Stock> list = service.getAllStock();
+
+            // Sort: low-stock items first (ascending by quantity/reorderLevel ratio),
+            // then OK items sorted alphabetically by product name.
+            list.sort((a, b) -> {
+                boolean aLow = a.isBelowReorder();
+                boolean bLow = b.isBelowReorder();
+                if (aLow != bLow) return aLow ? -1 : 1; // low-stock floats to top
+                if (aLow) {
+                    // Both low: the one with less remaining stock comes first
+                    int diff = a.getQuantity() - b.getQuantity();
+                    if (diff != 0) return diff;
+                }
+                // Alphabetical fallback
+                String na = a.getProductName() != null ? a.getProductName() : "";
+                String nb = b.getProductName() != null ? b.getProductName() : "";
+                return na.compareToIgnoreCase(nb);
+            });
+
             stockData.setAll(list);
             long low = list.stream().filter(Stock::isBelowReorder).count();
             setStatus("Loaded " + list.size() + " products"
@@ -101,11 +119,24 @@ public class EmployeeStockController {
     @FXML public void handleSearch() {
         String kw = txtSearch.getText().trim().toLowerCase();
         if (kw.isBlank()) { loadStock(); return; }
-        ObservableList<Stock> filtered = FXCollections.observableArrayList(
-                stockData.filtered(s ->
-                        s.getProductName() != null &&
-                        s.getProductName().toLowerCase().contains(kw)));
-        tblStock.setItems(filtered);
+        // Filter then re-apply sort so low-stock items stay on top
+        List<Stock> filtered = stockData.stream()
+                .filter(s -> s.getProductName() != null
+                        && s.getProductName().toLowerCase().contains(kw))
+                .sorted((a, b) -> {
+                    boolean aLow = a.isBelowReorder();
+                    boolean bLow = b.isBelowReorder();
+                    if (aLow != bLow) return aLow ? -1 : 1;
+                    if (aLow) {
+                        int diff = a.getQuantity() - b.getQuantity();
+                        if (diff != 0) return diff;
+                    }
+                    String na = a.getProductName() != null ? a.getProductName() : "";
+                    String nb = b.getProductName() != null ? b.getProductName() : "";
+                    return na.compareToIgnoreCase(nb);
+                })
+                .toList();
+        tblStock.setItems(FXCollections.observableArrayList(filtered));
         setStatus("Found " + filtered.size() + " product(s).", false);
     }
 
@@ -212,6 +243,11 @@ public class EmployeeStockController {
         if (lblStatus == null) return;
         lblStatus.setText(msg);
         lblStatus.setStyle(isError ? "-fx-text-fill:#c62828;-fx-font-size:12px;"
-                                   : "-fx-text-fill:#2e7d32;-fx-font-size:12px;");
+                                   : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("Adjusted") || msg.contains("linked")
+                || msg.contains("success") || msg.contains("Ticket") && msg.contains("→")
+                ? "-fx-text-fill:#1e7e4a;-fx-font-weight:bold;-fx-font-size:12px;"
+                : "-fx-text-fill:#37474f;-fx-font-size:12px;"));
     }
 }

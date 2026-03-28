@@ -23,16 +23,6 @@
     </HBox>
     <Separator styleClass="separator"/>
 
-    <!-- Lookup Bar -->
-    <HBox styleClass="search-card" spacing="10" alignment="CENTER_LEFT">
-        <Label text="🔎 Look up code:" styleClass="search-card-title"/>
-        <TextField fx:id="tfLookupCode"
-                   promptText="Enter promo code (e.g. SPRING26)"
-                   prefWidth="240"
-                   styleClass="login-field"/>
-        <Button text="Lookup" onAction="#handleLookup" styleClass="btn-success"/>
-    </HBox>
-
     <!-- Search Row -->
     <HBox spacing="8" alignment="CENTER_LEFT">
         <TextField fx:id="txtSearch"

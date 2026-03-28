@@ -88,8 +88,8 @@ public class BillingDAO {
     // ─────────────────────────────────────────────────────────────────────
 
     /**
-     * Xoá cứng một Billing record.
-     * Chỉ gọi khi BillingStatus = UNPAID hoặc VOID (kiểm tra ở Service).
+     * Hard-deletes a Billing record.
+     * Only call when BillingStatus = UNPAID or VOID (validated by Service).
      */
     public boolean delete(int invoiceId) throws SQLException {
         String sql = "DELETE FROM Billing WHERE InvoiceId = ?";

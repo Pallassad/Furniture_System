@@ -199,8 +199,8 @@ public class WarrantyTicketDAO {
     // ── DELETE / CANCEL ───────────────────────────────────────────────────────
 
     /**
-     * Xoá cứng một WarrantyTicket.
-     * Chỉ gọi khi Status đã terminal (COMPLETED/CANCELLED/REJECTED) — kiểm tra ở Service.
+     * Hard-deletes a WarrantyTicket.
+     * Only call when Status is terminal (COMPLETED/CANCELLED/REJECTED) — validated by Service.
      */
     public int hardDelete(int ticketId) throws SQLException {
         String sql = "DELETE FROM WarrantyTicket WHERE TicketId = ?";

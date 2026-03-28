@@ -14,11 +14,7 @@
 .login-root {
     -fx-background-color: #1e2a5e;
     -fx-pref-width: 780;
-    -fx-min-width: 780;
-    -fx-max-width: 780;
     -fx-pref-height: 560;
-    -fx-min-height: 560;
-    -fx-max-height: 560;
 }
 
 /* ================================================================
@@ -28,7 +24,6 @@
     -fx-background-color: linear-gradient(to bottom right, #1e2a5e, #2a3f8f);
     -fx-pref-width: 320;
     -fx-min-width: 320;
-    -fx-max-width: 320;
     -fx-padding: 44 36 36 36;
 }
 

@@ -9,7 +9,8 @@
 
   <!-- Page Header -->
   <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 14 28;">
-    <Label styleClass="page-title" text="📦  Order Management" HBox.hgrow="ALWAYS"/>
+    <Label styleClass="page-title" text="📦  Order Management"/>
+    <Region HBox.hgrow="ALWAYS"/>
     <Button fx:id="btnViewDetail"    styleClass="btn-info"    text="🔍  Detail"        onAction="#handleViewDetail"    disable="true"/>
     <Button fx:id="btnUpdateStatus"  styleClass="btn-warning" text="✏  Update Status" onAction="#handleUpdateStatus"  disable="true"/>
     <Button fx:id="btnManageBilling" styleClass="btn-success" text="💳  Billing"        onAction="#handleManageBilling" disable="true"/>
@@ -18,14 +19,11 @@
   </HBox>
   <Separator style="-fx-background-color:#d8dce8;"/>
 
-  <!-- Filter Row -->
+  <!-- Search Row -->
   <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding:10 28 8 28;">
-    <TextField fx:id="tfSearchOrderId"    styleClass="search-field" promptText="Order ID"    prefWidth="100"/>
-    <TextField fx:id="tfSearchCustomerId" styleClass="search-field" promptText="Customer ID" prefWidth="110"/>
-    <TextField fx:id="tfSearchEmployeeId" styleClass="search-field" promptText="Employee ID" prefWidth="110"/>
-    <ComboBox  fx:id="cbSearchStatus"     styleClass="filter-combo" promptText="All Status"  prefWidth="130"/>
-    <DatePicker fx:id="dpFrom" styleClass="filter-date" promptText="From" prefWidth="130"/>
-    <DatePicker fx:id="dpTo"   styleClass="filter-date" promptText="To"   prefWidth="130"/>
+    <TextField fx:id="txtSearch" styleClass="search-field"
+               promptText="🔍  Search by Order ID, Customer, Employee, Status…"
+               onAction="#onSearch" HBox.hgrow="ALWAYS"/>
     <Button styleClass="btn-primary" text="🔍 Search" onAction="#onSearch"
             style="-fx-padding:7 14 7 14;"/>
     <Button styleClass="btn-outline" text="✕ Reset"   onAction="#onReset"

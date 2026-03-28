@@ -105,7 +105,7 @@ public class AdminDashboardController {
     }
 
     @FXML
-    public void showPromotionManagement() {       // ← MỚI
+    public void showPromotionManagement() {
         setActive(btnPromotion);
         loadView("/furniture_system/view/admin_promotion_management.fxml");
     }
@@ -156,9 +156,9 @@ public class AdminDashboardController {
                 getClass().getResource("/furniture_system/view/login.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) lblUsername.getScene().getWindow();
+            stage.setMaximized(false);
             stage.setResizable(false);
             stage.setScene(new Scene(root, 780, 560));
-            stage.sizeToScene();
             stage.setTitle("Fair Deal Furniture – Login");
             stage.centerOnScreen();
         } catch (IOException e) {
@@ -182,7 +182,13 @@ public class AdminDashboardController {
                 return;
             }
             Parent view = FXMLLoader.load(url);
-            contentArea.getChildren().setAll(view);
+            // Replace only the first child (content slot).
+            // Any toast overlays added by NotificationUtil are kept on top.
+            if (contentArea.getChildren().isEmpty()) {
+                contentArea.getChildren().add(0, view);
+            } else {
+                contentArea.getChildren().set(0, view);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             showPlaceholder("⚠ Error loading: " + e.getMessage());
@@ -193,6 +199,10 @@ public class AdminDashboardController {
         Label lbl = new Label(title + "\n\nComing soon...");
         lbl.setStyle("-fx-font-size:18px; -fx-text-fill:#9e9e9e; -fx-font-style:italic;");
         lbl.setAlignment(javafx.geometry.Pos.CENTER);
-        contentArea.getChildren().setAll(lbl);
+        if (contentArea.getChildren().isEmpty()) {
+            contentArea.getChildren().add(0, lbl);
+        } else {
+            contentArea.getChildren().set(0, lbl);
+        }
     }
 }

@@ -7,6 +7,8 @@ import furniture_system.model.StockLog;
 import furniture_system.model.StockLog.LogType;
 import furniture_system.service.ProductService;
 import furniture_system.service.StockService;
+import furniture_system.utils.NotificationUtil;
+import furniture_system.utils.SearchableComboBox;
 import furniture_system.utils.SessionManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -53,6 +55,7 @@ public class StockController {
     // ── Toolbar ────────────────────────────────────────────────────────────
     @FXML private Button btnStockIn;
     @FXML private Button btnAdjust;
+    @FXML private TextField txtStockSearch;
     @FXML private Label  lblStatus;
 
     private final StockService           service = new StockService();
@@ -85,17 +88,17 @@ public class StockController {
     }
 
     // ── Resolve actorId ────────────────────────────────────────────────────
-    // actorId PHẢI là Employee.EmployeeId (FK constraint trong bảng StockLog).
-    // Nếu không tìm thấy Employee row → actorId = -1 → disable Stock In/Adjust.
+    // actorId must be Employee.EmployeeId (FK constraint on the StockLog table).
+    // If no Employee row is found, actorId stays -1, and write operations are disabled.
     private void resolveActorId() {
-        // Ưu tiên 1: lấy từ SessionManager (LoginController đã set sau đăng nhập)
+        // Priority 1: read from SessionManager (set by LoginController after login)
         var emp = SessionManager.getInstance().getCurrentEmployee();
         if (emp != null) {
             actorId = emp.getEmployeeId();
             return;
         }
 
-        // Ưu tiên 2: tra DB theo AccountId (trường hợp SessionManager chưa set Employee)
+        // Priority 2: look up from DB by AccountId (in case SessionManager has no Employee yet)
         var account = SessionManager.getInstance().getCurrentAccount();
         if (account == null) return;
 
@@ -107,8 +110,8 @@ public class StockController {
                 if (rs.next()) {
                     actorId = rs.getInt("EmployeeId");
                 }
-                // Nếu không có Employee row (kể cả Admin) → actorId giữ -1.
-                // KHÔNG fallback dùng AccountId vì đó là FK violation.
+                // No Employee row found (including Admin accounts): keep actorId = -1.
+                // Do NOT fall back to AccountId — that would violate the FK constraint.
             }
         } catch (Exception ignored) {}
     }
@@ -193,6 +196,24 @@ public class StockController {
     private void loadStock() {
         try {
             List<Stock> list = service.getAllStock();
+
+            // Sort: low-stock items first (ascending by quantity/reorderLevel ratio),
+            // then OK items sorted alphabetically by product name.
+            list.sort((a, b) -> {
+                boolean aLow = a.isBelowReorder();
+                boolean bLow = b.isBelowReorder();
+                if (aLow != bLow) return aLow ? -1 : 1; // low-stock floats to top
+                if (aLow) {
+                    // Both low: the one with less remaining stock comes first
+                    int diff = a.getQuantity() - b.getQuantity();
+                    if (diff != 0) return diff;
+                }
+                // Alphabetical fallback
+                String na = a.getProductName() != null ? a.getProductName() : "";
+                String nb = b.getProductName() != null ? b.getProductName() : "";
+                return na.compareToIgnoreCase(nb);
+            });
+
             stockData.setAll(list);
             long low = list.stream().filter(Stock::isBelowReorder).count();
             setStatus("Loaded " + list.size() + " products"
@@ -215,7 +236,27 @@ public class StockController {
         } catch (Exception e) { setStatus("Error: " + e.getMessage(), true); }
     }
 
-    @FXML public void handleRefreshStock() { loadStock(); loadLog(); }
+    @FXML public void handleRefreshStock() { if (txtStockSearch != null) txtStockSearch.clear(); loadStock(); loadLog(); }
+
+    @FXML public void handleSearchStock() {
+        String kw = txtStockSearch == null ? "" : txtStockSearch.getText().trim().toLowerCase();
+        if (kw.isBlank()) { loadStock(); return; }
+        // Filter then preserve sort order (low-stock on top)
+        List<Stock> filtered = stockData.stream()
+                .filter(s -> s.getProductName() != null
+                        && s.getProductName().toLowerCase().contains(kw))
+                .sorted((a, b) -> {
+                    boolean aLow = a.isBelowReorder(), bLow = b.isBelowReorder();
+                    if (aLow != bLow) return aLow ? -1 : 1;
+                    if (aLow) { int d = a.getQuantity() - b.getQuantity(); if (d != 0) return d; }
+                    String na = a.getProductName() != null ? a.getProductName() : "";
+                    String nb = b.getProductName() != null ? b.getProductName() : "";
+                    return na.compareToIgnoreCase(nb);
+                })
+                .toList();
+        tblStock.setItems(FXCollections.observableArrayList(filtered));
+        setStatus("Found " + filtered.size() + " product(s).", false);
+    }
     @FXML public void handleFilterLog()    { loadLog(); }
     @FXML public void handleClearFilter()  {
         cbLogProduct.setValue(null); cbLogType.setValue("");
@@ -238,14 +279,17 @@ public class StockController {
         ComboBox<Product> cbProduct = new ComboBox<>();
         TextField         tfQty     = new TextField();
         TextField         tfNote    = new TextField();
-        cbProduct.setMaxWidth(Double.MAX_VALUE);
         tfQty.setPromptText("Positive integer, e.g. 50");
         tfNote.setPromptText("Optional — invoice no., supplier, etc.");
 
+        List<Product> allProducts;
         try {
-            cbProduct.setItems(FXCollections.observableArrayList(
-                    new ProductService().getAllProducts()));
-        } catch (Exception ignored) {}
+            allProducts = new ProductService().getAllProducts();
+        } catch (Exception ignored) { allProducts = List.of(); }
+
+        VBox vProduct = SearchableComboBox.wrap(cbProduct, allProducts,
+                p -> p.getProductId() + ". " + p.getName()
+                     + "  [Stock: ?]");
 
         Label lblErr = new Label();
         lblErr.setStyle("-fx-text-fill:#c62828;-fx-font-size:12px;"); lblErr.setWrapText(true);
@@ -253,7 +297,7 @@ public class StockController {
         GridPane grid = buildGrid();
         int row = 0;
         grid.add(sec("-- Stock In Details"),      0, row, 2, 1); row++;
-        grid.add(fl("Product *"),      0, row); grid.add(cbProduct, 1, row++);
+        grid.add(fl("Product *"),      0, row); grid.add(vProduct,  1, row++);
         grid.add(fl("Quantity *"),     0, row); grid.add(tfQty,     1, row++);
         grid.add(new Label(""),        0, row); grid.add(hint("Must be a positive integer."), 1, row++);
         grid.add(fl("Note"),           0, row); grid.add(tfNote,    1, row++);
@@ -277,7 +321,8 @@ public class StockController {
                 if (qty <= 0) throw new NumberFormatException();
                 service.stockIn(cbProduct.getValue().getProductId(),
                         qty, tfNote.getText().trim(), actorId);
-                setStatus("Stock In recorded: +" + qty + " × " + cbProduct.getValue().getName(), false);
+                setStatus("Stock In recorded: +" + qty + " x " + cbProduct.getValue().getName(), false);
+                NotificationUtil.success(tblStock, "Stock In: +" + qty + " x " + cbProduct.getValue().getName());
                 loadStock(); loadLog(); dlg.close();
             } catch (NumberFormatException ex) { lblErr.setText("Quantity must be a positive integer."); }
               catch (IllegalArgumentException ex) { lblErr.setText(ex.getMessage()); }
@@ -304,14 +349,16 @@ public class StockController {
         ComboBox<Product> cbProduct = new ComboBox<>();
         TextField         tfQty     = new TextField();
         TextField         tfNote    = new TextField();
-        cbProduct.setMaxWidth(Double.MAX_VALUE);
         tfQty.setPromptText("Positive or negative integer, e.g. -3 or +10");
         tfNote.setPromptText("Required — reason for adjustment");
 
+        List<Product> allProductsAdj;
         try {
-            cbProduct.setItems(FXCollections.observableArrayList(
-                    new ProductService().getAllProducts()));
-        } catch (Exception ignored) {}
+            allProductsAdj = new ProductService().getAllProducts();
+        } catch (Exception ignored) { allProductsAdj = List.of(); }
+
+        VBox vProduct = SearchableComboBox.wrap(cbProduct, allProductsAdj,
+                p -> p.getProductId() + ". " + p.getName());
 
         Label lblErr = new Label();
         lblErr.setStyle("-fx-text-fill:#c62828;-fx-font-size:12px;"); lblErr.setWrapText(true);
@@ -319,7 +366,7 @@ public class StockController {
         GridPane grid = buildGrid();
         int row = 0;
         grid.add(sec("-- Stock Adjustment"),          0, row, 2, 1); row++;
-        grid.add(fl("Product *"),          0, row); grid.add(cbProduct, 1, row++);
+        grid.add(fl("Product *"),          0, row); grid.add(vProduct,  1, row++);
         grid.add(fl("Change Qty *"),       0, row); grid.add(tfQty,     1, row++);
         grid.add(new Label(""),            0, row); grid.add(hint("Use negative to reduce, positive to increase. Cannot be 0."), 1, row++);
         grid.add(fl("Reason *"),           0, row); grid.add(tfNote,    1, row++);
@@ -345,7 +392,7 @@ public class StockController {
                 service.adjustStock(cbProduct.getValue().getProductId(),
                         qty, tfNote.getText().trim(), actorId);
                 setStatus("Stock Adjusted: " + (qty >= 0 ? "+" : "") + qty
-                        + " × " + cbProduct.getValue().getName(), false);
+                         + " x " + cbProduct.getValue().getName(), false);
                 loadStock(); loadLog(); dlg.close();
             } catch (NumberFormatException ex) { lblErr.setText("Quantity must be a non-zero integer."); }
               catch (IllegalArgumentException ex) { lblErr.setText(ex.getMessage()); }
@@ -372,7 +419,12 @@ public class StockController {
         if (lblStatus == null) return;
         lblStatus.setText(msg);
         lblStatus.setStyle(isError ? "-fx-text-fill:#c62828;-fx-font-size:12px;"
-                                   : "-fx-text-fill:#2e7d32;-fx-font-size:12px;");
+                                   : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("Adjusted") || msg.contains("linked")
+                || msg.contains("success") || msg.contains("Ticket") && msg.contains("→")
+                ? "-fx-text-fill:#1e7e4a;-fx-font-weight:bold;-fx-font-size:12px;"
+                : "-fx-text-fill:#37474f;-fx-font-size:12px;"));
     }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();

@@ -8,7 +8,8 @@
       style="-fx-background-color:#eef0f5;">
 
   <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 14 28;">
-    <Label styleClass="page-title" text="📈  Stock &amp; Inventory" HBox.hgrow="ALWAYS"/>
+    <Label styleClass="page-title" text="📈  Stock &amp; Inventory"/>
+    <Region HBox.hgrow="ALWAYS"/>
     <Button fx:id="btnStockIn" styleClass="btn-primary" text="📥  Stock In"  onAction="#handleStockIn"/>
     <Button fx:id="btnAdjust"  styleClass="btn-warning" text="⚙  Adjust"    onAction="#handleAdjust"/>
     <Button                    styleClass="btn-outline" text="⟳  Refresh"   onAction="#handleRefreshStock"/>
@@ -20,7 +21,11 @@
 
     <!-- Stock levels -->
     <VBox styleClass="table-card" minHeight="180">
-      <Label styleClass="sub-heading-label" text="📦  Current Stock Levels" maxWidth="Infinity"/>
+      <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:4 0 4 0;">
+        <Label styleClass="sub-heading-label" text="📦  Current Stock Levels" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtStockSearch" promptText="🔍  Search product…"
+                   onAction="#handleSearchStock" prefWidth="220" styleClass="search-field"/>
+      </HBox>
         <TableView VBox.vgrow="ALWAYS" fx:id="tblStock" styleClass="table-view">
         <columns>
           <TableColumn fx:id="colStockProduct" text="Product"      prefWidth="260"/>

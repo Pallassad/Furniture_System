@@ -2,6 +2,7 @@ package furniture_system.controller;
 
 import furniture_system.model.Salary;
 import furniture_system.service.SalaryService;
+import furniture_system.utils.NotificationUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -235,6 +236,7 @@ public class AdminSalaryManagementController {
                         cbStatus.getValue(), dpPaidDate.getValue(),
                         taNote.getText());
                 setStatus("Salary record #" + id + ".", false);
+                NotificationUtil.success(tableSalary, "Salary record created.");
                 loadAll(); dlg.close();
             } catch (IllegalArgumentException ex) { lblErr.setText(ex.getMessage()); }
               catch (SQLException ex) { lblErr.setText("Error DB: " + ex.getMessage()); }
@@ -338,6 +340,7 @@ public class AdminSalaryManagementController {
                         cbStatus.getValue(), dpPaidDate.getValue(),
                         taNote.getText());
                 setStatus("Updated record #" + sel.getSalaryId() + ".", false);
+                NotificationUtil.success(tableSalary, "Salary record updated.");
                 loadAll(); dlg.close();
             } catch (IllegalArgumentException ex) { lblErr.setText(ex.getMessage()); }
               catch (SQLException ex) { lblErr.setText("Error DB: " + ex.getMessage()); }
@@ -468,7 +471,12 @@ public class AdminSalaryManagementController {
         if (lblSalaryStatus == null) return;
         lblSalaryStatus.setText(msg);
         lblSalaryStatus.setStyle(isError ? "-fx-text-fill:#c62828;-fx-font-size:12px;"
-                                         : "-fx-text-fill:#37474f;-fx-font-size:12px;");
+                                         : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("Adjusted") || msg.contains("linked")
+                || msg.contains("success") || msg.contains("Ticket") && msg.contains("→")
+                ? "-fx-text-fill:#1e7e4a;-fx-font-weight:bold;-fx-font-size:12px;"
+                : "-fx-text-fill:#37474f;-fx-font-size:12px;"));
     }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();

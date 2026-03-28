@@ -14,6 +14,8 @@
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label text="🔧 Warranty &amp; Repair" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtSearch" promptText="🔍  Search product, customer, status…"
+                   onAction="#handleSearch" prefWidth="240" styleClass="search-field"/>
         <Button text="⟳  Refresh"      onAction="#handleRefresh" styleClass="btn-outline"/>
         <Button fx:id="btnCreate"
                 text="➕  Create Ticket"

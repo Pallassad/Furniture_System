@@ -56,11 +56,11 @@ public class EmployeeDAO {
     }
 
     /**
-     * Tìm Employee theo AccountId — dùng trong LoginController sau khi
-     * xác thực thành công để lưu vào SessionManager.
+     * Finds an Employee by AccountId — used in LoginController after
+     * successful authentication to store in SessionManager.
      *
-     * @param accountId  AccountId của Account vừa đăng nhập
-     * @return Employee tương ứng, hoặc null nếu chưa liên kết
+     * @param accountId  AccountId of the account that just logged in
+     * @return the corresponding Employee, or null if not yet linked
      */
     public Employee findByAccountId(int accountId) {
         List<Employee> list = query(
@@ -120,7 +120,7 @@ public class EmployeeDAO {
         } catch (SQLException e) { throw new RuntimeException("hasRelatedData failed", e); }
     }
 
-    /** Kiểm tra nhân viên còn Order nào không (bất kỳ status). */
+    /** Returns true if the employee has any Orders (any status). */
     public boolean hasOrders(int employeeId) {
         String sql = "SELECT COUNT(*) FROM [Order] WHERE EmployeeId = ?";
         try (Connection c = DatabaseConfig.getConnection();
@@ -131,7 +131,7 @@ public class EmployeeDAO {
         } catch (SQLException e) { throw new RuntimeException("hasOrders failed", e); }
     }
 
-    /** Kiểm tra nhân viên còn Salary không phải DRAFT (PAID/PENDING). */
+    /** Returns true if the employee has any non-DRAFT Salary records. */
     public boolean hasNonDraftSalary(int employeeId) {
         String sql = "SELECT COUNT(*) FROM Salary WHERE EmployeeId = ? AND Status <> 'DRAFT'";
         try (Connection c = DatabaseConfig.getConnection();
@@ -142,7 +142,7 @@ public class EmployeeDAO {
         } catch (SQLException e) { throw new RuntimeException("hasNonDraftSalary failed", e); }
     }
 
-    /** Kiểm tra nhân viên còn WarrantyTicket đang active (chưa terminal). */
+    /** Returns true if the employee has any active (non-terminal) WarrantyTickets. */
     public boolean hasActiveWarrantyTickets(int employeeId) {
         String sql = "SELECT COUNT(*) FROM WarrantyTicket " +
                 "WHERE HandlerEmployeeId = ? " +
@@ -155,7 +155,7 @@ public class EmployeeDAO {
         } catch (SQLException e) { throw new RuntimeException("hasActiveWarrantyTickets failed", e); }
     }
 
-    /** Kiểm tra nhân viên có StockLog nào không. */
+    /** Returns true if the employee has any StockLog entries. */
     public boolean hasStockLogs(int employeeId) {
         String sql = "SELECT COUNT(*) FROM StockLog WHERE ActorId = ?";
         try (Connection c = DatabaseConfig.getConnection();
@@ -166,7 +166,7 @@ public class EmployeeDAO {
         } catch (SQLException e) { throw new RuntimeException("hasStockLogs failed", e); }
     }
 
-    /** Xoá toàn bộ Salary DRAFT của nhân viên (gọi trước khi xoá Employee). */
+    /** Deletes all DRAFT Salary records for the employee (call before deleting the Employee). */
     public void deleteDraftSalaries(int employeeId) {
         String sql = "DELETE FROM Salary WHERE EmployeeId = ? AND Status = 'DRAFT'";
         try (Connection c = DatabaseConfig.getConnection();
@@ -235,7 +235,7 @@ public class EmployeeDAO {
     // STATISTICS
     // ─────────────────────────────────────────────────────────────────────────
 
-    /** Số nhân viên theo từng Position. */
+    /** Employee count grouped by Position. */
     public List<Object[]> countByPosition() {
         String sql = "SELECT Position, COUNT(*) AS cnt FROM Employee GROUP BY Position ORDER BY cnt DESC";
         List<Object[]> rows = new ArrayList<>();
@@ -247,7 +247,7 @@ public class EmployeeDAO {
         return rows;
     }
 
-    /** Số nhân viên theo từng Status. */
+    /** Employee count grouped by Status. */
     public List<Object[]> countByStatus() {
         String sql = "SELECT Status, COUNT(*) AS cnt FROM Employee GROUP BY Status ORDER BY Status";
         List<Object[]> rows = new ArrayList<>();
@@ -259,7 +259,7 @@ public class EmployeeDAO {
         return rows;
     }
 
-    /** Nhân viên mới theo tháng (12 tháng gần nhất). */
+    /** New employees per month (last 12 months). */
     public List<Object[]> newEmployeesByMonth() {
         String sql =
             "SELECT FORMAT(HiredAt,'yyyy-MM') AS Mon, COUNT(*) AS cnt " +

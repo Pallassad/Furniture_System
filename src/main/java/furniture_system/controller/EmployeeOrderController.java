@@ -6,6 +6,8 @@ import furniture_system.dao.ProductDAO;
 import furniture_system.dao.PromotionDAO;
 import furniture_system.model.*;
 import furniture_system.service.OrderService;
+import furniture_system.utils.NotificationUtil;
+import furniture_system.utils.SearchableComboBox;
 import furniture_system.utils.SessionManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -155,8 +157,6 @@ public class EmployeeOrderController {
         TextField                 tfQty      = new TextField();
         TextArea                  taNote     = new TextArea();
 
-        cbCustomer.setMaxWidth(Double.MAX_VALUE); cbAddress.setMaxWidth(Double.MAX_VALUE);
-        cbPromo.setMaxWidth(Double.MAX_VALUE);    cbProduct.setMaxWidth(Double.MAX_VALUE);
         tfQty.setPromptText("Qty"); taNote.setPrefRowCount(2); taNote.setWrapText(true);
 
         // Declare labels FIRST before using them in lambdas
@@ -170,11 +170,27 @@ public class EmployeeOrderController {
         TableView<OrderLine> tblDraft = buildDraftLinesTable(draftLines, () -> recalcTotals(draftLines, cbPromo, lblSub, lblDisc, lblFinal));
         tblDraft.setPrefHeight(160);
 
+        List<Customer>        allCustomers;
+        List<Promotion>       allPromos;
+        List<Product>         allProducts;
         try {
-            cbCustomer.setItems(FXCollections.observableArrayList(customerDAO.findAll()));
-            cbPromo.setItems(FXCollections.observableArrayList(promoDAO.findActive()));
-            cbProduct.setItems(FXCollections.observableArrayList(productDAO.getActive()));
+            allCustomers = customerDAO.findAll();
+            allPromos    = promoDAO.findActive();
+            allProducts  = productDAO.getActive();
         } catch (Exception e) { alert(Alert.AlertType.ERROR, "Error", e.getMessage()); return; }
+
+        // Searchable wrappers
+        VBox vCustomer = SearchableComboBox.wrap(cbCustomer, allCustomers,
+                c -> c.getCustomerId() + " – " + c.getFullName() + " (" + c.getPhone() + ")");
+        VBox vPromo    = SearchableComboBox.wrap(cbPromo, allPromos,
+                p -> p.getCode() + " – " + p.getName());
+        VBox vProduct  = SearchableComboBox.wrap(cbProduct, allProducts,
+                p -> p.getProductId() + ". " + p.getName()
+                     + "  [" + String.format("%,.0f ₫", p.getPrice()) + "]");
+        // Address combo – items will be reloaded when a customer is selected
+        VBox vAddress  = SearchableComboBox.wrap(cbAddress, List.of(),
+                a -> (a.isDefault() ? "⭐ " : "") + a.getReceiverName() + " | "
+                     + a.getAddressLine() + ", " + a.getWard() + ", " + a.getDistrict());
 
         cbCustomer.valueProperty().addListener((obs, old, cust) -> {
             cbAddress.setValue(null);
@@ -184,6 +200,8 @@ public class EmployeeOrderController {
                     cbAddress.setItems(FXCollections.observableArrayList(addrs));
                     addrs.stream().filter(DeliveryAddress::isDefault).findFirst().ifPresent(cbAddress::setValue);
                 } catch (Exception ex) { alert(Alert.AlertType.ERROR, "Error", ex.getMessage()); }
+            } else {
+                cbAddress.setItems(FXCollections.observableArrayList());
             }
         });
 
@@ -192,16 +210,16 @@ public class EmployeeOrderController {
         GridPane grid = buildGrid();
         int row = 0;
         grid.add(sec("-- Order Info"),         0, row, 2, 1); row++;
-        grid.add(fl("Customer *"),   0, row); grid.add(cbCustomer, 1, row++);
-        grid.add(fl("Address *"),    0, row); grid.add(cbAddress,  1, row++);
-        grid.add(fl("Promotion"),    0, row); grid.add(cbPromo,    1, row++);
-        grid.add(fl("Note"),         0, row); grid.add(taNote,     1, row++);
+        grid.add(fl("Customer *"),   0, row); grid.add(vCustomer, 1, row++);
+        grid.add(fl("Address *"),    0, row); grid.add(vAddress,  1, row++);
+        grid.add(fl("Promotion"),    0, row); grid.add(vPromo,    1, row++);
+        grid.add(fl("Note"),         0, row); grid.add(taNote,    1, row++);
         grid.add(new Separator(),              0, row, 2, 1); row++;
         grid.add(sec("-- Add Products"),       0, row, 2, 1); row++;
 
         // Add-line row
-        HBox addLine = new HBox(8, cbProduct, tfQty);
-        HBox.setHgrow(cbProduct, Priority.ALWAYS);
+        HBox addLine = new HBox(8, vProduct, tfQty);
+        HBox.setHgrow(vProduct, Priority.ALWAYS);
         Button btnAddLine = new Button("＋ Add");
         btnAddLine.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:6 14;");
         addLine.getChildren().add(btnAddLine);
@@ -256,6 +274,7 @@ public class EmployeeOrderController {
                         taNote.getText().trim().isBlank() ? null : taNote.getText().trim());
                 int newId = orderService.createOrder(order, new ArrayList<>(draftLines));
                 setStatus("Order #" + newId + " created successfully.");
+                NotificationUtil.success(tblMyOrders, "Order #" + newId + " created!");
                 loadMyOrders(); dlg.close();
             } catch (Exception ex) { lblErr.setText(ex.getMessage()); }
         });
@@ -353,18 +372,18 @@ public class EmployeeOrderController {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Update Status – Order #" + sel.getOrderId());
 
-        // FIX: Đồng bộ chính xác với OrderService.validateTransition():
+        // Matches exactly the transitions defined in OrderService.validateTransition():
         //   DRAFT      → CONFIRMED | CANCELLED
         //   CONFIRMED  → PAID      | CANCELLED
         //   PAID       → DELIVERING
         //   DELIVERING → COMPLETED | RETURNED
-        //   (không có PENDING, không có transition sai)
+        //   (no PENDING state, no invalid transitions)
         List<String> allowed = switch (cur) {
             case "DRAFT"      -> List.of("CONFIRMED", "CANCELLED");
             case "CONFIRMED"  -> List.of("PAID", "CANCELLED");
             case "PAID"       -> List.of("DELIVERING");
             case "DELIVERING" -> List.of("COMPLETED", "RETURNED");
-            default           -> List.of(); // trạng thái không xác định → không cho update
+            default           -> List.of(); // unrecognised status: no transitions allowed
         };
 
         if (allowed.isEmpty()) {
@@ -433,6 +452,7 @@ public class EmployeeOrderController {
                 orderService.updateStatus(sel.getOrderId(), newStatus, getActorId(),
                         note.isBlank() ? null : note);
                 setStatus("Order #" + sel.getOrderId() + "  " + cur + " → " + newStatus);
+                NotificationUtil.success(tblMyOrders, "Order #" + sel.getOrderId() + " → " + newStatus);
                 loadMyOrders(); dlg.close();
             } catch (Exception ex) { lblErr.setText(ex.getMessage()); }
         });
@@ -514,6 +534,7 @@ public class EmployeeOrderController {
                     orderService.updateBilling(existing[0], false);
                 }
                 setStatus("Invoice saved for Order #" + sel.getOrderId());
+                NotificationUtil.success(tblMyOrders, "Invoice saved for Order #" + sel.getOrderId());
                 loadMyOrders(); dlg.close();
             } catch (NumberFormatException ex) { lblErr.setText("Amount must be a valid number."); }
               catch (Exception ex) { lblErr.setText(ex.getMessage()); }
@@ -567,7 +588,7 @@ public class EmployeeOrderController {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal disc = BigDecimal.ZERO;
         Promotion promo = cbPromo.getValue();
-        if (promo != null && sub.compareTo(promo.getMinOrderValue()) >= 0) {
+        if (promo != null) {
             disc = "PERCENT".equals(promo.getDiscountType())
                     ? sub.multiply(promo.getDiscountValue()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
                     : promo.getDiscountValue().min(sub);
@@ -599,7 +620,20 @@ public class EmployeeOrderController {
         b.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;");
         return b;
     }
-    private void setStatus(String msg) { if (statusBarLabel != null) statusBarLabel.setText(msg); }
+    private void setStatus(String msg) { setStatus(msg, false); }
+    private void setStatus(String msg, boolean isError) {
+        if (statusBarLabel == null) return;
+        statusBarLabel.setText(msg);
+        if (isError) {
+            statusBarLabel.setStyle("-fx-text-fill:#c0392b;-fx-font-weight:bold;");
+        } else if (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("linked") || msg.contains("success")) {
+            statusBarLabel.setStyle("-fx-text-fill:#1e7e4a;-fx-font-weight:bold;");
+        } else {
+            statusBarLabel.setStyle("-fx-text-fill:#6878aa;-fx-font-weight:normal;");
+        }
+    }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }

@@ -168,7 +168,7 @@ public class FurnitureTypeDAO {
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    //  CHECK whether TypeId is referenced by ANY Product (kể cả INACTIVE)
+    //  CHECK whether TypeId is referenced by ANY Product (including INACTIVE)
     // ════════════════════════════════════════════════════════════════════════
     public boolean hasLinkedProducts(int typeId) throws SQLException {
         String sql = "SELECT COUNT(1) FROM Product WHERE TypeId = ?";
@@ -182,7 +182,7 @@ public class FurnitureTypeDAO {
     }
 
     /**
-     * Kiểm tra chỉ Product ACTIVE (dùng cho soft-deactivate cảnh báo).
+     * Checks only ACTIVE Products (used for soft-deactivate warning).
      */
     public boolean hasActiveLinkedProducts(int typeId) throws SQLException {
         String sql = "SELECT COUNT(1) FROM Product WHERE TypeId = ? AND Status <> 'INACTIVE'";

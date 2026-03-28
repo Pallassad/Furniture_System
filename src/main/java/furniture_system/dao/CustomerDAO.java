@@ -130,8 +130,8 @@ public class CustomerDAO {
     }
 
     /**
-     * Xoá DeliveryAddress của customer mà không còn Order nào tham chiếu.
-     * Gọi trước khi hard-delete Customer.
+     * Deletes DeliveryAddresses of a customer that are no longer referenced by any Order.
+     * Call before hard-deleting the Customer.
      */
     public void deleteUnlinkedAddresses(int customerId) {
         String sql = "DELETE FROM DeliveryAddress WHERE CustomerId = ? " +

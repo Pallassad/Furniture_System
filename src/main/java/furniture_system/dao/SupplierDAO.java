@@ -96,20 +96,20 @@ public class SupplierDAO {
 
     /**
      * Hard-delete Supplier.
-     * SupplierProduct links được xoá trước (không có CASCADE trong schema).
-     * Chỉ gọi khi không còn Product nào có supplierId trỏ tới Supplier này.
+     * SupplierProduct links are deleted first (no CASCADE in schema).
+     * Only call when no Products reference this Supplier via supplierId.
      */
     public boolean hardDelete(int supplierId) throws SQLException {
         try (Connection con = DatabaseConfig.getConnection()) {
             con.setAutoCommit(false);
             try {
-                // Xoá SupplierProduct links
+                // Delete SupplierProduct links
                 try (PreparedStatement ps = con.prepareStatement(
                         "DELETE FROM SupplierProduct WHERE SupplierId = ?")) {
                     ps.setInt(1, supplierId);
                     ps.executeUpdate();
                 }
-                // Xoá Supplier
+                // Delete Supplier
                 int rows;
                 try (PreparedStatement ps = con.prepareStatement(
                         "DELETE FROM Supplier WHERE SupplierId = ?")) {
@@ -125,7 +125,7 @@ public class SupplierDAO {
         }
     }
 
-    /** Kiểm tra Supplier còn Product nào tham chiếu (supplierId FK trong Product). */
+    /** Returns true if any Product references this Supplier (supplierId FK). */
     public boolean hasLinkedProducts(int supplierId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Product WHERE SupplierId = ?";
         try (Connection con = DatabaseConfig.getConnection();
@@ -218,7 +218,7 @@ public class SupplierDAO {
 
     // ── Private helpers ─────────────────────────────────────────────────────
 
-    // Sửa lại (đúng):
+    // Fixed (correct):
 private Supplier map(ResultSet rs) throws SQLException {
     Supplier s = new Supplier();
     s.setSupplierId(rs.getInt("SupplierId"));
@@ -226,7 +226,7 @@ private Supplier map(ResultSet rs) throws SQLException {
     s.setPhone(rs.getString("Phone"));
     s.setEmail(rs.getString("Email"));
     s.setAddress(rs.getString("Address"));
-    s.setStatus(rs.getString("Status"));  // ✅ String trực tiếp
+    s.setStatus(rs.getString("Status"));  // direct String mapping
     return s;
 }
 

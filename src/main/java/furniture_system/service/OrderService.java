@@ -403,7 +403,7 @@ public class OrderService {
 
     private BigDecimal calcDiscount(Promotion promo, BigDecimal subTotal) {
         if (promo == null) return BigDecimal.ZERO;
-        if (subTotal.compareTo(promo.getMinOrderValue()) < 0) return BigDecimal.ZERO;
+        // minOrderValue condition removed — discount applies to all orders
         if ("PERCENT".equals(promo.getDiscountType())) {
             return subTotal.multiply(promo.getDiscountValue())
                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
@@ -501,9 +501,9 @@ public class OrderService {
         }
     }
 
-    /** Decrement UsedCount khi order bị CANCELLED hoặc RETURNED sau khi đã CONFIRMED. */
+    /** Decrement UsedCount when order is CANCELLED or RETURNED after being CONFIRMED. */
     private void decrementPromoTx(Connection conn, int promoId) throws SQLException {
-        // Đảm bảo không xuống dưới 0
+        // Ensure UsedCount does not drop below 0
         String sql = "UPDATE Promotion SET UsedCount = CASE WHEN UsedCount > 0 THEN UsedCount-1 ELSE 0 END WHERE PromoId=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, promoId);

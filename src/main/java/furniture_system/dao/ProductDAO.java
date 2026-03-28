@@ -198,13 +198,13 @@ public class ProductDAO {
     // ══════════════════════════════════════════════════════════════════════
 
     /**
-     * Xoá cứng Product.
-     * Phải kiểm tra hasOrderLines() và hasWarrantyTickets() trước khi gọi.
-     * Stock và StockLog của product sẽ bị cascade-delete ở DB,
-     * hoặc gọi deleteRelatedStock() trước.
+     * Hard-deletes a Product.
+     * Must call hasOrderLines() and hasWarrantyTickets() before invoking this.
+     * Stock and StockLog rows will be cascade-deleted by the DB,
+     * or call deleteRelatedStock() beforehand.
      */
     public boolean hardDelete(int productId) throws SQLException {
-        // Xoá SupplierProduct links trước (không có CASCADE ở FK)
+        // Delete SupplierProduct links first (no CASCADE on FK)
         String delSP = "DELETE FROM SupplierProduct WHERE ProductId = ?";
         try (Connection c = DatabaseConfig.getConnection()) {
             c.setAutoCommit(false);
@@ -213,19 +213,19 @@ public class ProductDAO {
                     ps.setInt(1, productId);
                     ps.executeUpdate();
                 }
-                // Xoá StockLog
+                // Delete StockLog entries
                 try (PreparedStatement ps = c.prepareStatement(
                         "DELETE FROM StockLog WHERE ProductId = ?")) {
                     ps.setInt(1, productId);
                     ps.executeUpdate();
                 }
-                // Xoá Stock
+                // Delete Stock row
                 try (PreparedStatement ps = c.prepareStatement(
                         "DELETE FROM Stock WHERE ProductId = ?")) {
                     ps.setInt(1, productId);
                     ps.executeUpdate();
                 }
-                // Xoá Product
+                // Delete Product
                 int rows;
                 try (PreparedStatement ps = c.prepareStatement(
                         "DELETE FROM Product WHERE ProductId = ?")) {
@@ -241,7 +241,7 @@ public class ProductDAO {
         }
     }
 
-    /** Kiểm tra Product còn được tham chiếu bởi OrderLine không. */
+    /** Returns true if the product is referenced by any OrderLine. */
     public boolean hasOrderLines(int productId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM OrderLine WHERE ProductId = ?";
         try (Connection c = DatabaseConfig.getConnection();
@@ -253,7 +253,7 @@ public class ProductDAO {
         }
     }
 
-    /** Kiểm tra Product còn WarrantyTicket nào không. */
+    /** Returns true if the product has any WarrantyTickets. */
     public boolean hasWarrantyTickets(int productId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM WarrantyTicket WHERE ProductId = ?";
         try (Connection c = DatabaseConfig.getConnection();

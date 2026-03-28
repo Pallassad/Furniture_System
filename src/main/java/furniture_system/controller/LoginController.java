@@ -46,7 +46,7 @@ public class LoginController {
     @FXML private Label summaryTime;
 
     private final AuthService authService = new AuthService();
-    private final EmployeeDAO employeeDAO = new EmployeeDAO();  // ← THÊM MỚI
+    private final EmployeeDAO employeeDAO = new EmployeeDAO();  
 
     @FXML
     public void initialize() {
@@ -166,8 +166,8 @@ public class LoginController {
 
     /**
      * After successful verification:
-     *  1. Save Account + Employee to SessionManager ← MAIN FIX
-     *  2. Navigate sang dashboard tương ứng
+     *  1. Save Account + Employee to SessionManager (main fix)
+     *  2. Navigate to the corresponding dashboard
      */
     private void onLoginSuccess(Account account) {
         try {
@@ -205,8 +205,7 @@ public class LoginController {
             Parent root = loader.load();
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setResizable(true);
-            // Create Scene with size control panel → do not display Background Stage
-            stage.setScene(new Scene(root, 1100, 680));
+            stage.setScene(new Scene(root, 1280, 760));
             String title = (account.isAdmin())  ? "Furniture System - Admin"
                          : isManager             ? "Furniture System - Manager"
                          :                         "Furniture System - Employee";

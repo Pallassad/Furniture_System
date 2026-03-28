@@ -2,6 +2,7 @@ package furniture_system.controller;
 
 import furniture_system.model.*;
 import furniture_system.service.OrderService;
+import furniture_system.utils.NotificationUtil;
 import furniture_system.utils.SessionManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -30,12 +31,7 @@ public class AdminOrderController {
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     // ── Search bar ─────────────────────────────────────────────────────────
-    @FXML private TextField        tfSearchOrderId;
-    @FXML private TextField        tfSearchCustomerId;
-    @FXML private TextField        tfSearchEmployeeId;
-    @FXML private ComboBox<String> cbSearchStatus;
-    @FXML private DatePicker       dpFrom;
-    @FXML private DatePicker       dpTo;
+    @FXML private TextField txtSearch;
 
     // ── Order table ────────────────────────────────────────────────────────
     @FXML private TableView<Order>               tblOrders;
@@ -61,7 +57,6 @@ public class AdminOrderController {
     @FXML
     public void initialize() {
         setupOrderTable();
-        setupSearchCombo();
         loadAllOrders();
 
         tblOrders.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
@@ -124,11 +119,6 @@ public class AdminOrderController {
         tblOrders.setItems(orderList);
     }
 
-    private void setupSearchCombo() {
-        cbSearchStatus.setItems(FXCollections.observableArrayList(
-                "", "DRAFT", "CONFIRMED", "PAID", "DELIVERING", "COMPLETED", "CANCELLED", "RETURNED"));
-    }
-
     // ── Load & Search ──────────────────────────────────────────────────────
     private void loadAllOrders() {
         try {
@@ -140,25 +130,30 @@ public class AdminOrderController {
     @FXML public void onRefresh() { clearSearch(); loadAllOrders(); }
 
     @FXML public void onSearch() {
-        try {
-            Integer orderId    = parseIntOrNull(tfSearchOrderId.getText());
-            Integer customerId = parseIntOrNull(tfSearchCustomerId.getText());
-            Integer employeeId = parseIntOrNull(tfSearchEmployeeId.getText());
-            String  status     = cbSearchStatus.getValue();
-            LocalDateTime from = dpFrom.getValue() != null ? dpFrom.getValue().atStartOfDay()  : null;
-            LocalDateTime to   = dpTo.getValue()   != null ? dpTo.getValue().atTime(23,59,59)  : null;
-            List<Order> result = orderService.searchOrders(customerId, employeeId, orderId,
-                    (status != null && !status.isBlank()) ? status : null, from, to);
-            orderList.setAll(result);
-            setStatus("Found " + result.size() + " order(s).");
-        } catch (Exception e) { alert(Alert.AlertType.ERROR, "Search Error", e.getMessage()); }
+        String kw = txtSearch == null ? "" : txtSearch.getText().trim().toLowerCase();
+        if (kw.isBlank()) { loadAllOrders(); return; }
+
+        // Try to parse as an integer for ID matching
+        Integer idMatch = parseIntOrNull(kw);
+
+        ObservableList<Order> filtered = FXCollections.observableArrayList(
+            orderList.filtered(o ->
+                (idMatch != null && (o.getOrderId() == idMatch ||
+                                     o.getCustomerId() == idMatch ||
+                                     o.getEmployeeId() == idMatch))  ||
+                (o.getCustomerName() != null && o.getCustomerName().toLowerCase().contains(kw)) ||
+                (o.getEmployeeName() != null && o.getEmployeeName().toLowerCase().contains(kw)) ||
+                (o.getStatus()       != null && o.getStatus().toLowerCase().contains(kw))
+            ));
+        tblOrders.setItems(filtered);
+        setStatus("Found " + filtered.size() + " order(s).");
     }
 
     @FXML public void onReset() { clearSearch(); loadAllOrders(); }
 
     private void clearSearch() {
-        tfSearchOrderId.clear(); tfSearchCustomerId.clear(); tfSearchEmployeeId.clear();
-        cbSearchStatus.setValue(null); dpFrom.setValue(null); dpTo.setValue(null);
+        if (txtSearch != null) txtSearch.clear();
+        tblOrders.setItems(orderList);
     }
 
     // ==================== VIEW DETAIL DIALOG ====================
@@ -271,6 +266,7 @@ public class AdminOrderController {
             try {
                 orderService.updateStatus(sel.getOrderId(), newStatus, getActorId(), note);
                 setStatus("Order #" + sel.getOrderId() + " → " + newStatus);
+                NotificationUtil.success(tblOrders, "Order #" + sel.getOrderId() + " → " + newStatus);
                 loadAllOrders(); dlg.close();
             } catch (Exception ex) { lblErr.setText(ex.getMessage()); }
         });
@@ -389,6 +385,7 @@ public class AdminOrderController {
                     orderService.updateBilling(existing[0], true);
                 }
                 setStatus("Invoice saved for Order #" + sel.getOrderId());
+                NotificationUtil.success(tblOrders, "Invoice saved for Order #" + sel.getOrderId());
                 loadAllOrders(); dlg.close();
             } catch (NumberFormatException ex) { lblErr.setText("Amount must be a valid number."); }
               catch (Exception ex) { lblErr.setText(ex.getMessage()); }
@@ -479,8 +476,8 @@ public class AdminOrderController {
     }
 
     private int getActorId() {
-        // StockLog.ActorId là FK → Employee.EmployeeId, KHÔNG dùng AccountId làm fallback.
-        // Admin phải có Employee row được liên kết; nếu không sẽ ném lỗi rõ ràng.
+        // StockLog.ActorId is a FK -> Employee.EmployeeId; do NOT use AccountId as a fallback.
+        // The admin account must have a linked Employee row; otherwise an explicit error is thrown.
         Employee emp = SessionManager.getInstance().getCurrentEmployee();
         if (emp != null) return emp.getEmployeeId();
         throw new IllegalStateException(
@@ -508,7 +505,20 @@ public class AdminOrderController {
         b.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;");
         return b;
     }
-    private void setStatus(String msg) { if (statusBarLabel != null) statusBarLabel.setText(msg); }
+    private void setStatus(String msg) { setStatus(msg, false); }
+    private void setStatus(String msg, boolean isError) {
+        if (statusBarLabel == null) return;
+        statusBarLabel.setText(msg);
+        if (isError) {
+            statusBarLabel.setStyle("-fx-text-fill:#c0392b;-fx-font-weight:bold;");
+        } else if (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("linked") || msg.contains("success")) {
+            statusBarLabel.setStyle("-fx-text-fill:#1e7e4a;-fx-font-weight:bold;");
+        } else {
+            statusBarLabel.setStyle("-fx-text-fill:#6878aa;-fx-font-weight:normal;");
+        }
+    }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }

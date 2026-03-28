@@ -5,11 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 /**
  * Main – JavaFX application entry point.
- * Opens the Login window on start.
  */
 public class Main extends Application {
 
@@ -19,9 +17,8 @@ public class Main extends Application {
                 getClass().getResource("/furniture_system/view/login.fxml"));
         Parent root = loader.load();
 
-        Scene scene = new Scene(root, 780, 560);
         primaryStage.setTitle("Fair Deal Furniture – Login");
-        primaryStage.setScene(scene);
+        primaryStage.setScene(new Scene(root, 780, 560));
         primaryStage.setResizable(false);
         primaryStage.centerOnScreen();
         primaryStage.show();

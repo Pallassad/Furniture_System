@@ -226,7 +226,20 @@ public class EmployeeFurnitureTypeController {
     private Label fl(String t)  { Label l = new Label(t); l.setStyle("-fx-font-weight:bold;-fx-font-size:12px;"); return l; }
     private Label sec(String t) { Label l = new Label(t); l.setStyle("-fx-font-weight:bold;-fx-font-size:11px;-fx-text-fill:#3949ab;"); return l; }
     private Label val(String t) { Label l = new Label(t); l.setStyle("-fx-font-size:12px;"); l.setWrapText(true); return l; }
-    private void setStatus(String msg) { if (statusBarLabel != null) statusBarLabel.setText(msg); }
+    private void setStatus(String msg) { setStatus(msg, false); }
+    private void setStatus(String msg, boolean isError) {
+        if (statusBarLabel == null) return;
+        statusBarLabel.setText(msg);
+        if (isError) {
+            statusBarLabel.setStyle("-fx-text-fill:#c0392b;-fx-font-weight:bold;");
+        } else if (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("linked") || msg.contains("success")) {
+            statusBarLabel.setStyle("-fx-text-fill:#1e7e4a;-fx-font-weight:bold;");
+        } else {
+            statusBarLabel.setStyle("-fx-text-fill:#6878aa;-fx-font-weight:normal;");
+        }
+    }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }

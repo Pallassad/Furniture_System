@@ -2,6 +2,7 @@ package furniture_system.controller;
 
 import furniture_system.service.WarrantyTicketService;
 import furniture_system.model.WarrantyTicket;
+import furniture_system.utils.NotificationUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,9 +21,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * FIX: Bỏ hoàn toàn WarrantyTicketDAO trực tiếp.
- * Tất cả operations đều đi qua WarrantyTicketService để enforce:
- *   - Status transition hợp lệ
+ * Uses WarrantyTicketService exclusively — no direct DAO access.
+ * Admin – Warranty Management. All operations go through WarrantyTicketService to enforce:
+ *   - Valid status transitions
  *   - Terminal state guard
  *   - Business validation (issueDesc, cost)
  */
@@ -53,7 +54,7 @@ public class AdminWarrantyManagementController {
     private static final Set<String> TERMINAL_STATUSES =
             Set.of("COMPLETED", "CANCELLED", "REJECTED");
 
-    // FIX: Chỉ dùng Service, không inject DAO trực tiếp
+    // Uses Service only — no direct DAO injection
     private final WarrantyTicketService      warrantyService  = new WarrantyTicketService();
     private final ObservableList<WarrantyTicket> data = FXCollections.observableArrayList();
 
@@ -202,8 +203,8 @@ public class AdminWarrantyManagementController {
                     tfHandlerId, taIssue, taNote, cbStatus, tfCost, lblErr);
             if (t == null) return;
             try {
-                // FIX: Dùng service.create() để enforce validation
-                // (status bị force CREATED, order phải COMPLETED, v.v.)
+                // Use service.create() to enforce validation
+                // (status is forced to CREATED, order must be COMPLETED, etc.)
                 int id = warrantyService.create(t);
                 setStatus("Ticket #" + id + " created successfully.", false);
                 loadAll(); dlg.close();
@@ -277,12 +278,13 @@ public class AdminWarrantyManagementController {
                     tfCustomerId, tfHandlerId, taIssue, taNote, cbStatus, tfCost, lblErr);
             if (t == null) return;
             try {
-                // FIX: Dùng service.update() để enforce:
+                // Use service.update() to enforce:
                 //   - terminal state guard
-                //   - status transition hợp lệ
+                //   - valid status transitions
                 //   - validation issueDesc, cost
                 warrantyService.update(t);
                 setStatus("Ticket #" + sel.getTicketId() + " updated.", false);
+                NotificationUtil.success(tableWarranty, "Ticket #" + sel.getTicketId() + " updated.");
                 loadAll(); dlg.close();
             } catch (IllegalArgumentException | IllegalStateException ex) {
                 lblErr.setText(ex.getMessage());
@@ -310,7 +312,7 @@ public class AdminWarrantyManagementController {
         dlg.setContentText("Set status to:");
         dlg.showAndWait().ifPresent(choice -> {
             try {
-                // FIX: Dùng service để enforce terminal state guard
+                // Use service to enforce terminal state guard
                 if ("CANCELLED".equals(choice)) warrantyService.cancel(sel.getTicketId());
                 else                            warrantyService.reject(sel.getTicketId());
                 setStatus("Ticket #" + sel.getTicketId() + " → " + choice, false);
@@ -396,7 +398,12 @@ public class AdminWarrantyManagementController {
         if (lblStatus == null) return;
         lblStatus.setText(msg);
         lblStatus.setStyle(isError ? "-fx-text-fill:#c62828;-fx-font-size:12px;"
-                                   : "-fx-text-fill:#37474f;-fx-font-size:12px;");
+                                   : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("Adjusted") || msg.contains("linked")
+                || msg.contains("success") || msg.contains("Ticket") && msg.contains("→")
+                ? "-fx-text-fill:#1e7e4a;-fx-font-weight:bold;-fx-font-size:12px;"
+                : "-fx-text-fill:#37474f;-fx-font-size:12px;"));
     }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();

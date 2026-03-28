@@ -4,6 +4,8 @@ import furniture_system.model.Customer;
 import furniture_system.model.DeliveryAddress;
 import furniture_system.dao.CustomerDAO;
 import furniture_system.service.DeliveryAddressService;
+import furniture_system.utils.NotificationUtil;
+import furniture_system.utils.SearchableComboBox;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -166,7 +168,8 @@ public class AdminDeliveryAddressController {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Add New Delivery Address");
 
-        ComboBox<Customer> cmbCustomer = buildCustomerCombo(customers);
+        ComboBox<Customer> cmbCustomer = new ComboBox<>();
+        VBox vCustomer = buildCustomerComboBox(customers, cmbCustomer);
         TextField tfReceiver = new TextField();
         TextField tfPhone    = new TextField();
         TextField tfAddrLine = new TextField();
@@ -185,7 +188,7 @@ public class AdminDeliveryAddressController {
         GridPane grid = buildGrid();
         int row = 0;
         grid.add(sec("-- Customer"),            0, row, 2, 1); row++;
-        grid.add(fl("Customer *"),     0, row); grid.add(cmbCustomer, 1, row++);
+        grid.add(fl("Customer *"),     0, row); grid.add(vCustomer,   1, row++);
         grid.add(new Separator(),               0, row, 2, 1); row++;
         grid.add(sec("-- Receiver Info"),       0, row, 2, 1); row++;
         grid.add(fl("Receiver Name *"), 0, row); grid.add(tfReceiver, 1, row++);
@@ -216,6 +219,7 @@ public class AdminDeliveryAddressController {
                 if (addr == null) return;
                 service.addAddress(addr);
                 setStatus("Address added for " + nvl(addr.getReceiverName()) + ".", false);
+                NotificationUtil.success(tblAddresses, "Address added.");
                 loadTable(); loadStats(); dlg.close();
             } catch (IllegalArgumentException ex) { lblErr.setText(ex.getMessage()); }
               catch (Exception ex) { lblErr.setText("DB Error: " + ex.getMessage()); }
@@ -238,7 +242,8 @@ public class AdminDeliveryAddressController {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Edit Address #" + sel.getAddressId());
 
-        ComboBox<Customer> cmbCustomer = buildCustomerCombo(customers);
+        ComboBox<Customer> cmbCustomer = new ComboBox<>();
+        VBox vCustomer = buildCustomerComboBox(customers, cmbCustomer);
         customers.stream().filter(c -> c.getCustomerId() == sel.getCustomerId())
                 .findFirst().ifPresent(cmbCustomer::setValue);
 
@@ -264,7 +269,7 @@ public class AdminDeliveryAddressController {
         grid.add(lblInfo,                       0, row, 2, 1); row++;
         grid.add(new Separator(),               0, row, 2, 1); row++;
         grid.add(sec("-- Customer"),            0, row, 2, 1); row++;
-        grid.add(fl("Customer *"),     0, row); grid.add(cmbCustomer, 1, row++);
+        grid.add(fl("Customer *"),     0, row); grid.add(vCustomer,   1, row++);
         grid.add(new Separator(),               0, row, 2, 1); row++;
         grid.add(sec("-- Receiver Info"),       0, row, 2, 1); row++;
         grid.add(fl("Receiver Name *"), 0, row); grid.add(tfReceiver, 1, row++);
@@ -355,15 +360,25 @@ public class AdminDeliveryAddressController {
         }
     }
 
+    /**
+     * Creates a Customer ComboBox (internal state only).
+     * Call buildCustomerComboBox() to get the searchable VBox to add to the layout.
+     */
     private ComboBox<Customer> buildCustomerCombo(List<Customer> customers) {
-        ComboBox<Customer> cb = new ComboBox<>(FXCollections.observableArrayList(customers));
-        cb.setMaxWidth(Double.MAX_VALUE);
-        cb.setConverter(new javafx.util.StringConverter<>() {
-            @Override public String toString(Customer c) {
-                return c == null ? "" : c.getCustomerId() + " - " + c.getFullName(); }
-            @Override public Customer fromString(String s) { return null; }
-        });
+        ComboBox<Customer> cb = new ComboBox<>();
+        SearchableComboBox.wrap(cb, customers,
+                c -> c.getCustomerId() + " – " + c.getFullName()
+                     + " (" + c.getPhone() + ")");
         return cb;
+    }
+
+    /**
+     * Returns a searchable VBox wrapper (TextField + ComboBox) to add to the layout.
+     */
+    private VBox buildCustomerComboBox(List<Customer> customers, ComboBox<Customer> cb) {
+        return SearchableComboBox.wrap(cb, customers,
+                c -> c.getCustomerId() + " – " + c.getFullName()
+                     + " (" + c.getPhone() + ")");
     }
 
     private void setAddressPrompts(TextField rec, TextField ph, TextField addr,
@@ -412,7 +427,12 @@ public class AdminDeliveryAddressController {
         if (lblStatus == null) return;
         lblStatus.setText(msg);
         lblStatus.setStyle(isError ? "-fx-text-fill:#c62828;-fx-font-size:12px;"
-                                   : "-fx-text-fill:#37474f;-fx-font-size:12px;");
+                                   : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("Adjusted") || msg.contains("linked")
+                || msg.contains("success") || msg.contains("Ticket") && msg.contains("→")
+                ? "-fx-text-fill:#1e7e4a;-fx-font-weight:bold;-fx-font-size:12px;"
+                : "-fx-text-fill:#37474f;-fx-font-size:12px;"));
     }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();

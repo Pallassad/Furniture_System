@@ -212,9 +212,8 @@ public class PromotionService {
         if (!p.getStartDate().isBefore(p.getEndDate()))
             throw new IllegalArgumentException("Start date must be before end date.");
 
-        // MinOrderValue
-        if (p.getMinOrderValue() == null || p.getMinOrderValue().compareTo(BigDecimal.ZERO) < 0)
-            throw new IllegalArgumentException("Minimum order value must be ≥ 0.");
+        // MinOrderValue: always default to ZERO (condition removed)
+        if (p.getMinOrderValue() == null) p.setMinOrderValue(BigDecimal.ZERO);
 
         // UsageLimit (nullable = unlimited)
         if (p.getUsageLimit() != null && p.getUsageLimit() <= 0)

@@ -8,7 +8,8 @@
       style="-fx-background-color:#eef0f5;">
 
   <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:20 28 14 28;">
-    <Label styleClass="page-title" text="🛋  Furniture Management" HBox.hgrow="ALWAYS"/>
+    <Label styleClass="page-title" text="🛋  Furniture Management"/>
+    <Region HBox.hgrow="ALWAYS"/>
     <Button fx:id="btnAdd"     styleClass="btn-primary" text="➕  Add"     onAction="#handleAdd"/>
     <Button fx:id="btnEdit"    styleClass="btn-warning" text="✏  Edit"    onAction="#handleEdit"   disable="true"/>
     <Button fx:id="btnDelete"  styleClass="btn-danger"  text="🗑  Delete"  onAction="#handleDelete" disable="true"/>

@@ -4,6 +4,7 @@ import furniture_system.model.Account;
 import furniture_system.model.Account.Role;
 import furniture_system.model.Account.Status;
 import furniture_system.service.AuthService;
+import furniture_system.utils.NotificationUtil;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -32,6 +33,7 @@ public class AuthController {
     @FXML private TableColumn<Account,String>  colLastLogin;
     @FXML private TableColumn<Account,Integer> colFailed;
     @FXML private Button btnRefresh, btnAdd, btnEdit, btnDelete;
+    @FXML private TextField txtSearch;
     @FXML private Label  statusBarLabel;
 
     private final AuthService             authService = new AuthService();
@@ -81,7 +83,21 @@ public class AuthController {
           catch (Exception e)         { alert(Alert.AlertType.ERROR,"Error","Failed: "+e.getMessage()); }
     }
 
-    @FXML public void handleRefresh() { loadAccounts(); }
+    @FXML public void handleRefresh() { if (txtSearch != null) txtSearch.clear(); loadAccounts(); }
+
+    @FXML public void handleSearch() {
+        String kw = txtSearch == null ? "" : txtSearch.getText().trim().toLowerCase();
+        if (kw.isBlank()) { loadAccounts(); return; }
+        ObservableList<Account> filtered = FXCollections.observableArrayList(
+            data.filtered(a ->
+                (a.getUsername()  != null && a.getUsername().toLowerCase().contains(kw)) ||
+                (a.getEmail()     != null && a.getEmail().toLowerCase().contains(kw))    ||
+                (a.getRole()      != null && a.getRole().name().toLowerCase().contains(kw)) ||
+                (a.getStatus()    != null && a.getStatus().name().toLowerCase().contains(kw))
+            ));
+        accountTable.setItems(filtered);
+        setStatus("Found " + filtered.size() + " account(s).");
+    }
 
     // ==================== EDIT ====================
     @FXML
@@ -150,7 +166,8 @@ public class AuthController {
                 if (cbRole.getValue() != sel.getRole())     { authService.updateAccountRole(sel.getAccountId(),   cbRole.getValue());   changed = true; }
                 if (chkUnlock.isSelected())                 { authService.resetFailedAttempts(sel.getAccountId()); changed = true; }
                 if (!changed) { lblErr.setText("No changes detected."); return; }
-                setStatus("Account [" + sel.getUsername() + "] updated."); loadAccounts(); dlg.close();
+                setStatus("Account [" + sel.getUsername() + "] updated.");
+                NotificationUtil.success(accountTable, "Account updated: " + sel.getUsername()); loadAccounts(); dlg.close();
             } catch (IllegalArgumentException | IllegalStateException ex) { lblErr.setText(ex.getMessage()); }
               catch (Exception ex) { lblErr.setText("Error: " + ex.getMessage()); }
         });
@@ -194,7 +211,8 @@ public class AuthController {
                 String email = tfEmail.getText().trim();
                 int id = authService.addAccount(tfUsername.getText(), pfPassword.getText(),
                     cbRole.getValue(), cbStatus.getValue(), email.isEmpty() ? null : email);
-                setStatus("Account added - ID: " + id); loadAccounts(); dlg.close();
+                setStatus("Account added - ID: " + id);
+                NotificationUtil.success(accountTable, "Account created successfully."); loadAccounts(); dlg.close();
             } catch (Exception ex) { lblErr.setText(ex.getMessage()); }
         });
         btnCancel.setOnAction(ev -> dlg.close());
@@ -213,7 +231,8 @@ public class AuthController {
         confirm.setTitle("Confirm Delete"); confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.YES) return;
-            try { authService.deleteAccount(sel.getAccountId()); setStatus("Deleted [" + sel.getUsername() + "]."); loadAccounts(); }
+            try { authService.deleteAccount(sel.getAccountId()); setStatus("Deleted [" + sel.getUsername() + "].");
+                NotificationUtil.warning(accountTable, "Deleted: " + sel.getUsername()); loadAccounts(); }
             catch (IllegalStateException ex) { alert(Alert.AlertType.WARNING, "Cannot Delete", ex.getMessage()); }
             catch (Exception ex)             { alert(Alert.AlertType.ERROR,   "Delete Failed",  ex.getMessage()); }
         });
@@ -223,6 +242,19 @@ public class AuthController {
     private Label sec(String t)  { Label l = new Label(t); l.setStyle("-fx-font-weight:bold;-fx-font-size:11px;-fx-text-fill:#3949ab;"); return l; }
     private Label hint(String t) { Label l = new Label(t); l.setStyle("-fx-font-size:10px;-fx-text-fill:#888;"); return l; }
     private Button primaryBtn(String t) { Button b = new Button(t); b.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;"); return b; }
-    private void setStatus(String msg) { if (statusBarLabel != null) statusBarLabel.setText(msg); }
+    private void setStatus(String msg) { setStatus(msg, false); }
+    private void setStatus(String msg, boolean isError) {
+        if (statusBarLabel == null) return;
+        statusBarLabel.setText(msg);
+        if (isError) {
+            statusBarLabel.setStyle("-fx-text-fill:#c0392b;-fx-font-weight:bold;");
+        } else if (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("linked") || msg.contains("success")) {
+            statusBarLabel.setStyle("-fx-text-fill:#1e7e4a;-fx-font-weight:bold;");
+        } else {
+            statusBarLabel.setStyle("-fx-text-fill:#6878aa;-fx-font-weight:normal;");
+        }
+    }
     private void alert(Alert.AlertType t, String title, String msg) { Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait(); }
 }

@@ -20,8 +20,8 @@ import java.util.List;
  *    -200000                →  Deduction -200.000 ₫
  *
  *  As % of base salary:
- *    10%   or  +10%       →  Reward 10% × BaseSalary
- *    -5%                  →  Deduction 5% × BaseSalary
+ *    10%   or  +10%       ->  Reward 10% x BaseSalary
+ *    -5%                  ->  Deduction 5% x BaseSalary
  *
  *  Service auto-splits when saving to DB:
  *    bonus > 0  →  DB.Bonus = bonus,   DB.Deduction = 0
@@ -115,9 +115,9 @@ public class SalaryService {
      *   "500000"   →  +500.000   (reward)
      *   "+500000"  →  +500.000   (explicit reward)
      *   "-200000"  →  -200.000   (deduction)
-     *   "10%"      →  +10% × base
-     *   "+10%"     →  +10% × base
-     *   "-5%"      →  - 5% × base  (deduction)
+     *   "10%"      ->  +10% x base
+     *   "+10%"     ->  +10% x base
+     *   "-5%"      ->  - 5% x base  (deduction)
      *   ""  / null →  0
      *
      * @param input         User input string

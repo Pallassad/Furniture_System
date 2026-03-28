@@ -2,6 +2,7 @@ package furniture_system.controller;
 
 import furniture_system.model.Promotion;
 import furniture_system.service.PromotionService;
+import furniture_system.utils.NotificationUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -179,7 +180,6 @@ public class AdminPromotionController {
         TextField        tfValue    = new TextField();
         DatePicker       dpStart    = new DatePicker();
         DatePicker       dpEnd      = new DatePicker();
-        TextField        tfMinOrder = new TextField();
         TextField        tfLimit    = new TextField();
         ComboBox<String> cbStatus   = new ComboBox<>(FXCollections.observableArrayList(
                 "UPCOMING", "ACTIVE", "EXPIRED", "DISABLED"));
@@ -187,7 +187,7 @@ public class AdminPromotionController {
         cbType.setValue("PERCENT"); cbStatus.setValue("UPCOMING");
         cbType.setMaxWidth(Double.MAX_VALUE); cbStatus.setMaxWidth(Double.MAX_VALUE);
         dpStart.setMaxWidth(Double.MAX_VALUE); dpEnd.setMaxWidth(Double.MAX_VALUE);
-        tfMinOrder.setPromptText("0 = no minimum"); tfLimit.setPromptText("blank = ∞");
+        tfLimit.setPromptText("blank = ∞");
 
         Label lblErr = new Label();
         lblErr.setStyle("-fx-text-fill:#c62828;-fx-font-size:12px;"); lblErr.setWrapText(true);
@@ -204,7 +204,6 @@ public class AdminPromotionController {
         grid.add(fl("Type *"),       0, row); grid.add(cbType,     1, row++);
         grid.add(fl("Value *"),      0, row); grid.add(tfValue,    1, row++);
         grid.add(new Label(""),      0, row); grid.add(hint("PERCENT: 10 = 10%  |  FIXED: 200000 = 200,000 ₫"), 1, row++);
-        grid.add(fl("Min Order (₫)"),0, row); grid.add(tfMinOrder, 1, row++);
         grid.add(fl("Usage Limit"),  0, row); grid.add(tfLimit,    1, row++);
         grid.add(new Separator(),               0, row, 2, 1); row++;
         grid.add(sec("-- Period"),              0, row, 2, 1); row++;
@@ -222,11 +221,12 @@ public class AdminPromotionController {
         btnSave.setOnAction(ev -> {
             lblErr.setText("");
             Promotion p = buildPromotion(tfCode, tfName, cbType, tfValue,
-                    dpStart, dpEnd, tfMinOrder, tfLimit, cbStatus, lblErr);
+                    dpStart, dpEnd, tfLimit, cbStatus, lblErr);
             if (p == null) return;
             try {
                 svc.addPromotion(p);
                 setStatus("Promotion [" + p.getCode() + "] added.");
+            NotificationUtil.success(promoTable, "Promotion added: " + p.getCode());
                 loadData(); dlg.close();
             } catch (Exception ex) { lblErr.setText(ex.getMessage()); }
         });
@@ -251,7 +251,6 @@ public class AdminPromotionController {
         TextField        tfValue    = new TextField(sel.getDiscountValue() != null ? sel.getDiscountValue().toPlainString() : "");
         DatePicker       dpStart    = new DatePicker(sel.getStartDate() != null ? sel.getStartDate().toLocalDate() : null);
         DatePicker       dpEnd      = new DatePicker(sel.getEndDate()   != null ? sel.getEndDate().toLocalDate()   : null);
-        TextField        tfMinOrder = new TextField(sel.getMinOrderValue() != null ? sel.getMinOrderValue().toPlainString() : "0");
         TextField        tfLimit    = new TextField(sel.getUsageLimit() != null ? String.valueOf(sel.getUsageLimit()) : "");
         ComboBox<String> cbStatus   = new ComboBox<>(FXCollections.observableArrayList(
                 "UPCOMING", "ACTIVE", "EXPIRED", "DISABLED"));
@@ -259,7 +258,7 @@ public class AdminPromotionController {
         cbType.setValue(sel.getDiscountType()); cbStatus.setValue(sel.getStatus());
         cbType.setMaxWidth(Double.MAX_VALUE);   cbStatus.setMaxWidth(Double.MAX_VALUE);
         dpStart.setMaxWidth(Double.MAX_VALUE);  dpEnd.setMaxWidth(Double.MAX_VALUE);
-        tfMinOrder.setPromptText("0 = no minimum"); tfLimit.setPromptText("blank = ∞");
+        tfLimit.setPromptText("blank = ∞");
 
         Label lblInfo = new Label("Promo ID: " + sel.getPromoId()
                 + "   |   Used: " + sel.getUsedCount()
@@ -281,7 +280,6 @@ public class AdminPromotionController {
         grid.add(sec("-- Discount"),            0, row, 2, 1); row++;
         grid.add(fl("Type *"),       0, row); grid.add(cbType,     1, row++);
         grid.add(fl("Value *"),      0, row); grid.add(tfValue,    1, row++);
-        grid.add(fl("Min Order (₫)"),0, row); grid.add(tfMinOrder, 1, row++);
         grid.add(fl("Usage Limit"),  0, row); grid.add(tfLimit,    1, row++);
         grid.add(new Separator(),               0, row, 2, 1); row++;
         grid.add(sec("-- Period"),              0, row, 2, 1); row++;
@@ -299,7 +297,7 @@ public class AdminPromotionController {
         btnSave.setOnAction(ev -> {
             lblErr.setText("");
             Promotion p = buildPromotion(tfCode, tfName, cbType, tfValue,
-                    dpStart, dpEnd, tfMinOrder, tfLimit, cbStatus, lblErr);
+                    dpStart, dpEnd, tfLimit, cbStatus, lblErr);
             if (p == null) return;
             p.setPromoId(sel.getPromoId());
             p.setUsedCount(sel.getUsedCount());
@@ -329,6 +327,7 @@ public class AdminPromotionController {
             try {
                 svc.disablePromotion(sel.getPromoId());
                 setStatus("Promotion [" + sel.getCode() + "] disabled.");
+            NotificationUtil.warning(promoTable, "Promotion disabled.");
                 loadData();
             } catch (Exception ex) { alert(Alert.AlertType.ERROR, "Error", ex.getMessage()); }
         });
@@ -362,7 +361,7 @@ public class AdminPromotionController {
     private Promotion buildPromotion(TextField tfCode, TextField tfName,
                                       ComboBox<String> cbType, TextField tfValue,
                                       DatePicker dpStart, DatePicker dpEnd,
-                                      TextField tfMinOrder, TextField tfLimit,
+                                      TextField tfLimit,
                                       ComboBox<String> cbStatus, Label lblErr) {
         String code = tfCode.getText().trim();
         String name = tfName.getText().trim();
@@ -374,12 +373,6 @@ public class AdminPromotionController {
         BigDecimal value;
         try { value = new BigDecimal(tfValue.getText().trim().replace(",", "")); }
         catch (NumberFormatException ex) { lblErr.setText("Discount value must be a valid number."); return null; }
-
-        BigDecimal minOrder;
-        try {
-            String raw = tfMinOrder.getText().trim().replace(",", "");
-            minOrder = raw.isBlank() ? BigDecimal.ZERO : new BigDecimal(raw);
-        } catch (NumberFormatException ex) { lblErr.setText("Min order value must be a valid number."); return null; }
 
         Integer limit = null;
         String limitRaw = tfLimit.getText().trim();
@@ -394,7 +387,7 @@ public class AdminPromotionController {
         p.setDiscountValue(value);
         p.setStartDate(dpStart.getValue().atStartOfDay());
         p.setEndDate(dpEnd.getValue().atTime(23, 59, 59));
-        p.setMinOrderValue(minOrder);
+        p.setMinOrderValue(java.math.BigDecimal.ZERO); // min order removed
         p.setUsageLimit(limit);
         p.setUsedCount(0);
         p.setStatus(cbStatus.getValue());
@@ -416,7 +409,20 @@ public class AdminPromotionController {
         b.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;");
         return b;
     }
-    private void setStatus(String msg) { if (statusBarLabel != null) statusBarLabel.setText(msg); }
+    private void setStatus(String msg) { setStatus(msg, false); }
+    private void setStatus(String msg, boolean isError) {
+        if (statusBarLabel == null) return;
+        statusBarLabel.setText(msg);
+        if (isError) {
+            statusBarLabel.setStyle("-fx-text-fill:#c0392b;-fx-font-weight:bold;");
+        } else if (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("linked") || msg.contains("success")) {
+            statusBarLabel.setStyle("-fx-text-fill:#1e7e4a;-fx-font-weight:bold;");
+        } else {
+            statusBarLabel.setStyle("-fx-text-fill:#6878aa;-fx-font-weight:normal;");
+        }
+    }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }

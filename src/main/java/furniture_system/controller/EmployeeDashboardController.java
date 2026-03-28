@@ -184,7 +184,7 @@ public class EmployeeDashboardController {
         loadView("/furniture_system/view/employee_delivery_address_management.fxml");
     }
 
-    // ── Warranty: dùng FXMLLoader có controller để truyền employeeId ──────────
+    // ── Warranty: uses FXMLLoader with controller to inject employeeId ─────────
     @FXML
     public void showWarranty() {
         setActive(btnWarranty);
@@ -203,14 +203,14 @@ public class EmployeeDashboardController {
             FXMLLoader loader = new FXMLLoader(url);
             Parent view = loader.load();
 
-            // Truyền employeeId từ SessionManager vào controller
+            // Inject employeeId from SessionManager into the controller
             EmployeeWarrantyController ctrl = loader.getController();
             var emp = SessionManager.getInstance().getCurrentEmployee();
             if (emp != null) {
                 ctrl.setCurrentEmployeeId(emp.getEmployeeId());
             }
 
-            contentArea.getChildren().setAll(view);
+            if (contentArea.getChildren().isEmpty()) { contentArea.getChildren().add(0, view); } else { contentArea.getChildren().set(0, view); }
         } catch (IOException e) {
             showPlaceholder("⚠ Error loading warranty view: " + e.getMessage());
         }
@@ -226,9 +226,9 @@ public class EmployeeDashboardController {
                 getClass().getResource("/furniture_system/view/login.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) lblUsername.getScene().getWindow();
+            stage.setMaximized(false);
             stage.setResizable(false);
             stage.setScene(new Scene(root, 780, 560));
-            stage.sizeToScene();
             stage.setTitle("Fair Deal Furniture – Login");
             stage.centerOnScreen();
         } catch (IOException e) {
@@ -249,7 +249,11 @@ public class EmployeeDashboardController {
             var url = getClass().getResource(fxmlPath);
             if (url == null) { showPlaceholder("⚠ View not found: " + fxmlPath); return; }
             Parent view = FXMLLoader.load(url);
-            contentArea.getChildren().setAll(view);
+            if (contentArea.getChildren().isEmpty()) {
+                contentArea.getChildren().add(0, view);
+            } else {
+                contentArea.getChildren().set(0, view);
+            }
         } catch (IOException e) {
             showPlaceholder("⚠ Error loading: " + e.getMessage());
         }
@@ -259,6 +263,10 @@ public class EmployeeDashboardController {
         Label lbl = new Label(title + "\n\nComing soon...");
         lbl.setStyle("-fx-font-size:18px; -fx-text-fill:#9e9e9e; -fx-font-style:italic;");
         lbl.setAlignment(javafx.geometry.Pos.CENTER);
-        contentArea.getChildren().setAll(lbl);
+        if (contentArea.getChildren().isEmpty()) {
+            contentArea.getChildren().add(0, lbl);
+        } else {
+            contentArea.getChildren().set(0, lbl);
+        }
     }
 }

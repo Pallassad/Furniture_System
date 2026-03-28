@@ -3,24 +3,21 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.geometry.*?>
-<StackPane xmlns:fx="http://javafx.com/fxml"
+<StackPane prefWidth="780" prefHeight="560" xmlns:fx="http://javafx.com/fxml"
            xmlns="http://javafx.com/javafx"
            fx:controller="furniture_system.controller.LoginController"
-           stylesheets="@../resources/css/login.css"
-           prefWidth="780" prefHeight="560"
-           minWidth="780" maxWidth="780"
-           minHeight="560" maxHeight="560">
+           stylesheets="@../resources/css/login.css">
 
-  <!-- ── Background gradient panel ─────────────────────────── -->
-  <HBox styleClass="login-root" alignment="CENTER">
+  <!-- Background fills the whole StackPane -->
+  <HBox styleClass="login-root" alignment="CENTER" StackPane.alignment="CENTER" maxWidth="Infinity" maxHeight="Infinity">
 
-    <!-- LEFT PANEL -->
-    <VBox styleClass="panel-left" spacing="0">
+    <!-- LEFT PANEL — fixed width, full height -->
+    <VBox styleClass="panel-left" spacing="0" maxWidth="340" prefWidth="340">
       <VBox styleClass="brand-block" spacing="10">
         <Label styleClass="brand-icon" text="🛋"/>
         <Label styleClass="brand-name" text="Fair Deal&#10;Furniture"/>
         <Label styleClass="brand-tagline"
-               text="Internal management system&#10;for staff and administrators."
+               text="Internal management system&#10;for employee and administrators."
                wrapText="true"/>
       </VBox>
 
@@ -52,14 +49,14 @@
              wrapText="true"/>
     </VBox>
 
-    <!-- RIGHT PANEL -->
-    <VBox styleClass="panel-right" alignment="CENTER" HBox.hgrow="ALWAYS">
+    <!-- RIGHT PANEL — grows to fill remaining space -->
+    <VBox styleClass="panel-right" alignment="CENTER" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
       <padding><Insets top="52" right="48" bottom="52" left="48"/></padding>
 
       <!-- StackPane so all panes occupy the same space -->
       <StackPane VBox.vgrow="ALWAYS">
 
-        <!-- ══ PANE 1: Login ════════════════════════════════════ -->
+        <!-- PANE 1: Login -->
         <VBox fx:id="loginPane" styleClass="form-pane" spacing="0" alignment="TOP_LEFT">
 
           <Label styleClass="pane-title"    text="Welcome back"/>
@@ -79,7 +76,6 @@
                          promptText="Enter your password"/>
           <Region prefHeight="10"/>
 
-          <!-- Error label (hidden initially) -->
           <Label fx:id="errorLabel"
                  styleClass="error-label"
                  text=""
@@ -108,7 +104,7 @@
           </HBox>
         </VBox>
 
-        <!-- ══ PANE 2: Forgot — enter email ═════════════════════ -->
+        <!-- PANE 2: Forgot — enter email -->
         <VBox fx:id="step1Pane" styleClass="form-pane" spacing="0" alignment="TOP_LEFT"
               visible="false" managed="false">
 
@@ -154,7 +150,7 @@
                   onAction="#handleBackToLogin"/>
         </VBox>
 
-        <!-- ══ PANE 3: OTP + new password ══════════════════════ -->
+        <!-- PANE 3: OTP + new password -->
         <VBox fx:id="step2Pane" styleClass="form-pane" spacing="0" alignment="TOP_LEFT"
               visible="false" managed="false">
 
@@ -219,7 +215,7 @@
                   onAction="#handleBackToStep1"/>
         </VBox>
 
-        <!-- ══ PANE 4: Success ══════════════════════════════════ -->
+        <!-- PANE 4: Success -->
         <VBox fx:id="step3Pane" styleClass="form-pane" spacing="0" alignment="TOP_LEFT"
               visible="false" managed="false">
 
@@ -240,7 +236,6 @@
                  wrapText="true"/>
           <Region prefHeight="16"/>
 
-          <!-- Summary grid -->
           <GridPane styleClass="success-detail" hgap="12" vgap="8">
             <Label styleClass="summary-key" text="Account" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
             <Label fx:id="summaryUsername"  styleClass="summary-val" text="—"
@@ -257,7 +252,7 @@
                   maxWidth="Infinity"/>
         </VBox>
 
-      </StackPane><!-- /StackPane -->
+      </StackPane>
     </VBox><!-- /panel-right -->
 
   </HBox>

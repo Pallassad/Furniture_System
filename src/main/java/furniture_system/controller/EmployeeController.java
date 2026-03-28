@@ -8,21 +8,17 @@ import furniture_system.model.Employee.Status;
 import static furniture_system.model.Employee.Status.INACTIVE;
 import static furniture_system.model.Employee.Status.SUSPENDED;
 import furniture_system.service.EmployeeService;
+import furniture_system.utils.NotificationUtil;
 import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import javafx.scene.Scene;
-import javafx.fxml.FXMLLoader;
-
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 /**
  * EmployeeController – backs employee_management.fxml
@@ -175,6 +171,7 @@ public class EmployeeController {
             try {
                 service.removeEmployee(sel.getEmployeeId());
                 setStatus("Permanently deleted employee [" + sel.getFullName() + "].");
+                NotificationUtil.warning(employeeTable, "Employee deleted.");
                 loadAll();
             } catch (IllegalStateException e) {
                 showError("Cannot delete", e.getMessage());
@@ -335,6 +332,7 @@ public class EmployeeController {
                 if (isEdit) {
                     service.updateEmployee(e);
                     setStatus("Employee [" + e.getFullName() + "] updated.");
+                NotificationUtil.success(employeeTable, "Employee updated.");
                 } else {
                     int newId = service.addEmployee(e);
                     setStatus("Employee added with ID " + newId + ".");
@@ -365,7 +363,20 @@ public class EmployeeController {
         return l;
     }
     private String nvl(String s) { return s == null ? "" : s; }
-    private void setStatus(String msg) { if (statusBarLabel != null) statusBarLabel.setText(msg); }
+    private void setStatus(String msg) { setStatus(msg, false); }
+    private void setStatus(String msg, boolean isError) {
+        if (statusBarLabel == null) return;
+        statusBarLabel.setText(msg);
+        if (isError) {
+            statusBarLabel.setStyle("-fx-text-fill:#c0392b;-fx-font-weight:bold;");
+        } else if (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("linked") || msg.contains("success")) {
+            statusBarLabel.setStyle("-fx-text-fill:#1e7e4a;-fx-font-weight:bold;");
+        } else {
+            statusBarLabel.setStyle("-fx-text-fill:#6878aa;-fx-font-weight:normal;");
+        }
+    }
     private void showError(String title, String msg) {
         Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();

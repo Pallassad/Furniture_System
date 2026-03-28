@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 
 /**
  * Account – mirrors the Account table in the database.
- * UPDATED: createdAt removed; email added (dùng cho quên mật khẩu qua Gmail).
- *          resetToken / resetTokenExpiry thêm cho forgot-password flow.
+ * UPDATED: createdAt removed; email added (used for forgot-password flow via Gmail).
+ *          resetToken / resetTokenExpiry added for the forgot-password flow.
  */
 public class Account {
 
@@ -17,11 +17,11 @@ public class Account {
     private String        passwordHash;
     private Role          role;
     private Status        status;
-    private String        email;               // thay thế createdAt
+    private String        email;               // replaces createdAt
     private LocalDateTime lastLoginAt;
     private int           failedAttempts;
-    private String        resetToken;          // OTP 6 chữ số; NULL khi không dùng
-    private LocalDateTime resetTokenExpiry;    // thời điểm hết hạn OTP
+    private String        resetToken;          // 6-digit OTP; NULL when not in use
+    private LocalDateTime resetTokenExpiry;    // OTP expiry timestamp
 
     // ── Constructors ──────────────────────────────────────────────────────────
     public Account() {}

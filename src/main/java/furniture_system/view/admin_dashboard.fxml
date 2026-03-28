@@ -12,11 +12,9 @@
     <top>
         <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16" prefHeight="58">
         
-            <!-- Bên trái: Logo + Title -->
             <Region styleClass="topbar-logo" prefWidth="22" prefHeight="22"/>
             <Label styleClass="topbar-title" text="Fair Deal – Admin Dashboard" HBox.hgrow="ALWAYS"/>
 
-            <!-- Bên phải: Role + Welcome + Logout (sát phải) -->
             <HBox alignment="CENTER_RIGHT" spacing="14" HBox.hgrow="NEVER">
                 <Label styleClass="topbar-role" text="ADMIN"/>
                 <Label fx:id="lblUsername" styleClass="topbar-welcome" text="Welcome, admin"/>
@@ -39,9 +37,9 @@
                 <Button fx:id="btnEmployee"        styleClass="nav-btn" text="👥  Employee Management"   onAction="#showEmployeeManagement"        maxWidth="Infinity"/>
                 <Button fx:id="btnCustomer"        styleClass="nav-btn" text="🙍  Customer Management"   onAction="#showCustomerManagement"        maxWidth="Infinity"/>
                 <Button fx:id="btnProduct"         styleClass="nav-btn" text="🛋  Furniture Management"  onAction="#showProductManagement"         maxWidth="Infinity"/>
-                <Button fx:id="btnFurnitureType"   styleClass="nav-btn" text="🪑  Furniture Types"        onAction="#showFurnitureTypeManagement"   maxWidth="Infinity"/>
+                <Button fx:id="btnFurnitureType"   styleClass="nav-btn" text="🏷  Furniture Types"        onAction="#showFurnitureTypeManagement"   maxWidth="Infinity"/>
                 <Button fx:id="btnOrders"          styleClass="nav-btn" text="📦  Orders"                 onAction="#showOrders"                    maxWidth="Infinity"/>
-                <Button fx:id="btnPromotion"       styleClass="nav-btn" text="🏷  Promotion Management"  onAction="#showPromotionManagement"       maxWidth="Infinity"/>
+                <Button fx:id="btnPromotion"       styleClass="nav-btn" text="🎫 Promotion Management"  onAction="#showPromotionManagement"       maxWidth="Infinity"/>
                 <Button fx:id="btnSupplier"        styleClass="nav-btn" text="🏭  Supplier Management"   onAction="#showSupplierManagement"        maxWidth="Infinity"/>
                 <Button fx:id="btnStock"           styleClass="nav-btn" text="📈  Stock &amp; Inventory"      onAction="#showStockManagement"           maxWidth="Infinity"/>
                 <Button fx:id="btnSalary"          styleClass="nav-btn" text="💰  Salary Management"     onAction="#showSalaryManagement"          maxWidth="Infinity"/>
@@ -50,7 +48,7 @@
             </VBox>
 
             <!-- CONTENT AREA -->
-            <StackPane fx:id="contentArea" HBox.hgrow="ALWAYS"
+            <StackPane fx:id="contentArea" id="contentArea" HBox.hgrow="ALWAYS"
                        style="-fx-background-color:#eef0f5;">
 
                 <!-- Default: welcome card + tile grid -->

@@ -2,6 +2,7 @@ package furniture_system.controller;
 
 import furniture_system.model.FurnitureType;
 import furniture_system.service.FurnitureTypeService;
+import furniture_system.utils.NotificationUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -161,6 +162,7 @@ public class FurnitureTypeController {
                 String err = service.add(tfName.getText(), taDesc.getText(), cbStatus.getValue());
                 if (err != null) { lblErr.setText(err); return; }
                 setStatus("Furniture type [" + tfName.getText().trim() + "] added.");
+                NotificationUtil.success(typeTable, "Type added: " + tfName.getText().trim());
                 loadData(); dlg.close();
             } catch (SQLException ex) { lblErr.setText("Database error: " + ex.getMessage()); }
         });
@@ -217,6 +219,7 @@ public class FurnitureTypeController {
                 String err = service.update(sel.getTypeId(), tfName.getText(), taDesc.getText(), cbStatus.getValue());
                 if (err != null) { lblErr.setText(err); return; }
                 setStatus("Furniture type [" + tfName.getText().trim() + "] updated.");
+                NotificationUtil.success(typeTable, "Type updated.");
                 loadData(); dlg.close();
             } catch (SQLException ex) { lblErr.setText("Database error: " + ex.getMessage()); }
         });
@@ -243,6 +246,7 @@ public class FurnitureTypeController {
                 String err = service.delete(sel.getTypeId());
                 if (err != null) { alert(Alert.AlertType.WARNING, "Cannot Delete", err); return; }
                 setStatus("Deleted [" + sel.getTypeName() + "].");
+            NotificationUtil.warning(typeTable, "Deleted: " + sel.getTypeName());
                 loadData();
             } catch (SQLException ex) {
                 alert(Alert.AlertType.ERROR, "Delete Failed", ex.getMessage());
@@ -265,7 +269,20 @@ public class FurnitureTypeController {
         b.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;");
         return b;
     }
-    private void setStatus(String msg) { if (statusBarLabel != null) statusBarLabel.setText(msg); }
+    private void setStatus(String msg) { setStatus(msg, false); }
+    private void setStatus(String msg, boolean isError) {
+        if (statusBarLabel == null) return;
+        statusBarLabel.setText(msg);
+        if (isError) {
+            statusBarLabel.setStyle("-fx-text-fill:#c0392b;-fx-font-weight:bold;");
+        } else if (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
+                || msg.contains("recorded") || msg.contains("linked") || msg.contains("success")) {
+            statusBarLabel.setStyle("-fx-text-fill:#1e7e4a;-fx-font-weight:bold;");
+        } else {
+            statusBarLabel.setStyle("-fx-text-fill:#6878aa;-fx-font-weight:normal;");
+        }
+    }
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }
