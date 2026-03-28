@@ -1,12 +1,12 @@
 package furniture_system.service;
 
+import furniture_system.config.DatabaseConfig;
 import furniture_system.dao.StockDAO;
 import furniture_system.model.Stock;
 import furniture_system.model.StockLog;
 import furniture_system.model.StockLog.LogType;
 
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.List;
 
 /**
@@ -86,6 +86,40 @@ public class StockService {
             throw new RuntimeException("DB error: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Get current Reorder Level for a product.
+     * Returns 0 if no stock row found.
+     */
+    public int getReorderLevel(int productId) throws SQLException {
+        if (productId <= 0) throw new IllegalArgumentException("Invalid product ID.");
+        String sql = "SELECT ReorderLevel FROM Stock WHERE ProductId = ?";
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt("ReorderLevel") : 0;
+            }
+        }
+    }
+
+    /**
+     * Update Reorder Level for a product.
+     * @param reorderLevel must be >= 0
+     */
+    public void updateReorderLevel(int productId, int reorderLevel) throws SQLException {
+        if (productId <= 0) throw new IllegalArgumentException("Invalid product ID.");
+        if (reorderLevel < 0) throw new IllegalArgumentException("Reorder level cannot be negative.");
+        String sql = "UPDATE Stock SET ReorderLevel = ? WHERE ProductId = ?";
+        try (Connection con = DatabaseConfig.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, reorderLevel);
+            ps.setInt(2, productId);
+            ps.executeUpdate();
+        }
+    }
+
+    // ── Private helpers ────────────────────────────────────────────────────
 
     private void validateNote(String note, boolean required) {
         if (required && (note == null || note.isBlank()))

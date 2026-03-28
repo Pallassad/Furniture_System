@@ -71,7 +71,7 @@ public class AdminFurnitureController {
     // ── Column setup ───────────────────────────────────────────────────────
     private void setupColumns() {
         colId.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleIntegerProperty(c.getValue().getProductId()).asObject());
+new javafx.beans.property.SimpleIntegerProperty(c.getValue().getProductId()).asObject());
         colName.setCellValueFactory(c ->
                 new SimpleStringProperty(c.getValue().getName()));
         colType.setCellValueFactory(c ->
@@ -131,7 +131,7 @@ public class AdminFurnitureController {
             data.setAll(list);
             setStatus("Loaded " + list.size() + " product(s).");
         } catch (Exception e) {
-            alert(Alert.AlertType.ERROR, "Error", "Failed to load products: " + e.getMessage());
+alert(Alert.AlertType.ERROR, "Error", "Failed to load products: " + e.getMessage());
         }
     }
 
@@ -166,6 +166,8 @@ public class AdminFurnitureController {
         ComboBox<Product.Status> cbStatus  = new ComboBox<>(FXCollections.observableArrayList(Product.Status.values()));
         spnWarranty.setEditable(true);
         spnWarranty.setMaxWidth(Double.MAX_VALUE);
+        spnWarranty.getEditor().setTextFormatter(new TextFormatter<>(change ->
+        change.getControlNewText().matches("\\d{0,3}") ? change : null));
         cbStatus.setMaxWidth(Double.MAX_VALUE);
         cbStatus.getSelectionModel().select(Product.Status.ACTIVE);
         taDesc.setPrefRowCount(4); taDesc.setWrapText(true);
@@ -193,7 +195,7 @@ public class AdminFurnitureController {
         grid.add(sec("-- Category & Supplier"), 0, row, 2, 1); row++;
         grid.add(fl("Furniture Type *"),    0, row); grid.add(vType,      1, row++);
         grid.add(fl("Supplier *"),          0, row); grid.add(vSupplier,  1, row++);
-        grid.add(new Separator(),           0, row, 2, 1); row++;
+grid.add(new Separator(),           0, row, 2, 1); row++;
         grid.add(sec("-- Pricing & Warranty"), 0, row, 2, 1); row++;
         grid.add(fl("Price (VND) *"),       0, row); grid.add(tfPrice,     1, row++);
         grid.add(new Label(""),             0, row); grid.add(hint("Numeric only, e.g. 1500000"), 1, row++);
@@ -245,10 +247,12 @@ public class AdminFurnitureController {
         TextArea         taDesc      = new TextArea(sel.getDescription() != null ? sel.getDescription() : "");
         Spinner<Integer> spnWarranty = new Spinner<>(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 999, sel.getWarrantyMonths()));
         ComboBox<FurnitureType>  cbType     = new ComboBox<>();
-        ComboBox<Supplier>       cbSupplier = new ComboBox<>();
+ComboBox<Supplier>       cbSupplier = new ComboBox<>();
         ComboBox<Product.Status> cbStatus   = new ComboBox<>(FXCollections.observableArrayList(Product.Status.values()));
 
         spnWarranty.setEditable(true); spnWarranty.setMaxWidth(Double.MAX_VALUE);
+        spnWarranty.getEditor().setTextFormatter(new TextFormatter<>(change ->
+        change.getControlNewText().matches("\\d{0,3}") ? change : null));
         cbStatus.setMaxWidth(Double.MAX_VALUE); cbStatus.setValue(sel.getStatus());
         taDesc.setPrefRowCount(4); taDesc.setWrapText(true);
 
@@ -289,7 +293,7 @@ public class AdminFurnitureController {
         Button btnSave   = primaryBtn("Save Changes");
         Button btnCancel = new Button("Cancel");
         btnCancel.setStyle("-fx-background-radius:6;-fx-padding:8 18;");
-        HBox btns = new HBox(10, btnCancel, btnSave); btns.setAlignment(Pos.CENTER_RIGHT);
+HBox btns = new HBox(10, btnCancel, btnSave); btns.setAlignment(Pos.CENTER_RIGHT);
         grid.add(btns, 0, row, 2, 1);
 
         btnSave.setOnAction(ev -> {
@@ -346,7 +350,7 @@ public class AdminFurnitureController {
                                   ComboBox<Product.Status> cbStatus,
                                   Label lblErr) {
         String name = tfName.getText().trim();
-        if (name.isEmpty())            { lblErr.setText("Product name is required."); return null; }
+if (name.isEmpty())            { lblErr.setText("Product name is required."); return null; }
         if (cbType.getValue() == null) { lblErr.setText("Please select a Furniture Type."); return null; }
         if (cbSupplier.getValue() == null) { lblErr.setText("Please select a Supplier."); return null; }
         if (cbStatus.getValue() == null)   { lblErr.setText("Please select a Status."); return null; }
@@ -406,7 +410,7 @@ public class AdminFurnitureController {
                                    ComboBox<Supplier> cbSupplier,
                                    Product sel) {
         try {
-            // ── Furniture Types ──────────────────────────────────────────────
+// ── Furniture Types ──────────────────────────────────────────────
             List<FurnitureType> activeTypes = new java.util.ArrayList<>(svcType.getActive());
             boolean currentTypePresent = activeTypes.stream()
                     .anyMatch(t -> t.getTypeId() == sel.getTypeId());
@@ -455,7 +459,7 @@ public class AdminFurnitureController {
         b.setStyle("-fx-background-color:#3949ab;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:8 18;-fx-font-weight:bold;");
         return b;
     }
-    private void setStatus(String msg) { setStatus(msg, false); }
+private void setStatus(String msg) { setStatus(msg, false); }
     private void setStatus(String msg, boolean isError) {
         if (statusBarLabel == null) return;
         statusBarLabel.setText(msg);

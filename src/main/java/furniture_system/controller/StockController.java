@@ -58,9 +58,9 @@ public class StockController {
     @FXML private TextField txtStockSearch;
     @FXML private Label  lblStatus;
 
-    private final StockService           service = new StockService();
-    private final ObservableList<Stock>  stockData = FXCollections.observableArrayList();
-    private final ObservableList<StockLog> logData = FXCollections.observableArrayList();
+    private final StockService             service   = new StockService();
+    private final ObservableList<Stock>    stockData = FXCollections.observableArrayList();
+    private final ObservableList<StockLog> logData   = FXCollections.observableArrayList();
 
     /**
      * actorId = Employee.EmployeeId of the logged-in user.
@@ -88,30 +88,17 @@ public class StockController {
     }
 
     // ── Resolve actorId ────────────────────────────────────────────────────
-    // actorId must be Employee.EmployeeId (FK constraint on the StockLog table).
-    // If no Employee row is found, actorId stays -1, and write operations are disabled.
     private void resolveActorId() {
-        // Priority 1: read from SessionManager (set by LoginController after login)
         var emp = SessionManager.getInstance().getCurrentEmployee();
-        if (emp != null) {
-            actorId = emp.getEmployeeId();
-            return;
-        }
-
-        // Priority 2: look up from DB by AccountId (in case SessionManager has no Employee yet)
+        if (emp != null) { actorId = emp.getEmployeeId(); return; }
         var account = SessionManager.getInstance().getCurrentAccount();
         if (account == null) return;
-
         try (Connection con = DatabaseConfig.getConnection();
              PreparedStatement ps = con.prepareStatement(
                      "SELECT EmployeeId FROM Employee WHERE AccountId = ?")) {
             ps.setInt(1, account.getAccountId());
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    actorId = rs.getInt("EmployeeId");
-                }
-                // No Employee row found (including Admin accounts): keep actorId = -1.
-                // Do NOT fall back to AccountId — that would violate the FK constraint.
+                if (rs.next()) actorId = rs.getInt("EmployeeId");
             }
         } catch (Exception ignored) {}
     }
@@ -166,11 +153,11 @@ public class StockController {
                 if (empty || s == null) { setText(null); setStyle(""); return; }
                 setText(s);
                 setStyle(switch (s) {
-                    case "IN"                    -> "-fx-text-fill:#27ae60;-fx-font-weight:bold;";
-                    case "ADJUST"                -> "-fx-text-fill:#e65100;-fx-font-weight:bold;";
-                    case "OUT", "CANCEL"         -> "-fx-text-fill:#c62828;-fx-font-weight:bold;";
-                    case "WARRANTY_OUT", "RETURN"-> "-fx-text-fill:#6a1b9a;-fx-font-weight:bold;";
-                    default                      -> "-fx-text-fill:#37474f;";
+                    case "IN"                     -> "-fx-text-fill:#27ae60;-fx-font-weight:bold;";
+                    case "ADJUST"                 -> "-fx-text-fill:#e65100;-fx-font-weight:bold;";
+                    case "OUT", "CANCEL"          -> "-fx-text-fill:#c62828;-fx-font-weight:bold;";
+                    case "WARRANTY_OUT", "RETURN" -> "-fx-text-fill:#6a1b9a;-fx-font-weight:bold;";
+                    default                       -> "-fx-text-fill:#37474f;";
                 });
             }
         });
@@ -196,24 +183,14 @@ public class StockController {
     private void loadStock() {
         try {
             List<Stock> list = service.getAllStock();
-
-            // Sort: low-stock items first (ascending by quantity/reorderLevel ratio),
-            // then OK items sorted alphabetically by product name.
             list.sort((a, b) -> {
-                boolean aLow = a.isBelowReorder();
-                boolean bLow = b.isBelowReorder();
-                if (aLow != bLow) return aLow ? -1 : 1; // low-stock floats to top
-                if (aLow) {
-                    // Both low: the one with less remaining stock comes first
-                    int diff = a.getQuantity() - b.getQuantity();
-                    if (diff != 0) return diff;
-                }
-                // Alphabetical fallback
+                boolean aLow = a.isBelowReorder(), bLow = b.isBelowReorder();
+                if (aLow != bLow) return aLow ? -1 : 1;
+                if (aLow) { int diff = a.getQuantity() - b.getQuantity(); if (diff != 0) return diff; }
                 String na = a.getProductName() != null ? a.getProductName() : "";
                 String nb = b.getProductName() != null ? b.getProductName() : "";
                 return na.compareToIgnoreCase(nb);
             });
-
             stockData.setAll(list);
             long low = list.stream().filter(Stock::isBelowReorder).count();
             setStatus("Loaded " + list.size() + " products"
@@ -223,7 +200,7 @@ public class StockController {
 
     private void loadLog() {
         try {
-            Product selProd = cbLogProduct.getValue();
+            Product selProd   = cbLogProduct.getValue();
             Integer productId = selProd != null ? selProd.getProductId() : null;
             String  logType   = cbLogType.getValue();
             Timestamp from = dpFrom.getValue() != null
@@ -241,10 +218,8 @@ public class StockController {
     @FXML public void handleSearchStock() {
         String kw = txtStockSearch == null ? "" : txtStockSearch.getText().trim().toLowerCase();
         if (kw.isBlank()) { loadStock(); return; }
-        // Filter then preserve sort order (low-stock on top)
         List<Stock> filtered = stockData.stream()
-                .filter(s -> s.getProductName() != null
-                        && s.getProductName().toLowerCase().contains(kw))
+                .filter(s -> s.getProductName() != null && s.getProductName().toLowerCase().contains(kw))
                 .sorted((a, b) -> {
                     boolean aLow = a.isBelowReorder(), bLow = b.isBelowReorder();
                     if (aLow != bLow) return aLow ? -1 : 1;
@@ -257,11 +232,47 @@ public class StockController {
         tblStock.setItems(FXCollections.observableArrayList(filtered));
         setStatus("Found " + filtered.size() + " product(s).", false);
     }
-    @FXML public void handleFilterLog()    { loadLog(); }
-    @FXML public void handleClearFilter()  {
+
+    @FXML public void handleFilterLog()   { loadLog(); }
+    @FXML public void handleClearFilter() {
         cbLogProduct.setValue(null); cbLogType.setValue("");
         dpFrom.setValue(null); dpTo.setValue(null);
         loadLog();
+    }
+
+    // ── Shared helper: build Reorder Point spinner ─────────────────────────
+    private Spinner<Integer> buildReorderSpinner() {
+        Spinner<Integer> spn = new Spinner<>(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 9999, 0));
+        spn.setEditable(true);
+        spn.setMaxWidth(Double.MAX_VALUE);
+        spn.setDisable(true);
+        spn.getEditor().setTextFormatter(new TextFormatter<>(change ->
+                change.getControlNewText().matches("\\d{0,4}") ? change : null));
+        return spn;
+    }
+
+    // ── Shared helper: listen for product selection → load reorder level ───
+    private void attachReorderListener(ComboBox<Product> cbProduct, Spinner<Integer> spnReorder) {
+        cbProduct.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null) { spnReorder.setDisable(true); return; }
+            try {
+                int current = service.getReorderLevel(newVal.getProductId());
+                spnReorder.getValueFactory().setValue(current);
+                spnReorder.setDisable(false);
+            } catch (Exception ex) {
+                spnReorder.getValueFactory().setValue(0);
+                spnReorder.setDisable(false);
+            }
+        });
+    }
+
+    // ── Shared helper: build button bar ────────────────────────────────────
+    private HBox buildButtonBar(Button btnCancel, Button btnSave) {
+        HBox bar = new HBox(10, btnCancel, btnSave);
+        bar.setAlignment(Pos.CENTER_RIGHT);
+        bar.setPadding(new Insets(10, 0, 0, 0));
+        return bar;
     }
 
     // ==================== STOCK IN DIALOG ====================
@@ -276,42 +287,48 @@ public class StockController {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Stock In — Receive Inventory");
 
-        ComboBox<Product> cbProduct = new ComboBox<>();
-        TextField         tfQty     = new TextField();
-        TextField         tfNote    = new TextField();
+        ComboBox<Product> cbProduct  = new ComboBox<>();
+        TextField         tfQty      = new TextField();
+        TextField         tfNote     = new TextField();
+        Spinner<Integer>  spnReorder = buildReorderSpinner();
+
         tfQty.setPromptText("Positive integer, e.g. 50");
         tfNote.setPromptText("Optional — invoice no., supplier, etc.");
 
         List<Product> allProducts;
-        try {
-            allProducts = new ProductService().getAllProducts();
-        } catch (Exception ignored) { allProducts = List.of(); }
+        try { allProducts = new ProductService().getAllProducts(); }
+        catch (Exception ignored) { allProducts = List.of(); }
 
         VBox vProduct = SearchableComboBox.wrap(cbProduct, allProducts,
-                p -> p.getProductId() + ". " + p.getName()
-                     + "  [Stock: ?]");
+                p -> p.getProductId() + ". " + p.getName() + "  [Stock: ?]");
+
+        attachReorderListener(cbProduct, spnReorder);
 
         Label lblErr = new Label();
         lblErr.setStyle("-fx-text-fill:#c62828;-fx-font-size:12px;"); lblErr.setWrapText(true);
-
-        GridPane grid = buildGrid();
-        int row = 0;
-        grid.add(sec("-- Stock In Details"),      0, row, 2, 1); row++;
-        grid.add(fl("Product *"),      0, row); grid.add(vProduct,  1, row++);
-        grid.add(fl("Quantity *"),     0, row); grid.add(tfQty,     1, row++);
-        grid.add(new Label(""),        0, row); grid.add(hint("Must be a positive integer."), 1, row++);
-        grid.add(fl("Note"),           0, row); grid.add(tfNote,    1, row++);
-        grid.add(new Label(""),        0, row); grid.add(hint("Optional. Invoice number, supplier name, etc."), 1, row++);
-        grid.add(new Separator(),                 0, row, 2, 1); row++;
-        grid.add(lblErr,                          0, row, 2, 1); row++;
 
         Button btnSave   = new Button("Record Stock In");
         btnSave.setStyle("-fx-background-color:#27ae60;-fx-text-fill:white;-fx-background-radius:6;" +
                          "-fx-padding:8 18;-fx-font-weight:bold;");
         Button btnCancel = new Button("Cancel");
         btnCancel.setStyle("-fx-background-radius:6;-fx-padding:8 18;");
-        HBox btns = new HBox(10, btnCancel, btnSave); btns.setAlignment(Pos.CENTER_RIGHT);
-        grid.add(btns, 0, row, 2, 1);
+        HBox btns = buildButtonBar(btnCancel, btnSave);
+
+        GridPane grid = buildGrid();
+        int row = 0;
+        grid.add(sec("-- Stock In Details"),  0, row, 2, 1); row++;
+        grid.add(fl("Product *"),             0, row); grid.add(vProduct,   1, row++);
+        grid.add(fl("Quantity *"),            0, row); grid.add(tfQty,      1, row++);
+        grid.add(new Label(""),               0, row); grid.add(hint("Must be a positive integer."), 1, row++);
+        grid.add(fl("Note"),                  0, row); grid.add(tfNote,     1, row++);
+        grid.add(new Label(""),               0, row); grid.add(hint("Optional. Invoice number, supplier name, etc."), 1, row++);
+        grid.add(new Separator(),             0, row, 2, 1); row++;
+        grid.add(sec("-- Reorder Settings"),  0, row, 2, 1); row++;
+        grid.add(fl("Reorder Point"),         0, row); grid.add(spnReorder, 1, row++);
+        grid.add(new Label(""),               0, row); grid.add(hint("Auto-loaded from current setting. Update if needed."), 1, row++);
+        grid.add(new Separator(),             0, row, 2, 1); row++;
+        grid.add(lblErr,                      0, row, 2, 1); row++;
+        grid.add(btns,                        0, row, 2, 1);
 
         btnSave.setOnAction(ev -> {
             lblErr.setText("");
@@ -321,6 +338,8 @@ public class StockController {
                 if (qty <= 0) throw new NumberFormatException();
                 service.stockIn(cbProduct.getValue().getProductId(),
                         qty, tfNote.getText().trim(), actorId);
+                if (!spnReorder.isDisable())
+                    service.updateReorderLevel(cbProduct.getValue().getProductId(), spnReorder.getValue());
                 setStatus("Stock In recorded: +" + qty + " x " + cbProduct.getValue().getName(), false);
                 NotificationUtil.success(tblStock, "Stock In: +" + qty + " x " + cbProduct.getValue().getName());
                 loadStock(); loadLog(); dlg.close();
@@ -330,7 +349,7 @@ public class StockController {
         });
         btnCancel.setOnAction(ev -> dlg.close());
 
-        dlg.setScene(new Scene(grid, 480, 340));
+        dlg.setScene(new Scene(grid, 480, 470));
         dlg.setResizable(false); dlg.showAndWait();
     }
 
@@ -346,41 +365,48 @@ public class StockController {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Adjust Stock — Correction / Audit");
 
-        ComboBox<Product> cbProduct = new ComboBox<>();
-        TextField         tfQty     = new TextField();
-        TextField         tfNote    = new TextField();
+        ComboBox<Product> cbProduct  = new ComboBox<>();
+        TextField         tfQty      = new TextField();
+        TextField         tfNote     = new TextField();
+        Spinner<Integer>  spnReorder = buildReorderSpinner();
+
         tfQty.setPromptText("Positive or negative integer, e.g. -3 or +10");
         tfNote.setPromptText("Required — reason for adjustment");
 
         List<Product> allProductsAdj;
-        try {
-            allProductsAdj = new ProductService().getAllProducts();
-        } catch (Exception ignored) { allProductsAdj = List.of(); }
+        try { allProductsAdj = new ProductService().getAllProducts(); }
+        catch (Exception ignored) { allProductsAdj = List.of(); }
 
         VBox vProduct = SearchableComboBox.wrap(cbProduct, allProductsAdj,
                 p -> p.getProductId() + ". " + p.getName());
 
+        attachReorderListener(cbProduct, spnReorder);
+
         Label lblErr = new Label();
         lblErr.setStyle("-fx-text-fill:#c62828;-fx-font-size:12px;"); lblErr.setWrapText(true);
-
-        GridPane grid = buildGrid();
-        int row = 0;
-        grid.add(sec("-- Stock Adjustment"),          0, row, 2, 1); row++;
-        grid.add(fl("Product *"),          0, row); grid.add(vProduct,  1, row++);
-        grid.add(fl("Change Qty *"),       0, row); grid.add(tfQty,     1, row++);
-        grid.add(new Label(""),            0, row); grid.add(hint("Use negative to reduce, positive to increase. Cannot be 0."), 1, row++);
-        grid.add(fl("Reason *"),           0, row); grid.add(tfNote,    1, row++);
-        grid.add(new Label(""),            0, row); grid.add(hint("Required for audit trail."), 1, row++);
-        grid.add(new Separator(),                     0, row, 2, 1); row++;
-        grid.add(lblErr,                              0, row, 2, 1); row++;
 
         Button btnSave   = new Button("Apply Adjustment");
         btnSave.setStyle("-fx-background-color:#e65100;-fx-text-fill:white;-fx-background-radius:6;" +
                          "-fx-padding:8 18;-fx-font-weight:bold;");
         Button btnCancel = new Button("Cancel");
         btnCancel.setStyle("-fx-background-radius:6;-fx-padding:8 18;");
-        HBox btns = new HBox(10, btnCancel, btnSave); btns.setAlignment(Pos.CENTER_RIGHT);
-        grid.add(btns, 0, row, 2, 1);
+        HBox btns = buildButtonBar(btnCancel, btnSave);
+
+        GridPane grid = buildGrid();
+        int row = 0;
+        grid.add(sec("-- Stock Adjustment"),  0, row, 2, 1); row++;
+        grid.add(fl("Product *"),             0, row); grid.add(vProduct,   1, row++);
+        grid.add(fl("Change Qty *"),          0, row); grid.add(tfQty,      1, row++);
+        grid.add(new Label(""),               0, row); grid.add(hint("Use negative to reduce, positive to increase. Cannot be 0."), 1, row++);
+        grid.add(fl("Reason *"),              0, row); grid.add(tfNote,     1, row++);
+        grid.add(new Label(""),               0, row); grid.add(hint("Required for audit trail."), 1, row++);
+        grid.add(new Separator(),             0, row, 2, 1); row++;
+        grid.add(sec("-- Reorder Settings"),  0, row, 2, 1); row++;
+        grid.add(fl("Reorder Point"),         0, row); grid.add(spnReorder, 1, row++);
+        grid.add(new Label(""),               0, row); grid.add(hint("Auto-loaded from current setting. Update if needed."), 1, row++);
+        grid.add(new Separator(),             0, row, 2, 1); row++;
+        grid.add(lblErr,                      0, row, 2, 1); row++;
+        grid.add(btns,                        0, row, 2, 1);
 
         btnSave.setOnAction(ev -> {
             lblErr.setText("");
@@ -391,6 +417,8 @@ public class StockController {
                 if (qty == 0) throw new NumberFormatException();
                 service.adjustStock(cbProduct.getValue().getProductId(),
                         qty, tfNote.getText().trim(), actorId);
+                if (!spnReorder.isDisable())
+                    service.updateReorderLevel(cbProduct.getValue().getProductId(), spnReorder.getValue());
                 setStatus("Stock Adjusted: " + (qty >= 0 ? "+" : "") + qty
                          + " x " + cbProduct.getValue().getName(), false);
                 loadStock(); loadLog(); dlg.close();
@@ -400,32 +428,39 @@ public class StockController {
         });
         btnCancel.setOnAction(ev -> dlg.close());
 
-        dlg.setScene(new Scene(grid, 480, 340));
+        dlg.setScene(new Scene(grid, 480, 500));
         dlg.setResizable(false); dlg.showAndWait();
     }
 
-
     // ── UI helpers ─────────────────────────────────────────────────────────
     private GridPane buildGrid() {
-        GridPane g = new GridPane(); g.setHgap(12); g.setVgap(10); g.setPadding(new Insets(24));
-        g.getColumnConstraints().addAll(new ColumnConstraints(145), new ColumnConstraints(290));
+        GridPane g = new GridPane();
+        g.setHgap(12); g.setVgap(10);
+        // padding đều 4 phía: top=24, right=24, bottom=16, left=24
+        g.setPadding(new Insets(24, 24, 16, 24));
+        ColumnConstraints c1 = new ColumnConstraints(145);
+        ColumnConstraints c2 = new ColumnConstraints(290);
+        c2.setHgrow(Priority.ALWAYS);
+        g.getColumnConstraints().addAll(c1, c2);
         return g;
     }
 
     private Label fl(String t)   { Label l = new Label(t); l.setStyle("-fx-font-weight:bold;-fx-font-size:12px;"); return l; }
     private Label sec(String t)  { Label l = new Label(t); l.setStyle("-fx-font-weight:bold;-fx-font-size:11px;-fx-text-fill:#3949ab;"); return l; }
     private Label hint(String t) { Label l = new Label(t); l.setStyle("-fx-font-size:10px;-fx-text-fill:#888;"); return l; }
+
     private void setStatus(String msg, boolean isError) {
         if (lblStatus == null) return;
         lblStatus.setText(msg);
         lblStatus.setStyle(isError ? "-fx-text-fill:#c62828;-fx-font-size:12px;"
-                                   : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
+                : (msg.startsWith("✔") || msg.contains("added") || msg.contains("updated")
                 || msg.contains("deleted") || msg.contains("created") || msg.contains("saved")
                 || msg.contains("recorded") || msg.contains("Adjusted") || msg.contains("linked")
                 || msg.contains("success") || msg.contains("Ticket") && msg.contains("→")
                 ? "-fx-text-fill:#1e7e4a;-fx-font-weight:bold;-fx-font-size:12px;"
                 : "-fx-text-fill:#37474f;-fx-font-size:12px;"));
     }
+
     private void alert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }
